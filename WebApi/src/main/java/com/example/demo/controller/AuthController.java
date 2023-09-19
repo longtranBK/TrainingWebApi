@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dto.LoginDto;
+import com.example.demo.service.OTPService;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -22,8 +23,8 @@ public class AuthController {
 	@Autowired
 	private AuthenticationManager authenticationManager;
 
-//	@Autowired
-//	private OTPService otpService;
+	@Autowired
+	private OTPService otpService;
 //	
 //	@Autowired
 //	private UserRepository userRepository;
@@ -31,16 +32,17 @@ public class AuthController {
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 
-	@PostMapping(value = { "/login", "/signin" })
+	@PostMapping(value = { "/signin" })
 	public ResponseEntity<String> authenticateUser(@RequestBody LoginDto loginDto) {
 		try {
 			Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
 					loginDto.getUsername(), loginDto.getPassword()));
 			SecurityContextHolder.getContext().setAuthentication(authentication);
-			return new ResponseEntity<>("User signed-in successfully!.", HttpStatus.OK);
+			String otp = otpService.generateOTP(authentication.getName()) + "";
+			return new ResponseEntity<>("OTP is: " + otp, HttpStatus.OK);
 		} catch (Exception ex) {
 			System.out.print(ex.getMessage());
-			return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(ex.getMessage(), HttpStatus.OK);
 		}
 	}
 
