@@ -15,6 +15,9 @@ public class OTPService {
 	private static final Integer EXPIRE_MINS = 5;
 	private LoadingCache<String, Integer> otpCache;
 	
+	/**
+	 * 
+	 */
 	public OTPService() {
 		otpCache = CacheBuilder.newBuilder().expireAfterWrite(EXPIRE_MINS, TimeUnit.MINUTES).build(new CacheLoader<String, Integer>(){
 			public Integer load(String key) {
@@ -24,6 +27,11 @@ public class OTPService {
 		
 	}
 	
+	/**
+	 * 
+	 * @param key
+	 * @return
+	 */
 	public int generateOTP(String key) {
 		Random random = new Random();
 		int otp = 100000 + random.nextInt(100000);
@@ -31,6 +39,11 @@ public class OTPService {
 		return otp;
 	}
 	
+	/**
+	 * 
+	 * @param key
+	 * @return
+	 */
 	public int getOtp(String key) {
 		try {
 			return otpCache.get(key);
@@ -39,6 +52,10 @@ public class OTPService {
 		}
 	}
 	
+	/**
+	 * 
+	 * @param key
+	 */
 	public void clearOTP(String key) {
 		otpCache.invalidate(key);
 	}

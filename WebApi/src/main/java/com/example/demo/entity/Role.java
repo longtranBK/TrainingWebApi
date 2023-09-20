@@ -11,10 +11,13 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "role")
+@Table(name = "roles")
 public class Role {
 	
 	@Id
 	@Column(name = "id", nullable = false)
 	private String id;
+	
+	@Column(name = "role_name", nullable = false)
+	private String roleName;
 }

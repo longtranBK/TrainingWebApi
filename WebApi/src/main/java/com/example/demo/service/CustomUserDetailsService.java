@@ -1,8 +1,9 @@
 package com.example.demo.service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -26,13 +27,12 @@ public class CustomUserDetailsService implements UserDetailsService{
 		User user = userRepository.findByUsername(username).orElseThrow(() 
 				-> new UsernameNotFoundException("User not found with username: "+ username));
 		
-		List<SimpleGrantedAuthority> authorities = new ArrayList<>();
-		authorities.add(new SimpleGrantedAuthority(user.getRole()));
+		 Set<GrantedAuthority> authorities = user.getRoles()
+	                .stream()
+	                .map((role) -> new SimpleGrantedAuthority(role.getRoleName())).collect(Collectors.toSet());
 		
         return new org.springframework.security.core.userdetails.User(user.getUsername(),
                 user.getPassword(),
                 authorities);
 	}
-
-
 }
