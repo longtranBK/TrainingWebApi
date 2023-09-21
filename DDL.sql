@@ -4,7 +4,7 @@ CREATE TABLE `users` (
   `avatar_url` varchar(256),
   `username` varchar(100),
   `password` varchar(100),
-  `reset_pasword_token` varchar(30),
+  `reset_password_token` varchar(30),
   `create_ts` timestamp,
   `update_ts` timestamp
 );
