@@ -3,6 +3,9 @@ package com.example.demo.dto;
 import lombok.Data;
 
 @Data
-public class OtpDto {
+public class ValidateOtpRequestDto {
+	
+	private String username;
+	
 	private int otp;
 }

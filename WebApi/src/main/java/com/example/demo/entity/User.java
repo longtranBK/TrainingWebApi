@@ -1,6 +1,7 @@
 package com.example.demo.entity;
 
 import java.util.Set;
+import java.util.HashSet;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -37,6 +38,9 @@ public class User {
 	@Column(name = "password", nullable = false)
 	private String password;
 	
+	@Column(name = "email")
+	private String email;
+	
 	@Column(name = "reset_password_token")
 	private String resetPasswordToken;
 	
@@ -44,6 +48,9 @@ public class User {
 	@JoinTable(name = "user_roles", 
 		joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
 		inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
-	Set<Role> roles;
+	Set<Role> roles = new HashSet<Role>();
 	
+    public void addRole(Role role) {
+        this.roles.add(role);
+    }
 }	

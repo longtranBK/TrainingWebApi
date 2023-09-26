@@ -1,0 +1,6 @@
+.gradle/
+.settings/
+*.class
+*.bat
+*.classpath
+*.project
