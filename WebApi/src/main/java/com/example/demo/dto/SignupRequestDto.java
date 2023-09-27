@@ -2,6 +2,7 @@ package com.example.demo.dto;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
 import org.springframework.validation.annotation.Validated;
@@ -22,6 +23,9 @@ public class SignupRequestDto {
 	
 	@NotBlank(message = "The password is required.")
 	private String password;
+	
+	@NotNull(message = "The sex is required.")
+	private int sex;
 	
 	@Email
 	@NotBlank(message = "The email is required.")

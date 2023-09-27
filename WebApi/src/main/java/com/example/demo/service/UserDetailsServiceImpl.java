@@ -15,22 +15,23 @@ import com.example.demo.entity.User;
 import com.example.demo.repository.UserRepository;
 
 @Service
-public class UserDetailsServiceImpl implements UserDetailsService{
-	
+public class UserDetailsServiceImpl implements UserDetailsService {
+
 	@Autowired
 	private UserRepository userRepository;
-	
+
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		User user = userRepository.findByUsername(username).orElseThrow(() 
-				-> new UsernameNotFoundException("User not found with username: "+ username));
-		
-		 Set<GrantedAuthority> authorities = user.getRoles()
-	                .stream()
-	                .map((role) -> new SimpleGrantedAuthority(role.getRoleName())).collect(Collectors.toSet());
-		
-        return new org.springframework.security.core.userdetails.User(user.getUsername(),
-                user.getPassword(),
-                authorities);
+		User user = userRepository.findByUsername(username);
+
+		if (user == null) {
+			throw new UsernameNotFoundException("User not found with username: " + username);
+		}
+
+		Set<GrantedAuthority> authorities = user.getRoles().stream()
+				.map((role) -> new SimpleGrantedAuthority(role.getRoleName())).collect(Collectors.toSet());
+
+		return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(),
+				authorities);
 	}
 }

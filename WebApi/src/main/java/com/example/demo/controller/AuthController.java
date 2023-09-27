@@ -1,16 +1,19 @@
 package com.example.demo.controller;
 
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 
 import java.util.Date;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -25,12 +28,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.demo.dto.SigninRequestDto;
-import com.example.demo.dto.SigninResponseDto;
-import com.example.demo.dto.SignupRequestDto;
-import com.example.demo.dto.SignupResponseDto;
-import com.example.demo.dto.ValidateOtpRequestDto;
-import com.example.demo.dto.ValidateOtpResponseDto;
+import com.example.demo.dto.*;
 import com.example.demo.entity.Role;
 import com.example.demo.entity.User;
 import com.example.demo.entity.UserInfor;
@@ -66,7 +64,7 @@ public class AuthController {
     private UserInforRepository userInforRepository;
 
 	@PostMapping(value = { "/signin" })
-	public ResponseEntity<SigninResponseDto> authenticateUser(@RequestBody SigninRequestDto signinRequestDto) {
+	public ResponseEntity<SigninResponseDto> authenticateUser(@Valid @RequestBody SigninRequestDto signinRequestDto) {
 		try {
 			SigninResponseDto response = new SigninResponseDto();
 			Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
@@ -87,7 +85,7 @@ public class AuthController {
 	}
 
 	@PostMapping(value = { "/validateOtp" })
-	public ResponseEntity<ValidateOtpResponseDto> validateOtp(
+	public ResponseEntity<ValidateOtpResponseDto> validateOtp(@Valid
 			@RequestBody ValidateOtpRequestDto validateOtpRequestDto) {
 
 		String username = validateOtpRequestDto.getUsername();
@@ -100,8 +98,11 @@ public class AuthController {
 				if (requestOtp == serverOtp) {
 					otpService.clearOTP(username);
 				}
-				User user = userRepository.findByUsername(username)
-						.orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
+				User user = userRepository.findByUsername(username);
+				
+				if (user == null) {
+					throw new UsernameNotFoundException("User not found with username: " + username);
+				}
 				
 				List<SimpleGrantedAuthority> authorities = user.getRoles().stream()
 						.map((role) -> new SimpleGrantedAuthority(role.getRoleName())).collect(Collectors.toList());
@@ -156,6 +157,7 @@ public class AuthController {
 		UserInfor userInfor = new UserInfor();
 		userInfor.setId(uuid.toString());
 		userInfor.setIsActive(1);
+		userInfor.setSex(signupRequestDto.getSex());
 		SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
 		Date parsed = format.parse(signupRequestDto.getDateOfBirth());
 		userInfor.setDateOfBirth(new java.sql.Date(parsed.getTime()));
@@ -165,4 +167,47 @@ public class AuthController {
 		return ResponseEntity.ok().body(signupResponseDto);
 		
 	}
+	
+	@PostMapping(value = { "/forgotPassword" })
+	@Transactional(rollbackOn = {Exception.class, Throwable.class})
+	public ResponseEntity<ForgotPasswordResponseDto> forgotPassword(@Valid @RequestBody ForgotPasswordRequestDto forgotPasswordRequestDto, 
+			HttpServletRequest request) {
+		ForgotPasswordResponseDto forgotPasswordResponseDto = new ForgotPasswordResponseDto();
+		User user = userRepository.findByUsernameAndEmail(forgotPasswordRequestDto.getUsername(), forgotPasswordRequestDto.getEmail());
+		if(user == null) {
+			forgotPasswordResponseDto.setMsg("Username or email is valid!");
+			return ResponseEntity.ok().body(forgotPasswordResponseDto);
+		}
+		
+		String resetTokenPassword = RandomStringUtils.randomAlphabetic(30);
+		user.setResetPasswordToken(resetTokenPassword);
+		userRepository.save(user);
+		
+		String resetPasswordLink = request.getRequestURL().toString() + "/reset_password?token=" + resetTokenPassword;
+		forgotPasswordResponseDto.setLinkResetPassword(resetPasswordLink);
+		forgotPasswordResponseDto.setMsg("We have sent a reset password link to your email. Please check.");
+		
+		return ResponseEntity.ok().body(forgotPasswordResponseDto);
+	}
+	
+	@PostMapping(value = { "/processResetPassword" })
+	@Transactional(rollbackOn = {Exception.class, Throwable.class})
+	public ResponseEntity<ProcessResetPasswordResponseDto> processResetPassword(@Valid @RequestBody ProcessResetPasswordRequestDto 
+			processResetPasswordRequestDto) {
+		ProcessResetPasswordResponseDto processResetPasswordResponseDto = new ProcessResetPasswordResponseDto();
+		User user = userRepository.findByUsernameAndEmailAndResetPasswordToken(
+				processResetPasswordRequestDto.getUsername(), processResetPasswordRequestDto.getEmail(), 
+				processResetPasswordRequestDto.getResetPasswordToken());
+		if(user == null) {
+			processResetPasswordResponseDto.setMsg("Username or email or token is valid!");
+			return ResponseEntity.ok().body(processResetPasswordResponseDto);
+		}
+		
+		user.setResetPasswordToken(null);
+		user.setPassword(passwordEncoder.encode(processResetPasswordRequestDto.getNewPassword()));
+		userRepository.save(user);
+		processResetPasswordResponseDto.setMsg("Password update succcessful!");
+		return ResponseEntity.ok().body(processResetPasswordResponseDto);
+	}
+	
 }

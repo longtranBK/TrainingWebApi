@@ -39,4 +39,7 @@ public class UserInfor {
 	@Column(name = "date_of_birth", nullable = false)
 	private Date dateOfBirth;
 	
+	@Column(name = "sex", nullable = false)
+	private int sex;
+	
 }
