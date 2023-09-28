@@ -2,18 +2,12 @@ package com.example.demo.security.jwt;
 
 import java.security.Key;
 import java.util.Date;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-
-import com.example.demo.repository.UserRepository;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -24,9 +18,6 @@ import io.jsonwebtoken.security.Keys;
 public class JwtUtils {
 	private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
 	
-    @Autowired
-    private UserRepository userRepository;
-
 	@Value("${bezkoder.app.jwtSecret}")
 	private String jwtSecret;
 
@@ -36,8 +27,6 @@ public class JwtUtils {
     @Value("${jwt.expiration}")
     private long tokenValidityInSeconds;
     
-    private static final String AUTHORITIES_KEY = "auth";
-	
 	public String generateJwtToken(Authentication authentication) {
 		return Jwts.builder().setSubject(authentication.getName()).setIssuedAt(new Date())
 				.setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))

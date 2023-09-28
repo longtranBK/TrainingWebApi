@@ -1,6 +1,8 @@
 package com.example.demo.entity;
 
 import java.util.Set;
+import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.HashSet;
 
 import javax.persistence.CascadeType;
@@ -53,4 +55,8 @@ public class User {
     public void addRole(Role role) {
         this.roles.add(role);
     }
+    
+	@Column(name = "update_ts")
+    private Timestamp updateTs;
+    
 }	

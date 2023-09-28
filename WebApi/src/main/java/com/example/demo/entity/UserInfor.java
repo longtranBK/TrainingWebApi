@@ -42,4 +42,7 @@ public class UserInfor {
 	@Column(name = "sex", nullable = false)
 	private int sex;
 	
+	@Column(name = "update_ts")
+    private Timestamp updateTs;
+	
 }
