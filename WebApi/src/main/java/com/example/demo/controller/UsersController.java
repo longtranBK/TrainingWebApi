@@ -3,12 +3,8 @@ package com.example.demo.controller;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
@@ -23,12 +19,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.demo.dto.SignupRequestDto;
-import com.example.demo.dto.SignupResponseDto;
-import com.example.demo.dto.UpdateUserInforRequestDto;
-import com.example.demo.dto.UpdateUserInforResponseDto;
+import com.example.demo.dto.GetUserTimelineResDto;
+import com.example.demo.dto.UpdateUserInforReqDto;
+import com.example.demo.dto.UpdateUserInforResDto;
 import com.example.demo.dto.UserInforInterface;
-import com.example.demo.entity.Role;
 import com.example.demo.entity.User;
 import com.example.demo.entity.UserInfor;
 import com.example.demo.repository.UserInforRepository;
@@ -62,36 +56,49 @@ public class UsersController {
 	
 	@PostMapping(value = { "/updateUserInfor" })
 	@Transactional(rollbackOn = {Exception.class, Throwable.class})
-	public ResponseEntity<UpdateUserInforResponseDto> updateUserInfor(@Valid @RequestBody UpdateUserInforRequestDto updateUserInforRequestDto) throws ParseException {
-		UpdateUserInforResponseDto updateUserInforResponseDto = new UpdateUserInforResponseDto();
+	public ResponseEntity<UpdateUserInforResDto> updateUserInfor(@Valid @RequestBody UpdateUserInforReqDto request) throws ParseException {
+		UpdateUserInforResDto response = new UpdateUserInforResDto();
 		Timestamp upadteTs = new java.sql.Timestamp(System.currentTimeMillis());
 		
-		User user = usersRepository.findUserById(updateUserInforRequestDto.getId());
+		User user = usersRepository.findUserById(request.getId());
 
 		if(user == null) {
 			throw new UsernameNotFoundException("User not found!");
 		}
 
-		user.setFullName(updateUserInforRequestDto.getFullName());
-		user.setAvatarUrl(updateUserInforRequestDto.getAvatarUrl());
+		user.setFullName(request.getFullName());
+		user.setAvatarUrl(request.getAvatarUrl());
 		user.setUpdateTs(upadteTs);
 		usersRepository.save(user);
 		
-		UserInfor userInfor = usersInforRepository.findUserInforById(updateUserInforRequestDto.getId());
-		userInfor.setSex(updateUserInforRequestDto.getSex());
-		userInfor.setStudyAt(updateUserInforRequestDto.getStudyAt());
-		userInfor.setWorkingAt(updateUserInforRequestDto.getWorkingAt());
-		userInfor.setFavorites(updateUserInforRequestDto.getFavorites());
-		userInfor.setOtherInfor(updateUserInforRequestDto.getOtherInfor());
+		UserInfor userInfor = usersInforRepository.findUserInforById(request.getId());
+		userInfor.setSex(request.getSex());
+		userInfor.setStudyAt(request.getStudyAt());
+		userInfor.setWorkingAt(request.getWorkingAt());
+		userInfor.setFavorites(request.getFavorites());
+		userInfor.setOtherInfor(request.getOtherInfor());
 		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-		Date parsed = format.parse(updateUserInforRequestDto.getDateOfBirth());
+		Date parsed = format.parse(request.getDateOfBirth());
 		userInfor.setDateOfBirth(new java.sql.Date(parsed.getTime()));
 		userInfor.setUpdateTs(upadteTs);
 		
 		usersInforRepository.save(userInfor);
-		updateUserInforResponseDto.setMsg("User infor updated!");
-		return ResponseEntity.ok().body(updateUserInforResponseDto);
+		response.setMsg("User infor updated!");
+		return ResponseEntity.ok().body(response);
 		
+	}
+	
+	@GetMapping(value = "getUserTimeline")
+	public ResponseEntity<GetUserTimelineResDto> getUserTimeline(@RequestParam("id") String id) {
+		User user = usersRepository.findUserById(id);
+		if (user == null) {
+			throw new UsernameNotFoundException("User not found!");
+		}
+		GetUserTimelineResDto response = new GetUserTimelineResDto();
+		response.setFullName(user.getFullName());
+		response.setAvatarUrl(user.getAvatarUrl());
+		
+		return ResponseEntity.ok().body(response);
 	}
 	
 }

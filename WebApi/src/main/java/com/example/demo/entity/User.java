@@ -1,9 +1,8 @@
 package com.example.demo.entity;
 
-import java.util.Set;
-import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -26,7 +25,7 @@ public class User {
 	
 	@Id
 	@Column(name = "id", nullable = false)
-	private String id;
+	private String userId;
 	
 	@Column(name = "full_name", nullable = false)
 	private String fullName;

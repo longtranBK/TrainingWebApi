@@ -19,7 +19,7 @@ public class UserInfor {
 	
 	@Id
 	@Column(name = "id", nullable = false)
-	private String id;
+	private String userId;
 	
 	@Column(name = "is_active", nullable = false)
 	private int isActive;

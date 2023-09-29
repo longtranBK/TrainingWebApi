@@ -8,7 +8,7 @@ import com.example.demo.constant.Constants.ValidatePattern;
 import lombok.Data;
 
 @Data
-public class UpdateUserInforRequestDto {
+public class UpdateUserInforReqDto {
 
 	@NotBlank(message = "The user id is required.")
 	private String id;

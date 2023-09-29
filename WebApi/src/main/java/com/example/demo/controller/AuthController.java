@@ -64,11 +64,11 @@ public class AuthController {
     private UserInforRepository userInforRepository;
 
 	@PostMapping(value = { "/signin" })
-	public ResponseEntity<SigninResponseDto> authenticateUser(@Valid @RequestBody SigninRequestDto signinRequestDto) {
+	public ResponseEntity<SigninResDto> authenticateUser(@Valid @RequestBody SigninReqDto request) {
 		try {
-			SigninResponseDto response = new SigninResponseDto();
+			SigninResDto response = new SigninResDto();
 			Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-					signinRequestDto.getUsername(), signinRequestDto.getPassword()));
+					request.getUsername(), request.getPassword()));
 			if (!userRepository.getActive(authentication.getName())) {
 				response.setMsg("User is not active!");
 				return ResponseEntity.ok().body(response);
@@ -78,19 +78,19 @@ public class AuthController {
 			response.setMsg("Otp is created!");
 			return ResponseEntity.ok().body(response);
 		} catch (Exception ex) {
-			SigninResponseDto response = new SigninResponseDto();
+			SigninResDto response = new SigninResDto();
 			response.setMsg("Username or password is incorrect!");
 			return ResponseEntity.ok().body(response);
 		}
 	}
 
 	@PostMapping(value = { "/validateOtp" })
-	public ResponseEntity<ValidateOtpResponseDto> validateOtp(@Valid
-			@RequestBody ValidateOtpRequestDto validateOtpRequestDto) {
+	public ResponseEntity<ValidateOtpResDto> validateOtp(@Valid
+			@RequestBody ValidateOtpReqDto request) {
 
-		String username = validateOtpRequestDto.getUsername();
-		int requestOtp = validateOtpRequestDto.getOtp();
-		ValidateOtpResponseDto response = new ValidateOtpResponseDto();
+		String username = request.getUsername();
+		int requestOtp = request.getOtp();
+		ValidateOtpResDto response = new ValidateOtpResDto();
 		
 		if (requestOtp >= 0) {
 			int serverOtp = otpService.getOtp(username);
@@ -129,54 +129,55 @@ public class AuthController {
 	
 	@PostMapping(value = { "/signup" })
 	@Transactional(rollbackOn = {Exception.class, Throwable.class})
-	public ResponseEntity<SignupResponseDto> signup(@Valid @RequestBody SignupRequestDto signupRequestDto) throws ParseException {
-		SignupResponseDto signupResponseDto = new SignupResponseDto();
+	public ResponseEntity<SignupResDto> signup(@Valid @RequestBody SignupReqDto request) throws ParseException {
+		SignupResDto response = new SignupResDto();
 		
-		if(userRepository.existsByUsername(signupRequestDto.getUsername())) {
-			signupResponseDto.setMsg("Username is already taken!");
-			return ResponseEntity.ok().body(signupResponseDto);
+		if(userRepository.existsByUsername(request.getUsername())) {
+			response.setMsg("Username is already taken!");
+			return ResponseEntity.ok().body(response);
 		}
 		
-		if(userRepository.existsByEmail(signupRequestDto.getEmail())) {
-			signupResponseDto.setMsg("Email is already taken!");
-			return ResponseEntity.ok().body(signupResponseDto);
+		if(userRepository.existsByEmail(request.getEmail())) {
+			response.setMsg("Email is already taken!");
+			return ResponseEntity.ok().body(response);
 		}
 		
+		String uuid = UUID.randomUUID().toString();  
 		User user = new User();
-		UUID uuid = UUID.randomUUID();  
-		user.setId(uuid.toString());
-		user.setFullName(signupRequestDto.getFullName());
-		user.setAvatarUrl(signupRequestDto.getAvatarUrl());
-		user.setUsername(signupRequestDto.getUsername());
-		user.setPassword(passwordEncoder.encode(signupRequestDto.getPassword()));
+
+		user.setUserId(uuid);
+		user.setFullName(request.getFullName());
+		user.setAvatarUrl(request.getAvatarUrl());
+		user.setUsername(request.getUsername());
+		user.setPassword(passwordEncoder.encode(request.getPassword()));
 		
 		Role role = roleRepository.findByRoleName("user").get();
         user.addRole(role);
 		userRepository.save(user);
 		
 		UserInfor userInfor = new UserInfor();
-		userInfor.setId(uuid.toString());
+		userInfor.setUserId(uuid);
 		userInfor.setIsActive(1);
-		userInfor.setSex(signupRequestDto.getSex());
+		userInfor.setSex(request.getSex());
 		SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
-		Date parsed = format.parse(signupRequestDto.getDateOfBirth());
+		Date parsed = format.parse(request.getDateOfBirth());
 		userInfor.setDateOfBirth(new java.sql.Date(parsed.getTime()));
 		
 		userInforRepository.save(userInfor);
-		signupResponseDto.setMsg("Registration successful");
-		return ResponseEntity.ok().body(signupResponseDto);
+		response.setMsg("Registration successful");
+		return ResponseEntity.ok().body(response);
 		
 	}
 	
 	@PostMapping(value = { "/forgotPassword" })
 	@Transactional(rollbackOn = {Exception.class, Throwable.class})
-	public ResponseEntity<ForgotPasswordResponseDto> forgotPassword(@Valid @RequestBody ForgotPasswordRequestDto forgotPasswordRequestDto, 
+	public ResponseEntity<ForgotPasswordResDto> forgotPassword(@Valid @RequestBody ForgotPasswordReqDto forgotPasswordRequestDto, 
 			HttpServletRequest request) {
-		ForgotPasswordResponseDto forgotPasswordResponseDto = new ForgotPasswordResponseDto();
+		ForgotPasswordResDto response = new ForgotPasswordResDto();
 		User user = userRepository.findByUsernameAndEmail(forgotPasswordRequestDto.getUsername(), forgotPasswordRequestDto.getEmail());
 		if(user == null) {
-			forgotPasswordResponseDto.setMsg("Username or email is valid!");
-			return ResponseEntity.ok().body(forgotPasswordResponseDto);
+			response.setMsg("Username or email is valid!");
+			return ResponseEntity.ok().body(response);
 		}
 		
 		String resetTokenPassword = RandomStringUtils.randomAlphabetic(30);
@@ -184,30 +185,30 @@ public class AuthController {
 		userRepository.save(user);
 		
 		String resetPasswordLink = request.getRequestURL().toString() + "/reset_password?token=" + resetTokenPassword;
-		forgotPasswordResponseDto.setLinkResetPassword(resetPasswordLink);
-		forgotPasswordResponseDto.setMsg("We have sent a reset password link to your email. Please check.");
+		response.setLinkResetPassword(resetPasswordLink);
+		response.setMsg("We have sent a reset password link to your email. Please check.");
 		
-		return ResponseEntity.ok().body(forgotPasswordResponseDto);
+		return ResponseEntity.ok().body(response);
 	}
 	
 	@PostMapping(value = { "/processResetPassword" })
 	@Transactional(rollbackOn = {Exception.class, Throwable.class})
-	public ResponseEntity<ProcessResetPasswordResponseDto> processResetPassword(@Valid @RequestBody ProcessResetPasswordRequestDto 
-			processResetPasswordRequestDto) {
-		ProcessResetPasswordResponseDto processResetPasswordResponseDto = new ProcessResetPasswordResponseDto();
+	public ResponseEntity<ProcessResetPasswordResDto> processResetPassword(@Valid @RequestBody ProcessResetPasswordReqDto 
+			request) {
+		ProcessResetPasswordResDto response = new ProcessResetPasswordResDto();
 		User user = userRepository.findByUsernameAndEmailAndResetPasswordToken(
-				processResetPasswordRequestDto.getUsername(), processResetPasswordRequestDto.getEmail(), 
-				processResetPasswordRequestDto.getResetPasswordToken());
+				request.getUsername(), request.getEmail(), 
+				request.getResetPasswordToken());
 		if(user == null) {
-			processResetPasswordResponseDto.setMsg("Username or email or token is valid!");
-			return ResponseEntity.ok().body(processResetPasswordResponseDto);
+			response.setMsg("Username or email or token is valid!");
+			return ResponseEntity.ok().body(response);
 		}
 		
 		user.setResetPasswordToken(null);
-		user.setPassword(passwordEncoder.encode(processResetPasswordRequestDto.getNewPassword()));
+		user.setPassword(passwordEncoder.encode(request.getNewPassword()));
 		userRepository.save(user);
-		processResetPasswordResponseDto.setMsg("Password update succcessful!");
-		return ResponseEntity.ok().body(processResetPasswordResponseDto);
+		response.setMsg("Password update succcessful!");
+		return ResponseEntity.ok().body(response);
 	}
 	
 }

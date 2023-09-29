@@ -3,7 +3,7 @@ package com.example.demo.dto;
 import lombok.Data;
 
 @Data
-public class ValidateOtpResponseDto {
+public class InsertPostResDto {
 
-	private String token;
+	private String msg;
 }

@@ -13,7 +13,7 @@ import lombok.Data;
 
 @Data
 @Validated
-public class SignupRequestDto {
+public class SignupReqDto {
 	
 	@NotBlank(message = "The fullName is required.")
 	private String fullName;

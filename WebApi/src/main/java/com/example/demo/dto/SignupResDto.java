@@ -3,8 +3,7 @@ package com.example.demo.dto;
 import lombok.Data;
 
 @Data
-public class SigninResponseDto {
-	private int otp;
+public class SignupResDto {
 	
 	private String msg;
 }

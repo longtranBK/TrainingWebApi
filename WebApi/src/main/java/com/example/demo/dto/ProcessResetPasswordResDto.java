@@ -3,9 +3,7 @@ package com.example.demo.dto;
 import lombok.Data;
 
 @Data
-public class ForgotPasswordResponseDto {
+public class ProcessResetPasswordResDto {
 
 	private String msg;
-	
-	private String linkResetPassword;
 }
