@@ -17,7 +17,7 @@ public class InsertPostReqDto {
 	private String content;
 	
 	@NotNull(message = "The status is required.")
-	private String status;
+	private int status;
 	
 	private List<String> capturesUrl;
 }

@@ -29,7 +29,7 @@ import com.example.demo.repository.UserInforRepository;
 import com.example.demo.repository.UserRepository;
 
 @RestController
-@RequestMapping("api")
+@RequestMapping("api/user")
 public class UsersController {
 
 	@Autowired
@@ -89,8 +89,8 @@ public class UsersController {
 	}
 	
 	@GetMapping(value = "getUserTimeline")
-	public ResponseEntity<GetUserTimelineResDto> getUserTimeline(@RequestParam("id") String id) {
-		User user = usersRepository.findUserById(id);
+	public ResponseEntity<GetUserTimelineResDto> getUserTimeline(@RequestParam("userId") String userId) {
+		User user = usersRepository.findUserById(userId);
 		if (user == null) {
 			throw new UsernameNotFoundException("User not found!");
 		}

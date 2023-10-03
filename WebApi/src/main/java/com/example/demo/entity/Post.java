@@ -27,10 +27,10 @@ public class Post {
 	private String content;
 
 	@Column(name = "status", nullable = false)
-	private String status;
+	private int status;
 	
-	@Column(name = "password", nullable = false)
-	private String password;
+	@Column(name = "create_ts")
+    private Timestamp createTs;
 	
 	@Column(name = "update_ts")
     private Timestamp updateTs;
