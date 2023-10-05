@@ -27,20 +27,39 @@ public class JwtUtils {
     @Value("${jwt.expiration}")
     private long tokenValidityInSeconds;
     
+    /**
+     * 
+     * @param authentication
+     * @return
+     */
 	public String generateJwtToken(Authentication authentication) {
 		return Jwts.builder().setSubject(authentication.getName()).setIssuedAt(new Date())
 				.setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
 				.signWith(key(), SignatureAlgorithm.HS256).compact();
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	private Key key() {
 		return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
 	}
 
+	/**
+	 * 
+	 * @param token
+	 * @return
+	 */
 	public String getUserNameFromJwtToken(String token) {
 		return Jwts.parserBuilder().setSigningKey(key()).build().parseClaimsJws(token).getBody().getSubject();
 	}
 
+	/**
+	 * 
+	 * @param authToken
+	 * @return
+	 */
 	public boolean validateJwtToken(String authToken) {
 		try {
 			Jwts.parserBuilder().setSigningKey(key()).build().parse(authToken);

@@ -15,25 +15,22 @@ import lombok.Data;
 @Validated
 public class SignupReqDto {
 	
-	@NotBlank(message = "The fullName is required.")
+	@NotBlank(message = "FullName is required.")
 	private String fullName;
 	
 	private String avatarUrl;
 	
-	@NotBlank(message = "The username is required.")
+	@Email
+	@NotBlank(message = "Username is required.")
 	private String username;
 	
-	@NotBlank(message = "The password is required.")
+	@NotBlank(message = "Password is required.")
 	private String password;
 	
-	@NotNull(message = "The sex is required.")
+	@NotNull(message = "Sex is required.")
 	private int sex;
 	
-	@Email
-	@NotBlank(message = "The email is required.")
-	private String email;
-	
-	@NotBlank(message = "The dateOfBirth is required.")
-	@Pattern(regexp = ValidatePattern.DATE_PATTERN, message = "The dateOfBirth is invalid.")
+	@NotBlank(message = "Birthday is required.")
+	@Pattern(regexp = ValidatePattern.DATE_PATTERN, message = "Birthday is invalid.")
 	private String dateOfBirth;
 }

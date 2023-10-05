@@ -27,5 +27,5 @@ public interface UserInforRepository extends JpaRepository<UserInfor, String>{
 			+ "from users u inner join user_infor ui "
 			+ "on u.id = ui.id "
 			+ "where u.id = ?1", nativeQuery = true)
-	UserInforInterface getUserInfor(String id);
+	UserInforInterface getUserInfor(String userId);
 }

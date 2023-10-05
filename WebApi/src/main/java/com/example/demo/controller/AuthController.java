@@ -1,26 +1,19 @@
 package com.example.demo.controller;
 
-import java.sql.Timestamp;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 
-import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,21 +27,21 @@ import com.example.demo.dto.request.ValidateOtpReqDto;
 import com.example.demo.dto.response.ForgotPasswordResDto;
 import com.example.demo.dto.response.SigninResDto;
 import com.example.demo.dto.response.ValidateOtpResDto;
-import com.example.demo.entity.Role;
 import com.example.demo.entity.User;
-import com.example.demo.entity.UserInfor;
-import com.example.demo.repository.RoleRepository;
-import com.example.demo.repository.UserInforRepository;
-import com.example.demo.repository.UserRepository;
 import com.example.demo.security.jwt.JwtUtils;
+import com.example.demo.service.AuthService;
 import com.example.demo.service.OTPService;
+import com.example.demo.service.UserService;
 
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
 
 	@Autowired
-	private UserRepository userRepository;
+	private AuthService authService;
+
+	@Autowired
+	private UserService userService;
 
 	@Autowired
 	private AuthenticationManager authenticationManager;
@@ -57,23 +50,16 @@ public class AuthController {
 	private OTPService otpService;
 
 	@Autowired
-	JwtUtils jwtUtils;
-
-	private PasswordEncoder passwordEncoder;
-
-	@Autowired
-	private RoleRepository roleRepository;
-
-	@Autowired
-	private UserInforRepository userInforRepository;
+	private JwtUtils jwtUtils;
 
 	@PostMapping(value = { "/signin" })
 	public ResponseEntity<SigninResDto> authenticateUser(@Valid @RequestBody SigninReqDto request) {
+		SigninResDto response = new SigninResDto();
 		try {
-			SigninResDto response = new SigninResDto();
 			Authentication authentication = authenticationManager.authenticate(
 					new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
-			if (!userRepository.getActive(authentication.getName())) {
+
+			if (!authService.isActive(request.getUsername())) {
 				response.setMsg("User is not active!");
 				return ResponseEntity.ok().body(response);
 			}
@@ -82,7 +68,6 @@ public class AuthController {
 			response.setMsg("Otp is created!");
 			return ResponseEntity.ok().body(response);
 		} catch (Exception ex) {
-			SigninResDto response = new SigninResDto();
 			response.setMsg("Username or password is incorrect!");
 			return ResponseEntity.ok().body(response);
 		}
@@ -101,12 +86,7 @@ public class AuthController {
 				if (requestOtp == serverOtp) {
 					otpService.clearOTP(username);
 				}
-				User user = userRepository.findByUsername(username);
-
-				if (user == null) {
-					throw new UsernameNotFoundException("User not found with username: " + username);
-				}
-
+				User user = userService.getByUsername(username);
 				List<SimpleGrantedAuthority> authorities = user.getRoles().stream()
 						.map((role) -> new SimpleGrantedAuthority(role.getRoleName())).collect(Collectors.toList());
 
@@ -115,7 +95,6 @@ public class AuthController {
 
 				// Create jwt token
 				String jwtToken = jwtUtils.generateJwtToken(authentication);
-//				SecurityContextHolder.getContext().setAuthentication(authentication);
 
 				// Return token
 				response.setToken(jwtToken);
@@ -131,86 +110,45 @@ public class AuthController {
 	}
 
 	@PostMapping(value = { "/signup" })
-	@Transactional(rollbackOn = { Exception.class, Throwable.class })
 	public ResponseEntity<?> signup(@Valid @RequestBody SignupReqDto request) throws ParseException {
-		Timestamp upadteTs = new java.sql.Timestamp(System.currentTimeMillis());
-
-		if (userRepository.existsByUsername(request.getUsername())) {
+		if (userService.getByUsername(request.getUsername()) != null) {
 			return ResponseEntity.ok().body("Username is already taken!");
 		}
-
-		if (userRepository.existsByEmail(request.getEmail())) {
-			return ResponseEntity.ok().body("Email is already taken!");
-		}
-
-		String uuid = UUID.randomUUID().toString();
-		User user = new User();
-
-		user.setUserId(uuid);
-		user.setFullName(request.getFullName());
-		user.setAvatarUrl(request.getAvatarUrl());
-		user.setUsername(request.getUsername());
-		user.setPassword(passwordEncoder.encode(request.getPassword()));
-
-		Role role = roleRepository.findByRoleName("user").get();
-		user.addRole(role);
-
-		user.setCreateTs(upadteTs);
-		user.setUpdateTs(upadteTs);
-
-		userRepository.save(user);
-
-		UserInfor userInfor = new UserInfor();
-		userInfor.setUserId(uuid);
-		userInfor.setIsActive(1);
-		userInfor.setSex(request.getSex());
-		SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
-		Date parsed = format.parse(request.getDateOfBirth());
-		userInfor.setDateOfBirth(new java.sql.Date(parsed.getTime()));
-		userInfor.setCreateTs(upadteTs);
-		userInfor.setUpdateTs(upadteTs);
-
-		userInforRepository.save(userInfor);
+		userService.saveUser(request);
 		return ResponseEntity.ok().body("Registration successful");
 
 	}
 
 	@PostMapping(value = { "/forgot-password" })
 	@Transactional(rollbackOn = { Exception.class, Throwable.class })
-	public ResponseEntity<ForgotPasswordResDto> forgotPassword(
-			@Valid @RequestBody ForgotPasswordReqDto forgotPasswordRequestDto, HttpServletRequest request) {
+	public ResponseEntity<ForgotPasswordResDto> forgotPassword(@Valid @RequestBody ForgotPasswordReqDto requestDto,
+			HttpServletRequest request) {
 		ForgotPasswordResDto response = new ForgotPasswordResDto();
-		User user = userRepository.findByUsernameAndEmail(forgotPasswordRequestDto.getUsername(),
-				forgotPasswordRequestDto.getEmail());
+		User user = userService.getByUsername(requestDto.getUsername());
 		if (user == null) {
-			response.setMsg("Username or email is valid!");
+			response.setMsg("Username is valid!");
 			return ResponseEntity.ok().body(response);
 		}
+		String resetPasswordLink = request.getRequestURL().toString() + "/reset_password?token="
+				+ userService.createTokenResetPws(user);
 
-		String resetTokenPassword = RandomStringUtils.randomAlphabetic(30);
-		user.setResetPasswordToken(resetTokenPassword);
-		userRepository.save(user);
-
-		String resetPasswordLink = request.getRequestURL().toString() + "/reset_password?token=" + resetTokenPassword;
 		response.setLinkResetPassword(resetPasswordLink);
+
 		response.setMsg("We have sent a reset password link to your email. Please check.");
 
 		return ResponseEntity.ok().body(response);
 	}
 
 	@PostMapping(value = { "/reset-password" })
-	@Transactional(rollbackOn = { Exception.class, Throwable.class })
 	public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordReqDto request) {
-		User user = userRepository.findByUsernameAndEmailAndResetPasswordToken(request.getUsername(),
-				request.getEmail(), request.getResetPasswordToken());
+		User user = userService.getByUsernameAndResetTokenPws(request.getUsername(),
+				request.getResetPasswordToken());
 
 		if (user == null) {
-			return ResponseEntity.ok().body("Username or email or token is valid!");
+			return ResponseEntity.ok().body("Username or token is valid!");
 		}
 
-		user.setResetPasswordToken(null);
-		user.setPassword(passwordEncoder.encode(request.getNewPassword()));
-		userRepository.save(user);
+		userService.setNewPws(user, request.getNewPassword());
 		return ResponseEntity.ok().body("Password update succcessful!");
 	}
 

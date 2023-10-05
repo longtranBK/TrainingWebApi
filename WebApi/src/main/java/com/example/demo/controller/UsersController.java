@@ -28,73 +28,42 @@ import com.example.demo.entity.User;
 import com.example.demo.entity.UserInfor;
 import com.example.demo.repository.UserInforRepository;
 import com.example.demo.repository.UserRepository;
+import com.example.demo.service.UserService;
 
 @RestController
 @RequestMapping("api/users")
 public class UsersController {
 
 	@Autowired
-	private UserRepository usersRepository;
-
-	@Autowired
-	private UserInforRepository usersInforRepository;
-
-	@GetMapping("users")
-	public List<User> getAllUsers() {
-		return usersRepository.findAll();
-	}
-
+	private UserService userService;
+	
 	@GetMapping(value = "/user-details/{userId}")
 	public ResponseEntity<UserInforInterface> getUserDetails(@PathVariable(value = "userId") String userId) {
-		User user = usersRepository.findUserById(userId);
+		User user = userService.getByUserId(userId);
+		
 		if (user == null) {
-			throw new UsernameNotFoundException("User not found with username!");
+			throw new UsernameNotFoundException("User not found!");
 		}
-		UserInforInterface infor = usersInforRepository.getUserInfor(userId);
-
+		UserInforInterface infor = userService.getUserInfor(user.getUserId());
 		return ResponseEntity.ok().body(infor);
 	}
 
 	@PutMapping(value = { "/user-details/{userId}" })
-	@Transactional(rollbackOn = { Exception.class, Throwable.class })
 	public ResponseEntity<?> updateUserInfor(@PathVariable(value = "userId") String userId,
 			@Valid @RequestBody UpdateUserInforReqDto request) throws ParseException {
 		
-		Timestamp upadteTs = new java.sql.Timestamp(System.currentTimeMillis());
-
-		User user = usersRepository.findUserById(userId);
-
+		User user = userService.getByUserId(userId);
 		if (user == null) {
 			return ResponseEntity.notFound().build();
 		}
-
-		user.setFullName(request.getFullName());
-		user.setAvatarUrl(request.getAvatarUrl());
-		user.setUpdateTs(upadteTs);
-		usersRepository.save(user);
-
-		UserInfor userInfor = usersInforRepository.findUserInforById(userId);
-		userInfor.setSex(request.getSex());
-		userInfor.setStudyAt(request.getStudyAt());
-		userInfor.setWorkingAt(request.getWorkingAt());
-		userInfor.setFavorites(request.getFavorites());
-		userInfor.setOtherInfor(request.getOtherInfor());
-		if (request.getDateOfBirth() != null) {
-			SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-			Date parsed = format.parse(request.getDateOfBirth());
-			userInfor.setDateOfBirth(new java.sql.Date(parsed.getTime()));
-		}
-
-		userInfor.setUpdateTs(upadteTs);
-
-		usersInforRepository.save(userInfor);
+		userService.updateUserInfor(user, request);
 		return ResponseEntity.ok().body("User details updated!");
 
 	}
 
 	@GetMapping(value = "/timeline/{userId}")
 	public ResponseEntity<GetUserTimelineResDto> getUserTimeline(@PathVariable(value = "userId") String userId) {
-		User user = usersRepository.findUserById(userId);
+		User user = userService.getByUserId(userId);
 		if (user == null) {
 			throw new UsernameNotFoundException("User not found!");
 		}
@@ -109,7 +78,7 @@ public class UsersController {
 	public ResponseEntity<GetUserTimelineResDto> getCurrentUserTimeline() {
 		SecurityContext securityContext = SecurityContextHolder.getContext();
 		String username = securityContext.getAuthentication().getName();
-		User user = usersRepository.findByUsername(username);
+		User user = userService.getByUsername(username);
 
 		GetUserTimelineResDto response = new GetUserTimelineResDto();
 		response.setFullName(user.getFullName());
