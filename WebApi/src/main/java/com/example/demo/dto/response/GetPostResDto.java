@@ -1,4 +1,4 @@
-package com.example.demo.dto;
+package com.example.demo.dto.response;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;

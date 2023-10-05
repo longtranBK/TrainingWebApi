@@ -20,6 +20,9 @@ public class Comment {
 	@Column(name = "id", nullable = false)
 	private String commentId;
 	
+	@Column(name = "user_id", nullable = false)
+	private String userId;
+	
 	@Column(name = "post_id", nullable = false)
 	private String postId;
 	

@@ -1,11 +1,11 @@
-package com.example.demo.dto;
+package com.example.demo.dto.request;
 
 import javax.validation.constraints.NotBlank;
 
 import lombok.Data;
 
 @Data
-public class ProcessResetPasswordReqDto {
+public class ResetPasswordReqDto {
 	
 	@NotBlank(message = "The username is required.")
 	private String username;

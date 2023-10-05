@@ -55,6 +55,9 @@ public class User {
         this.roles.add(role);
     }
     
+	@Column(name = "create_ts")
+    private Timestamp createTs;
+    
 	@Column(name = "update_ts")
     private Timestamp updateTs;
     

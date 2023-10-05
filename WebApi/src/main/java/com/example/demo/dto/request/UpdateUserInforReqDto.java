@@ -1,6 +1,5 @@
-package com.example.demo.dto;
+package com.example.demo.dto.request;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
 import com.example.demo.constant.Constants.ValidatePattern;
@@ -9,9 +8,6 @@ import lombok.Data;
 
 @Data
 public class UpdateUserInforReqDto {
-
-	@NotBlank(message = "The user id is required.")
-	private String id;
 	
 	private String fullName;
 	
