@@ -25,4 +25,5 @@ public class UpdateUserInforReqDto {
 	
 	@Pattern(regexp = ValidatePattern.DATE_PATTERN, message = "The dateOfBirth is invalid.")
 	private String dateOfBirth;
+	
 }

@@ -79,7 +79,7 @@ public class UserServiceImpl implements UserService {
 		userInfor.setUserId(uuid);
 		userInfor.setIsActive(1);
 		userInfor.setSex(request.getSex());
-		SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 		Date parsed = format.parse(request.getDateOfBirth());
 		userInfor.setDateOfBirth(new java.sql.Date(parsed.getTime()));
 		userInfor.setCreateTs(upadteTs);

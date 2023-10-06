@@ -6,6 +6,8 @@ import java.util.List;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -53,9 +55,10 @@ public class PostController {
 	}
 
 	@GetMapping(value = "")
-	public @ResponseBody ResponseEntity<List<GetPostResDto>> getPost(@RequestParam("userId") String userId,
-			@RequestParam("timeStart") @DateTimeFormat(pattern = "yyyy-MM-dd") Date timeStart,
-			@RequestParam("timeEnd") @DateTimeFormat(pattern = "yyyy-MM-dd") Date timeEnd,
+	public @ResponseBody ResponseEntity<List<GetPostResDto>> getPost(
+			@RequestParam("userId") String userId,
+			@RequestParam("timeStart") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) java.util.Date timeStart,
+			@RequestParam("timeEnd") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) java.util.Date timeEnd,
 			@RequestParam("numbersPost") int numbersPost) {
 		Date start = new java.sql.Date(timeStart.getTime());
 		Date end = new java.sql.Date(timeEnd.getTime());
