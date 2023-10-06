@@ -1,21 +1,30 @@
 package com.example.demo.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import java.sql.Date;
+import java.util.List;
 
+import com.example.demo.dto.request.InsertPostReqDto;
+import com.example.demo.dto.request.UpdatePostReqDto;
+import com.example.demo.dto.response.GetPostResDto;
 import com.example.demo.entity.Post;
-import com.example.demo.repository.PostRepository;
-import com.example.demo.service.impl.PostServiceInterface;
 
-@Service
-public class PostService implements PostServiceInterface{
-
-	@Autowired
-	private PostRepository postRepository;
+public interface PostService {
 	
-	@Override
-	public Post findByPostId(String postId) {
-		return postRepository.findByPostId(postId);
-	}
-
+	Post findByPostId(String postId);
+	
+	void insertPost(InsertPostReqDto request);
+	
+	List<GetPostResDto> getPostCustom(String userId, Date startDate, Date endDate, int numbersPost);
+	
+	void updatePost(Post post, UpdatePostReqDto request);
+	
+	void deletePost(Post post);
+	
+	List<GetPostResDto> getPostTimeLine(int numbersPost);
+	
+	boolean hasLike(String userId, String postId);
+	
+	void likePost(String userId, String postId);
+	
+	void dislikePost(String userId, String postId);
 }

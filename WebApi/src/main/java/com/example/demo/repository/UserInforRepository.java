@@ -15,7 +15,6 @@ public interface UserInforRepository extends JpaRepository<UserInfor, String>{
 	
 	@Query(value = "select "
 			+ "u.id as id, "
-			+ "u.email as email, "
 			+ "u.full_name as fullName, "
 			+ "u.avatar_url as avatarUrl, "
 			+ "ui.sex as sex, "

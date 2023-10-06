@@ -16,7 +16,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.example.demo.security.jwt.AuthEntryPointJwt;
-import com.example.demo.service.UserDetailsServiceImpl;
+import com.example.demo.service.impl.UserDetailsServiceImpl;
 
 @Configuration
 @EnableMethodSecurity

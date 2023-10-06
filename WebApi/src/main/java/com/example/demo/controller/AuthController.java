@@ -1,8 +1,6 @@
 package com.example.demo.controller;
 
 import java.text.ParseException;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
@@ -13,14 +11,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dto.request.ForgotPasswordReqDto;
-import com.example.demo.dto.request.ResetPasswordReqDto;
 import com.example.demo.dto.request.SigninReqDto;
 import com.example.demo.dto.request.SignupReqDto;
 import com.example.demo.dto.request.ValidateOtpReqDto;
@@ -78,35 +74,19 @@ public class AuthController {
 
 		String username = request.getUsername();
 		int requestOtp = request.getOtp();
+		int serverOtp = otpService.getOtp(username);
+
 		ValidateOtpResDto response = new ValidateOtpResDto();
+		response.setToken(null);
 
-		if (requestOtp >= 0) {
-			int serverOtp = otpService.getOtp(username);
-			if (serverOtp > 0) {
-				if (requestOtp == serverOtp) {
-					otpService.clearOTP(username);
-				}
-				User user = userService.getByUsername(username);
-				List<SimpleGrantedAuthority> authorities = user.getRoles().stream()
-						.map((role) -> new SimpleGrantedAuthority(role.getRoleName())).collect(Collectors.toList());
-
-				Authentication authentication = new UsernamePasswordAuthenticationToken(user.getUsername(),
-						user.getPassword(), authorities);
-
-				// Create jwt token
-				String jwtToken = jwtUtils.generateJwtToken(authentication);
-
-				// Return token
-				response.setToken(jwtToken);
-				return ResponseEntity.ok().body(response);
-			} else {
-				response.setToken(null);
-				return ResponseEntity.ok().body(response);
-			}
-		} else {
-			response.setToken(null);
-			return ResponseEntity.ok().body(response);
+		if (requestOtp == serverOtp) {
+			otpService.clearOTP(username);
+			// Create jwt token
+			String jwtToken = jwtUtils.generateJwtToken(username);
+			response.setToken(jwtToken);
 		}
+		
+		return ResponseEntity.ok().body(response);
 	}
 
 	@PostMapping(value = { "/signup" })
@@ -115,8 +95,8 @@ public class AuthController {
 			return ResponseEntity.ok().body("Username is already taken!");
 		}
 		userService.saveUser(request);
-		return ResponseEntity.ok().body("Registration successful");
 
+		return ResponseEntity.ok().body("Registration successful");
 	}
 
 	@PostMapping(value = { "/forgot-password" })
@@ -129,27 +109,15 @@ public class AuthController {
 			response.setMsg("Username is valid!");
 			return ResponseEntity.ok().body(response);
 		}
-		String resetPasswordLink = request.getRequestURL().toString() + "/reset_password?token="
-				+ userService.createTokenResetPws(user);
+
+		// Create jwt token
+		String jwtToken = jwtUtils.generateJwtToken(requestDto.getUsername());
+		String resetPasswordLink = request.getRequestURL().toString() + "/reset_password?token=" + jwtToken;
 
 		response.setLinkResetPassword(resetPasswordLink);
-
 		response.setMsg("We have sent a reset password link to your email. Please check.");
 
 		return ResponseEntity.ok().body(response);
-	}
-
-	@PostMapping(value = { "/reset-password" })
-	public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordReqDto request) {
-		User user = userService.getByUsernameAndResetTokenPws(request.getUsername(),
-				request.getResetPasswordToken());
-
-		if (user == null) {
-			return ResponseEntity.ok().body("Username or token is valid!");
-		}
-
-		userService.setNewPws(user, request.getNewPassword());
-		return ResponseEntity.ok().body("Password update succcessful!");
 	}
 
 }

@@ -1,12 +1,7 @@
 package com.example.demo.controller;
 
-import java.sql.Timestamp;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
 
-import javax.transaction.Transactional;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,18 +11,17 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.dto.request.ResetPasswordReqDto;
 import com.example.demo.dto.request.UpdateUserInforReqDto;
 import com.example.demo.dto.response.GetUserTimelineResDto;
 import com.example.demo.dto.response.UserInforInterface;
 import com.example.demo.entity.User;
-import com.example.demo.entity.UserInfor;
-import com.example.demo.repository.UserInforRepository;
-import com.example.demo.repository.UserRepository;
 import com.example.demo.service.UserService;
 
 @RestController
@@ -39,12 +33,13 @@ public class UsersController {
 	
 	@GetMapping(value = "/user-details/{userId}")
 	public ResponseEntity<UserInforInterface> getUserDetails(@PathVariable(value = "userId") String userId) {
-		User user = userService.getByUserId(userId);
 		
+		User user = userService.getByUserId(userId);
 		if (user == null) {
 			throw new UsernameNotFoundException("User not found!");
 		}
 		UserInforInterface infor = userService.getUserInfor(user.getUserId());
+		
 		return ResponseEntity.ok().body(infor);
 	}
 
@@ -57,12 +52,13 @@ public class UsersController {
 			return ResponseEntity.notFound().build();
 		}
 		userService.updateUserInfor(user, request);
+		
 		return ResponseEntity.ok().body("User details updated!");
-
 	}
 
 	@GetMapping(value = "/timeline/{userId}")
 	public ResponseEntity<GetUserTimelineResDto> getUserTimeline(@PathVariable(value = "userId") String userId) {
+		
 		User user = userService.getByUserId(userId);
 		if (user == null) {
 			throw new UsernameNotFoundException("User not found!");
@@ -76,6 +72,7 @@ public class UsersController {
 
 	@GetMapping(value = "/timeline/user-current")
 	public ResponseEntity<GetUserTimelineResDto> getCurrentUserTimeline() {
+		
 		SecurityContext securityContext = SecurityContextHolder.getContext();
 		String username = securityContext.getAuthentication().getName();
 		User user = userService.getByUsername(username);
@@ -86,5 +83,14 @@ public class UsersController {
 
 		return ResponseEntity.ok().body(response);
 	}
-
+	
+	@PostMapping(value = { "/reset-password" })
+	public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordReqDto request) {
+		SecurityContext securityContext = SecurityContextHolder.getContext();
+		String username = securityContext.getAuthentication().getName();
+		User user = userService.getByUsername(username);
+		userService.setNewPws(user, request.getNewPassword());
+		
+		return ResponseEntity.ok().body("Password update succcessful!");
+	}
 }

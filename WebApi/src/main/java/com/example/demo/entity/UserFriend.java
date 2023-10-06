@@ -1,9 +1,14 @@
 package com.example.demo.entity;
 
+import java.sql.Timestamp;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.IdClass;
 import javax.persistence.Table;
+
+import com.example.demo.entity.primarykey.UserFriendPK;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -12,17 +17,17 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "user_friend")
+@IdClass(UserFriendPK.class)
 public class UserFriend {
 	
 	@Id
-	@Column(name = "id", nullable = false)
-	private String id;
-	
 	@Column(name = "user1", nullable = false)
 	private String user1;
 	
+	@Id
 	@Column(name = "user2", nullable = false)
 	private String user2;
 	
-
+	@Column(name = "create_ts", nullable = false)
+	private Timestamp createTs;
 }

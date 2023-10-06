@@ -3,12 +3,10 @@ package com.example.demo.dto.request;
 import lombok.Data;
 
 @Data
-public class UpdateCommentReqDto {
+public class DeleteCommentReqDto {
 	
 	private String userId;
 	
 	private String postId;
-
-	private String content;
 	
 }

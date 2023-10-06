@@ -13,4 +13,13 @@ public interface LikeRepository   extends JpaRepository<Like, String> {
 	List<String> findByPostId(String postId);
 	
 	void deleteByPostId(String postId);
+	
+	@Query(value = "SELECT"
+			+ " CASE"
+			+ " WHEN COUNT(*) = 1 THEN TRUE"
+			+ " ELSE FALSE"
+			+ " END"
+			+ " FROM likes"
+			+ " WHERE user_id = ?1 AND post_id = ?2", nativeQuery = true)
+	boolean hasLike(String userId, String postId);
 }

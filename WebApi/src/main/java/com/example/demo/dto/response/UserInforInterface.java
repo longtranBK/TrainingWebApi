@@ -4,8 +4,6 @@ public interface UserInforInterface {
 
 	String getId();
 
-	String getEmail();
-
 	String getFullname();
 
 	String getAvataUrl();
