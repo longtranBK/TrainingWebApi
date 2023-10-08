@@ -2,7 +2,7 @@ package com.example.demo.dto.request;
 
 import javax.validation.constraints.Pattern;
 
-import com.example.demo.constant.Constants.ValidatePattern;
+import com.example.demo.constant.Constants;
 
 import lombok.Data;
 
@@ -23,7 +23,7 @@ public class UpdateUserInforReqDto {
 	
 	private String otherInfor;
 	
-	@Pattern(regexp = ValidatePattern.DATE_PATTERN, message = "The dateOfBirth is invalid.")
+	@Pattern(regexp = Constants.DATE_PATTERN, message = "The dateOfBirth is invalid.")
 	private String dateOfBirth;
 	
 }

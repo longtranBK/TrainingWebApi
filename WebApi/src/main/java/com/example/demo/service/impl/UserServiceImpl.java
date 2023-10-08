@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.example.demo.constant.Constants;
 import com.example.demo.dto.request.SignupReqDto;
 import com.example.demo.dto.request.UpdateUserInforReqDto;
 import com.example.demo.dto.response.UserInforInterface;
@@ -67,7 +68,7 @@ public class UserServiceImpl implements UserService {
 		user.setUsername(request.getUsername());
 		user.setPassword(passwordEncoder.encode(request.getPassword()));
 
-		Role role = roleRepository.findByRoleName("user").get();
+		Role role = roleRepository.findByRoleName(Constants.ROLE_USER_NAME).get();
 		user.addRole(role);
 
 		user.setCreateTs(upadteTs);

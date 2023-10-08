@@ -6,6 +6,7 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.constant.Constants;
 import com.example.demo.dto.request.ResetPasswordReqDto;
 import com.example.demo.dto.request.UpdateUserInforReqDto;
 import com.example.demo.dto.response.GetUserTimelineResDto;
@@ -32,6 +34,7 @@ public class UsersController {
 	private UserService userService;
 	
 	@GetMapping(value = "/user-details/{userId}")
+	@Secured(Constants.ROLE_USER_NAME)
 	public ResponseEntity<UserInforInterface> getUserDetails(@PathVariable(value = "userId") String userId) {
 		
 		User user = userService.getByUserId(userId);
@@ -44,6 +47,7 @@ public class UsersController {
 	}
 
 	@PutMapping(value = { "/user-details/{userId}" })
+	@Secured(Constants.ROLE_USER_NAME)
 	public ResponseEntity<?> updateUserInfor(@PathVariable(value = "userId") String userId,
 			@Valid @RequestBody UpdateUserInforReqDto request) throws ParseException {
 		
@@ -57,6 +61,7 @@ public class UsersController {
 	}
 
 	@GetMapping(value = "/timeline/{userId}")
+	@Secured(Constants.ROLE_USER_NAME)
 	public ResponseEntity<GetUserTimelineResDto> getUserTimeline(@PathVariable(value = "userId") String userId) {
 		
 		User user = userService.getByUserId(userId);
@@ -71,6 +76,7 @@ public class UsersController {
 	}
 
 	@GetMapping(value = "/timeline/user-current")
+	@Secured(Constants.ROLE_USER_NAME)
 	public ResponseEntity<GetUserTimelineResDto> getCurrentUserTimeline() {
 		
 		SecurityContext securityContext = SecurityContextHolder.getContext();
@@ -85,6 +91,7 @@ public class UsersController {
 	}
 	
 	@PostMapping(value = { "/reset-password" })
+	@Secured(Constants.ROLE_USER_NAME)
 	public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordReqDto request) {
 		SecurityContext securityContext = SecurityContextHolder.getContext();
 		String username = securityContext.getAuthentication().getName();

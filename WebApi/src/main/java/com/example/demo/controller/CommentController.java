@@ -4,6 +4,7 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.constant.Constants;
 import com.example.demo.dto.request.DeleteCommentReqDto;
 import com.example.demo.dto.request.InsertCommentReqDto;
 import com.example.demo.dto.request.UpdateCommentReqDto;
@@ -30,6 +32,7 @@ public class CommentController {
 	private CommentService commentService;
 
 	@PostMapping(value = { "" })
+	@Secured(Constants.ROLE_USER_NAME)
 	public ResponseEntity<?> insertComment(@Valid @RequestBody InsertCommentReqDto request) {
 
 		Post post = postService.findByPostId(request.getPostId());
@@ -43,6 +46,7 @@ public class CommentController {
 	}
 
 	@PutMapping(value = { "" })
+	@Secured(Constants.ROLE_USER_NAME)
 	public ResponseEntity<?> updateComment(@Valid @RequestBody UpdateCommentReqDto request) {
 
 		Comment comment = commentService.findByUserIdAndPostId(request.getUserId(), request.getPostId());
@@ -54,6 +58,7 @@ public class CommentController {
 	}
 
 	@DeleteMapping(value = { "" })
+	@Secured(Constants.ROLE_USER_NAME)
 	public ResponseEntity<?> deleteComment(@Valid @RequestBody DeleteCommentReqDto request) {
 
 		Comment comment = commentService.findByUserIdAndPostId(request.getUserId(), request.getPostId());

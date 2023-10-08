@@ -6,12 +6,11 @@ import java.util.List;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.constant.Constants;
 import com.example.demo.dto.request.InsertPostReqDto;
 import com.example.demo.dto.request.LikePostReqDto;
 import com.example.demo.dto.request.UpdatePostReqDto;
@@ -43,6 +43,7 @@ public class PostController {
 	private PostService postService;
 	
 	@PostMapping(value = { "" })
+	@Secured(Constants.ROLE_USER_NAME)
 	public ResponseEntity<?> insertPost(@Valid @RequestBody InsertPostReqDto request) {
 
 		User user = userService.getByUserId(request.getUserId());
@@ -55,6 +56,7 @@ public class PostController {
 	}
 
 	@GetMapping(value = "")
+	@Secured(Constants.ROLE_USER_NAME)
 	public @ResponseBody ResponseEntity<List<GetPostResDto>> getPost(
 			@RequestParam("userId") String userId,
 			@RequestParam("timeStart") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) java.util.Date timeStart,
@@ -68,6 +70,7 @@ public class PostController {
 	}
 
 	@PutMapping(value = { "/{postId}" })
+	@Secured(Constants.ROLE_USER_NAME)
 	@Transactional(rollbackOn = { Exception.class, Throwable.class })
 	public ResponseEntity<?> updatePost(@PathVariable(value = "postId") String postId,
 			@Valid @RequestBody UpdatePostReqDto request) throws ParseException {
@@ -83,6 +86,7 @@ public class PostController {
 	}
 
 	@DeleteMapping(value = { "/{postId}" })
+	@Secured(Constants.ROLE_USER_NAME)
 	public ResponseEntity<?> deletePost(@PathVariable(value = "postId") String postId) {
 
 		Post post = postService.findByPostId(postId);
@@ -95,6 +99,7 @@ public class PostController {
 	}
 
 	@GetMapping(value = "/timeline")
+	@Secured(Constants.ROLE_USER_NAME)
 	public @ResponseBody ResponseEntity<List<GetPostResDto>> getPostTimeLine(
 			@RequestParam("numbers-post") int numbersPost) {
 	
@@ -107,6 +112,7 @@ public class PostController {
 	}
 	
 	@PostMapping(value = { "/like" })
+	@Secured(Constants.ROLE_USER_NAME)
 	public ResponseEntity<?> likePost(@Valid @RequestBody LikePostReqDto request) {
 
 		if(postService.hasLike(request.getUserId(), request.getPostId())) {
@@ -118,6 +124,7 @@ public class PostController {
 	}
 	
 	@DeleteMapping(value = { "/dislike" })
+	@Secured(Constants.ROLE_USER_NAME)
 	public ResponseEntity<?> dislikePost(@Valid @RequestBody LikePostReqDto request) {
 
 		if(!postService.hasLike(request.getUserId(), request.getPostId())) {

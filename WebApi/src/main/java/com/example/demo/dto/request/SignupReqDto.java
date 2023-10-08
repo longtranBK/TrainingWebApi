@@ -7,7 +7,7 @@ import javax.validation.constraints.Pattern;
 
 import org.springframework.validation.annotation.Validated;
 
-import com.example.demo.constant.Constants.ValidatePattern;
+import com.example.demo.constant.Constants;
 
 import lombok.Data;
 
@@ -31,6 +31,6 @@ public class SignupReqDto {
 	private int sex;
 	
 	@NotBlank(message = "Birthday is required.")
-	@Pattern(regexp = ValidatePattern.DATE_PATTERN, message = "Birthday is invalid.")
+	@Pattern(regexp = Constants.DATE_PATTERN, message = "Birthday is invalid.")
 	private String dateOfBirth;
 }

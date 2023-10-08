@@ -8,6 +8,7 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.constant.Constants;
 import com.example.demo.dto.request.ForgotPasswordReqDto;
 import com.example.demo.dto.request.SigninReqDto;
 import com.example.demo.dto.request.SignupReqDto;
@@ -29,6 +31,9 @@ import com.example.demo.service.AuthService;
 import com.example.demo.service.OTPService;
 import com.example.demo.service.UserService;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+@Tag(name = "Auth", description = "API thực hiện xác thực user, đăng ký mới user")
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -101,6 +106,7 @@ public class AuthController {
 
 	@PostMapping(value = { "/forgot-password" })
 	@Transactional(rollbackOn = { Exception.class, Throwable.class })
+	@Secured(Constants.ROLE_USER_NAME)
 	public ResponseEntity<ForgotPasswordResDto> forgotPassword(@Valid @RequestBody ForgotPasswordReqDto requestDto,
 			HttpServletRequest request) {
 		ForgotPasswordResDto response = new ForgotPasswordResDto();

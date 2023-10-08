@@ -9,11 +9,13 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.example.demo.constant.Constants;
 import com.example.demo.service.ReportService;
 
 @Controller
@@ -24,6 +26,7 @@ public class ReportController {
 	private ReportService reportService;
 
 	@GetMapping("/download")
+	@Secured(Constants.ROLE_USER_NAME)
 	public ResponseEntity<Resource> getFile(
 			@RequestParam("userId") String userId,
 			@RequestParam("timeStart") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) java.util.Date timeStart,

@@ -4,12 +4,14 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.constant.Constants;
 import com.example.demo.dto.request.FriendReqDto;
 import com.example.demo.service.UserService;
 
@@ -21,6 +23,7 @@ public class FriendController {
 	private UserService userService;
 	
 	@PostMapping(value = { "" })
+	@Secured(Constants.ROLE_USER_NAME)
 	public ResponseEntity<?> addFriend(@Valid @RequestBody FriendReqDto request) {
 
 		if(userService.isFriend(request.getUserIdCurrent(), request.getUserIdFriend())) {
@@ -32,6 +35,7 @@ public class FriendController {
 	}
 	
 	@DeleteMapping(value = { "" })
+	@Secured(Constants.ROLE_USER_NAME)
 	public ResponseEntity<?> unFriend(@Valid @RequestBody FriendReqDto request) {
 
 		if(!userService.isFriend(request.getUserIdCurrent(), request.getUserIdFriend())) {

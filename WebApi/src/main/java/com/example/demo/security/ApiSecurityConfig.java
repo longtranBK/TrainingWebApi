@@ -5,8 +5,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -18,6 +20,8 @@ import com.example.demo.security.jwt.AuthEntryPointJwt;
 
 @Configuration
 @EnableMethodSecurity
+@EnableWebSecurity
+@EnableGlobalMethodSecurity(securedEnabled = true)
 public class ApiSecurityConfig {
 
 	@Autowired
@@ -60,6 +64,6 @@ public class ApiSecurityConfig {
 
 	@Bean
 	WebSecurityCustomizer webSecurityCustomizer() {
-		return (web) -> web.ignoring().antMatchers("/v2/**", "/swagger-resources/**", "/swagger-ui/**", "/swagger-ui.html", "/webjars/**");
+		return (web) -> web.ignoring().antMatchers("/v3/**", "/swagger-resources/**", "/swagger-ui/**", "/swagger-ui.html", "/webjars/**");
 	}
 }
