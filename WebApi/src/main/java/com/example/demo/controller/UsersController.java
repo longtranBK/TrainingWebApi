@@ -16,7 +16,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.demo.constant.Constants;
 import com.example.demo.dto.request.ResetPasswordReqDto;
@@ -52,13 +54,13 @@ public class UsersController {
 	@PutMapping(value = { "/user-details/{userId}" })
 	@Secured(Constants.ROLE_USER_NAME)
 	public ResponseEntity<?> updateUserInfor(@PathVariable(value = "userId") String userId,
-			@Valid @RequestBody UpdateUserInforReqDto request) throws ParseException {
+			@Valid @RequestPart("request") UpdateUserInforReqDto request, @RequestPart("file") MultipartFile avatarFile) throws ParseException {
 		
 		User user = userService.getByUserId(userId);
 		if (user == null) {
 			return ResponseEntity.notFound().build();
 		}
-		userService.updateUserInfor(user, request);
+		userService.updateUserInfor(user, request, avatarFile);
 		
 		return ResponseEntity.ok().body("User details updated!");
 	}

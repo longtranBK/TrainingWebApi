@@ -1,6 +1,5 @@
 package com.example.demo.service;
 
-import java.sql.Date;
 import java.text.ParseException;
 
 import org.springframework.web.multipart.MultipartFile;
@@ -52,7 +51,7 @@ public interface UserService {
 	 * @param request
 	 * @throws ParseException
 	 */
-	void updateUserInfor(User user, UpdateUserInforReqDto request) throws ParseException;
+	void updateUserInfor(User user, UpdateUserInforReqDto request, MultipartFile avatarFile) throws ParseException;
 	
 	/**
 	 * Get user by username

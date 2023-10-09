@@ -109,10 +109,10 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	@Transactional(rollbackOn = { Exception.class, Throwable.class })
-	public void updateUserInfor(User user, UpdateUserInforReqDto request) throws ParseException {
+	public void updateUserInfor(User user, UpdateUserInforReqDto request, MultipartFile avatarFile) throws ParseException {
 		Timestamp upadteTs = new java.sql.Timestamp(System.currentTimeMillis());
 		user.setFullName(request.getFullName());
-		user.setAvatarUrl(request.getAvatarUrl());
+		user.setAvatarUrl(fileService.save(avatarFile));
 		user.setUpdateTs(upadteTs);
 		userRepository.save(user);
 

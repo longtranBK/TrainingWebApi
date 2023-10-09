@@ -1,8 +1,11 @@
 package com.example.demo.dto.request;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
 import com.example.demo.constant.Constants;
 
@@ -11,27 +14,28 @@ import lombok.Data;
 @Data
 public class UpdateUserInforReqDto {
 	
+	@Size(max = 128)
 	@NotBlank(message = "The fullName is required.")
 	private String fullName;
 	
-	@NotBlank(message = "The avatarUrl is required.")
-	private String avatarUrl;
-	
+	@Min(0)
+	@Max(1)
 	@NotNull(message = "The sex is required.")
 	private int sex;
 	
-	@NotBlank(message = "The studyAt is required.")
+	@Size(max = 128)
 	private String studyAt;
 	
-	@NotBlank(message = "The workingAt is required.")
+	@Size(max = 128)
 	private String workingAt;
 	
-	@NotBlank(message = "The favorites is required.")
+	@Size(max = 1024)
 	private String favorites;
 	
-	@NotBlank(message = "The otherInfor is required.")
+	@Size(max = 1024)
 	private String otherInfor;
 	
+	@Size(max = 10)
 	@NotBlank(message = "The dateOfBirth is required.")
 	@Pattern(regexp = Constants.DATE_PATTERN, message = "The dateOfBirth is invalid.")
 	private String dateOfBirth;
