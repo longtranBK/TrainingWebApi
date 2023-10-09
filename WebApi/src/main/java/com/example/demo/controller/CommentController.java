@@ -21,6 +21,10 @@ import com.example.demo.entity.Post;
 import com.example.demo.service.CommentService;
 import com.example.demo.service.PostService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+@Tag(name = "Comment", description = "API thao tác với comment")
 @RestController
 @RequestMapping("api/comments")
 public class CommentController {
@@ -31,6 +35,7 @@ public class CommentController {
 	@Autowired
 	private CommentService commentService;
 
+	@Operation(summary = "Comment to post")
 	@PostMapping(value = { "" })
 	@Secured(Constants.ROLE_USER_NAME)
 	public ResponseEntity<?> insertComment(@Valid @RequestBody InsertCommentReqDto request) {
@@ -45,6 +50,7 @@ public class CommentController {
 
 	}
 
+	@Operation(summary = "Edit comment in post")
 	@PutMapping(value = { "" })
 	@Secured(Constants.ROLE_USER_NAME)
 	public ResponseEntity<?> updateComment(@Valid @RequestBody UpdateCommentReqDto request) {
@@ -57,6 +63,7 @@ public class CommentController {
 		return ResponseEntity.ok().body("Update comment successful!");
 	}
 
+	@Operation(summary = "Delete comment in post")
 	@DeleteMapping(value = { "" })
 	@Secured(Constants.ROLE_USER_NAME)
 	public ResponseEntity<?> deleteComment(@Valid @RequestBody DeleteCommentReqDto request) {

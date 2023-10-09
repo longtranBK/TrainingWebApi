@@ -10,21 +10,26 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.constant.Constants;
 import com.example.demo.service.ReportService;
 
-@Controller
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+@Tag(name = "Report", description = "API thao tác với report")
+@RestController
 @RequestMapping("/api/report")
 public class ReportController {
 	
 	@Autowired
 	private ReportService reportService;
-
+	
+	@Operation(summary = "Download report")
 	@GetMapping("/download")
 	@Secured(Constants.ROLE_USER_NAME)
 	public ResponseEntity<Resource> getFile(

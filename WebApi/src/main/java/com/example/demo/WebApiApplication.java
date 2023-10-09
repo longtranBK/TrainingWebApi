@@ -1,19 +1,25 @@
 package com.example.demo;
 
+import javax.annotation.Resource;
+
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import com.example.demo.service.FileService;
+
 @SpringBootApplication
-//@EnableSwagger2
-public class WebApiApplication {
+public class WebApiApplication implements CommandLineRunner {
+
+	@Resource
+	FileService fileService;
 
 	public static void main(String[] args) {
 		SpringApplication.run(WebApiApplication.class, args);
 	}
 
-//	@Bean
-//	public Docket productApi() {
-//		return new Docket(DocumentationType.SWAGGER_2).select()
-//				.apis(RequestHandlerSelectors.basePackage("com.example.demo.controller")).build();
-//	}
+	@Override
+	public void run(String... arg) throws Exception {
+		fileService.init();
+	}
 }

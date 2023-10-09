@@ -22,10 +22,13 @@ import com.example.demo.constant.Constants;
 import com.example.demo.dto.request.ResetPasswordReqDto;
 import com.example.demo.dto.request.UpdateUserInforReqDto;
 import com.example.demo.dto.response.GetUserTimelineResDto;
-import com.example.demo.dto.response.UserInforInterface;
+import com.example.demo.dto.response.UserInforResDto;
 import com.example.demo.entity.User;
 import com.example.demo.service.UserService;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+@Tag(name = "User", description = "API thao tác với user")
 @RestController
 @RequestMapping("api/users")
 public class UsersController {
@@ -35,13 +38,13 @@ public class UsersController {
 	
 	@GetMapping(value = "/user-details/{userId}")
 	@Secured(Constants.ROLE_USER_NAME)
-	public ResponseEntity<UserInforInterface> getUserDetails(@PathVariable(value = "userId") String userId) {
+	public ResponseEntity<UserInforResDto> getUserDetails(@PathVariable(value = "userId") String userId) {
 		
 		User user = userService.getByUserId(userId);
 		if (user == null) {
 			throw new UsernameNotFoundException("User not found!");
 		}
-		UserInforInterface infor = userService.getUserInfor(user.getUserId());
+		UserInforResDto infor = userService.getUserInfor(user.getUserId());
 		
 		return ResponseEntity.ok().body(infor);
 	}

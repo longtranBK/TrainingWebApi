@@ -5,6 +5,15 @@ import java.sql.Date;
 
 public interface ReportService {
 
+	/**
+	 * Get data then load to ByteArrayInputStream
+	 * 
+	 * @param userId
+	 * @param startDate
+	 * @param endDate
+	 * @param numbersPost
+	 * @return ByteArrayInputStream
+	 */
 	ByteArrayInputStream loadData(String userId, Date startDate, Date endDate, int numbersPost);
 
 }

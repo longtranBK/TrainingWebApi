@@ -23,6 +23,6 @@ public class GetPostResDto {
 	
 	private List<String> userIdLikeList = new ArrayList<>();
 	
-	private List<CommentCustomInterface> commentList = new ArrayList<>();
+	private List<CommentCustomResDto> commentList = new ArrayList<>();
 }
 

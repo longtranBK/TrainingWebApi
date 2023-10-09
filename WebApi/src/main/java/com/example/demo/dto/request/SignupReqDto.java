@@ -18,8 +18,6 @@ public class SignupReqDto {
 	@NotBlank(message = "FullName is required.")
 	private String fullName;
 	
-	private String avatarUrl;
-	
 	@Email
 	@NotBlank(message = "Username is required.")
 	private String username;

@@ -2,7 +2,7 @@ package com.example.demo.dto.response;
 
 import java.sql.Timestamp;
 
-public interface CommentCustomInterface {
+public interface CommentCustomResDto {
 	
 	String getUserId();
 

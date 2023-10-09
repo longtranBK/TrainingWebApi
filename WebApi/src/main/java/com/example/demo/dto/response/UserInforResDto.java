@@ -1,6 +1,6 @@
 package com.example.demo.dto.response;
 
-public interface UserInforInterface {
+public interface UserInforResDto {
 
 	String getId();
 

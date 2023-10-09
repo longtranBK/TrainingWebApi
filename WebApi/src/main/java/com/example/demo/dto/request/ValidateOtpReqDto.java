@@ -13,6 +13,6 @@ public class ValidateOtpReqDto {
 	@NotBlank(message = "The username is required.")
 	private String username;
 	
-	@NotNull
+	@NotNull(message = "The sex is required.")
 	private int otp;
 }

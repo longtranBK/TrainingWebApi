@@ -27,9 +27,10 @@ public class JwtUtils {
     private long tokenValidityInSeconds;
     
     /**
+     * Create token JWT 
      * 
      * @param username
-     * @return
+     * @return token
      */
 	public String generateJwtToken(String username) {
 		return Jwts.builder().setSubject(username).setIssuedAt(new Date())
@@ -38,6 +39,7 @@ public class JwtUtils {
 	}
 
 	/**
+	 * Decode jwt secret
 	 * 
 	 * @return
 	 */
@@ -46,6 +48,7 @@ public class JwtUtils {
 	}
 
 	/**
+	 * Get username from jwt token
 	 * 
 	 * @param token
 	 * @return
@@ -55,9 +58,10 @@ public class JwtUtils {
 	}
 
 	/**
+	 * Check jwt token
 	 * 
 	 * @param authToken
-	 * @return
+	 * @return true if parse ok
 	 */
 	public boolean validateJwtToken(String authToken) {
 		try {

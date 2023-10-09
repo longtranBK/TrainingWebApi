@@ -4,7 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import com.example.demo.dto.response.UserInforInterface;
+import com.example.demo.dto.response.UserInforResDto;
 import com.example.demo.entity.UserInfor;
 
 @Repository
@@ -26,5 +26,5 @@ public interface UserInforRepository extends JpaRepository<UserInfor, String>{
 			+ "from users u inner join user_infor ui "
 			+ "on u.id = ui.id "
 			+ "where u.id = ?1", nativeQuery = true)
-	UserInforInterface getUserInfor(String userId);
+	UserInforResDto getUserInfor(String userId);
 }

@@ -15,7 +15,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.demo.constant.Constants;
 import com.example.demo.dto.request.ForgotPasswordReqDto;
@@ -31,6 +33,7 @@ import com.example.demo.service.AuthService;
 import com.example.demo.service.OTPService;
 import com.example.demo.service.UserService;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @Tag(name = "Auth", description = "API thực hiện xác thực user, đăng ký mới user")
@@ -53,6 +56,7 @@ public class AuthController {
 	@Autowired
 	private JwtUtils jwtUtils;
 
+	@Operation(summary = "Sign in with username and password")
 	@PostMapping(value = { "/signin" })
 	public ResponseEntity<SigninResDto> authenticateUser(@Valid @RequestBody SigninReqDto request) {
 		SigninResDto response = new SigninResDto();
@@ -74,6 +78,7 @@ public class AuthController {
 		}
 	}
 
+	@Operation(summary = "Check otp after run api signin")
 	@PostMapping(value = { "/validate-otp" })
 	public ResponseEntity<ValidateOtpResDto> validateOtp(@Valid @RequestBody ValidateOtpReqDto request) {
 
@@ -94,16 +99,18 @@ public class AuthController {
 		return ResponseEntity.ok().body(response);
 	}
 
+	@Operation(summary = "Register new user")
 	@PostMapping(value = { "/signup" })
-	public ResponseEntity<?> signup(@Valid @RequestBody SignupReqDto request) throws ParseException {
+	public ResponseEntity<?> signup(@RequestPart("file") MultipartFile avatarFile, @Valid @RequestPart("request") SignupReqDto request) throws ParseException {
 		if (userService.getByUsername(request.getUsername()) != null) {
 			return ResponseEntity.ok().body("Username is already taken!");
 		}
-		userService.saveUser(request);
+		userService.saveUser(request, avatarFile);
 
 		return ResponseEntity.ok().body("Registration successful");
 	}
 
+	@Operation(summary = "Forgot password and get token")
 	@PostMapping(value = { "/forgot-password" })
 	@Transactional(rollbackOn = { Exception.class, Throwable.class })
 	@Secured(Constants.ROLE_USER_NAME)

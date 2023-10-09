@@ -11,11 +11,12 @@ import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.demo.constant.Constants;
 import com.example.demo.dto.request.SignupReqDto;
 import com.example.demo.dto.request.UpdateUserInforReqDto;
-import com.example.demo.dto.response.UserInforInterface;
+import com.example.demo.dto.response.UserInforResDto;
 import com.example.demo.entity.Role;
 import com.example.demo.entity.User;
 import com.example.demo.entity.UserFriend;
@@ -24,10 +25,14 @@ import com.example.demo.repository.RoleRepository;
 import com.example.demo.repository.UserFriendRepository;
 import com.example.demo.repository.UserInforRepository;
 import com.example.demo.repository.UserRepository;
+import com.example.demo.service.FileService;
 import com.example.demo.service.UserService;
 
 @Service
 public class UserServiceImpl implements UserService {
+	
+	@Autowired
+	private FileService fileService;
 
 	@Autowired
 	private RoleRepository roleRepository;
@@ -57,14 +62,14 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	@Transactional(rollbackOn = { Exception.class, Throwable.class })
-	public void saveUser(SignupReqDto request) throws ParseException {
+	public void saveUser(SignupReqDto request, MultipartFile avatarFile) throws ParseException {
 		Timestamp upadteTs = new java.sql.Timestamp(System.currentTimeMillis());
 		String uuid = UUID.randomUUID().toString();
 		User user = new User();
 
 		user.setUserId(uuid);
 		user.setFullName(request.getFullName());
-		user.setAvatarUrl(request.getAvatarUrl());
+		user.setAvatarUrl(fileService.save(avatarFile));
 		user.setUsername(request.getUsername());
 		user.setPassword(passwordEncoder.encode(request.getPassword()));
 
@@ -80,13 +85,14 @@ public class UserServiceImpl implements UserService {
 		userInfor.setUserId(uuid);
 		userInfor.setIsActive(1);
 		userInfor.setSex(request.getSex());
-		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+		SimpleDateFormat format = new SimpleDateFormat(Constants.DATE_FORMAT);
 		Date parsed = format.parse(request.getDateOfBirth());
 		userInfor.setDateOfBirth(new java.sql.Date(parsed.getTime()));
 		userInfor.setCreateTs(upadteTs);
 		userInfor.setUpdateTs(upadteTs);
 
 		userInforRepository.save(userInfor);
+		
 
 	}
 
@@ -97,7 +103,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public UserInforInterface getUserInfor(String userId) {
+	public UserInforResDto getUserInfor(String userId) {
 		return userInforRepository.getUserInfor(userId);
 	}
 
@@ -117,7 +123,7 @@ public class UserServiceImpl implements UserService {
 		userInfor.setFavorites(request.getFavorites());
 		userInfor.setOtherInfor(request.getOtherInfor());
 		if (request.getDateOfBirth() != null) {
-			SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+			SimpleDateFormat format = new SimpleDateFormat(Constants.DATE_FORMAT);
 			Date parsed = format.parse(request.getDateOfBirth());
 			userInfor.setDateOfBirth(new java.sql.Date(parsed.getTime()));
 		}
@@ -148,12 +154,6 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public void unFriend(String userId1, String userId2) {
 		userFriendRepository.unFriend(userId1, userId2);
-	}
-
-	@Override
-	public int numbersNewFriend(java.sql.Date startDate, java.sql.Date endDate) {
-		// TODO Auto-generated method stub
-		return 0;
 	}
 
 }

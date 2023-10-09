@@ -3,6 +3,7 @@ package com.example.demo.service.impl;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -12,10 +13,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.demo.dto.request.InsertPostReqDto;
 import com.example.demo.dto.request.UpdatePostReqDto;
-import com.example.demo.dto.response.CommentCustomInterface;
+import com.example.demo.dto.response.CommentCustomResDto;
 import com.example.demo.dto.response.GetPostResDto;
 import com.example.demo.entity.Capture;
 import com.example.demo.entity.Like;
@@ -26,26 +28,30 @@ import com.example.demo.repository.CommentRepository;
 import com.example.demo.repository.LikeRepository;
 import com.example.demo.repository.PostRepository;
 import com.example.demo.repository.UserRepository;
+import com.example.demo.service.FileService;
 import com.example.demo.service.PostService;
 
 @Service
-public class PostServiceImpl implements PostService{
+public class PostServiceImpl implements PostService {
+
+	@Autowired
+	private FileService fileService;
 
 	@Autowired
 	private PostRepository postRepository;
-	
+
 	@Autowired
 	private CaptureRepository captureRepository;
-	
+
 	@Autowired
 	private LikeRepository likeRepository;
-	
+
 	@Autowired
 	private CommentRepository commentRepository;
-	
+
 	@Autowired
 	private UserRepository userRepository;
-	
+
 	@Override
 	public Post findByPostId(String postId) {
 		return postRepository.findByPostId(postId);
@@ -53,7 +59,7 @@ public class PostServiceImpl implements PostService{
 
 	@Override
 	@Transactional(rollbackOn = { Exception.class, Throwable.class })
-	public void insertPost(InsertPostReqDto request) {
+	public void insertPost(InsertPostReqDto request, MultipartFile[] avatarList) {
 		String postId = UUID.randomUUID().toString();
 		Timestamp upadteTs = new java.sql.Timestamp(System.currentTimeMillis());
 
@@ -65,18 +71,8 @@ public class PostServiceImpl implements PostService{
 		post.setCreateTs(upadteTs);
 		post.setUpdateTs(upadteTs);
 		postRepository.save(post);
+		saveCapturesList(postId, avatarList);
 
-		if (request.getCapturesUrl().size() > 0) {
-			List<Capture> captureList = new ArrayList<>();
-
-			for (int i = 0; i < request.getCapturesUrl().size(); i++) {
-				Capture capture = new Capture();
-				capture.setPostId(postId);
-				captureList.add(capture);
-			}
-			captureRepository.saveAll(captureList);
-		}
-		
 	}
 
 	@Override
@@ -101,8 +97,7 @@ public class PostServiceImpl implements PostService{
 			List<String> userIdLikeList = likeRepository.findByPostId(postList.get(i).getPostId());
 			post.setUserIdLikeList(userIdLikeList);
 
-			List<CommentCustomInterface> commentList = commentRepository
-					.findByPostIdCustom(postList.get(i).getPostId());
+			List<CommentCustomResDto> commentList = commentRepository.findByPostIdCustom(postList.get(i).getPostId());
 			post.setCommentList(commentList);
 
 			response.add(post);
@@ -111,31 +106,23 @@ public class PostServiceImpl implements PostService{
 	}
 
 	@Override
-	public void updatePost(Post post, UpdatePostReqDto request) {
-		
+	public void updatePost(Post post, UpdatePostReqDto request, MultipartFile[] avatarList) {
+
 		Timestamp upadteTs = new java.sql.Timestamp(System.currentTimeMillis());
 		post.setContent(request.getContent());
 		post.setStatus(request.getStatus());
 		post.setUpdateTs(upadteTs);
 		postRepository.save(post);
-
-		if (request.getCaptureUrlList().size() > 0) {
-			captureRepository.deleteByPostId(post.getPostId());
-
-			for (int i = 0; i < request.getCaptureUrlList().size(); i++) {
-				Capture capture = new Capture();
-				capture.setPostId(post.getPostId());
-				capture.setCaptureUrl(request.getCaptureUrlList().get(i));
-				captureRepository.save(capture);
-			}
-		}
+		captureRepository.deleteByPostId(post.getPostId());
+		saveCapturesList(post.getPostId(), avatarList);
+		
 	}
 
 	@Override
 	@Transactional(rollbackOn = { Exception.class, Throwable.class })
 	public void deletePost(Post post) {
 		String postId = post.getPostId();
-		
+
 		// Delete table likes
 		likeRepository.deleteByPostId(postId);
 
@@ -152,16 +139,16 @@ public class PostServiceImpl implements PostService{
 	@Override
 	public List<GetPostResDto> getPostTimeLine(int numbersPost) {
 		List<GetPostResDto> response = new ArrayList<>();
-		
+
 		SecurityContext securityContext = SecurityContextHolder.getContext();
 		String username = securityContext.getAuthentication().getName();
 		User user = userRepository.findByUsername(username);
-		
+
 		List<Post> postList = postRepository.getPostTimeline(user.getUserId(), numbersPost);
 		if (postList.size() == 0) {
 			return response;
 		}
-		
+
 		for (int i = 0; i < postList.size(); i++) {
 			GetPostResDto post = new GetPostResDto();
 			post.setPostId(postList.get(i).getPostId());
@@ -176,13 +163,12 @@ public class PostServiceImpl implements PostService{
 			List<String> userIdLikeList = likeRepository.findByPostId(postList.get(i).getPostId());
 			post.setUserIdLikeList(userIdLikeList);
 
-			List<CommentCustomInterface> commentList = commentRepository
-					.findByPostIdCustom(postList.get(i).getPostId());
+			List<CommentCustomResDto> commentList = commentRepository.findByPostIdCustom(postList.get(i).getPostId());
 			post.setCommentList(commentList);
 
 			response.add(post);
 		}
-		
+
 		return response;
 	}
 
@@ -202,7 +188,27 @@ public class PostServiceImpl implements PostService{
 	@Override
 	public void dislikePost(String userId, String postId) {
 		// TODO Auto-generated method stub
-		
+
+	}
+	
+	/**
+	 * 
+	 * @param postId
+	 * @param avatarList
+	 */
+	private void saveCapturesList(String postId, MultipartFile[] avatarList) {
+		if (avatarList.length > 0) {
+			List<Capture> captureList = new ArrayList<>();
+
+			Arrays.asList(avatarList).stream().forEach(file -> {
+				Capture capture = new Capture();
+				capture.setCaptureUrl(fileService.save(file));
+				capture.setPostId(postId);
+				captureList.add(capture);
+			});
+
+			captureRepository.saveAll(captureList);
+		}
 	}
 
 }
