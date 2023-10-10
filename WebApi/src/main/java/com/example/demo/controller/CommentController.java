@@ -1,11 +1,14 @@
 package com.example.demo.controller;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.constant.Constants;
-import com.example.demo.dto.request.DeleteCommentReqDto;
 import com.example.demo.dto.request.InsertCommentReqDto;
 import com.example.demo.dto.request.UpdateCommentReqDto;
 import com.example.demo.entity.Comment;
@@ -36,7 +38,7 @@ public class CommentController {
 	private CommentService commentService;
 
 	@Operation(summary = "Comment to post")
-	@PostMapping(value = { "" })
+	@PostMapping
 	@Secured(Constants.ROLE_USER_NAME)
 	public ResponseEntity<?> insertComment(@Valid @RequestBody InsertCommentReqDto request) {
 
@@ -55,7 +57,7 @@ public class CommentController {
 	@Secured(Constants.ROLE_USER_NAME)
 	public ResponseEntity<?> updateComment(@Valid @RequestBody UpdateCommentReqDto request) {
 
-		Comment comment = commentService.findByUserIdAndPostId(request.getUserId(), request.getPostId());
+		Comment comment = commentService.findByCommentId(request.getCommentId());
 		if (comment == null) {
 			return ResponseEntity.notFound().build();
 		}
@@ -64,11 +66,11 @@ public class CommentController {
 	}
 
 	@Operation(summary = "Delete comment in post")
-	@DeleteMapping(value = { "" })
+	@DeleteMapping(value = { "/{commentId}" })
 	@Secured(Constants.ROLE_USER_NAME)
-	public ResponseEntity<?> deleteComment(@Valid @RequestBody DeleteCommentReqDto request) {
+	public ResponseEntity<?> deleteComment(@PathVariable @NotBlank @Size(max = 36) String commentId) {
 
-		Comment comment = commentService.findByUserIdAndPostId(request.getUserId(), request.getPostId());
+		Comment comment = commentService.findByCommentId(commentId);
 		if (comment == null) {
 			return ResponseEntity.notFound().build();
 		}

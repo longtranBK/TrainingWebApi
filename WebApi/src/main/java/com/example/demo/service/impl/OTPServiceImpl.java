@@ -17,9 +17,6 @@ public class OTPServiceImpl implements OTPService {
 
 	private LoadingCache<String, Integer> otpCache;
 
-	/**
-	 * 
-	 */
 	public OTPServiceImpl() {
 		otpCache = CacheBuilder.newBuilder().expireAfterWrite(EXPIRE_MINS, TimeUnit.MINUTES)
 				.build(new CacheLoader<String, Integer>() {

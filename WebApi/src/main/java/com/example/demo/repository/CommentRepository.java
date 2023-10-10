@@ -12,6 +12,7 @@ import com.example.demo.entity.Comment;
 public interface CommentRepository extends JpaRepository<Comment, String> {
 
 	@Query(value = "SELECT"
+			+ " comment_id AS commentId,"
 			+ " user_id AS userId,"
 			+ " content,"
 			+ " create_ts AS createTs,"
@@ -21,7 +22,7 @@ public interface CommentRepository extends JpaRepository<Comment, String> {
 	
 	void deleteByPostId(String postId);
 	
-	Comment findByUserIdAndPostId(String userId, String postId);
+	Comment findByCommentId(String commentId);
 	
 	@Query(value = "SELECT * FROM comment"
 			+ " WHERE create_ts >= ?1 AND create_ts <= ?2"

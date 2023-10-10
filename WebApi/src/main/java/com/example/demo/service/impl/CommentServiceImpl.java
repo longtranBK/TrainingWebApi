@@ -1,6 +1,7 @@
 package com.example.demo.service.impl;
 
 import java.sql.Timestamp;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,8 +20,10 @@ public class CommentServiceImpl implements CommentService{
 	@Override
 	public void insertComment(InsertCommentReqDto request) {
 		Timestamp upadteTs = new java.sql.Timestamp(System.currentTimeMillis());
-
+		String commentId = UUID.randomUUID().toString();
+		
 		Comment comment = new Comment();
+		comment.setCommentId(commentId);
 		comment.setPostId(request.getPostId());
 		comment.setUserId(request.getUserId());
 		comment.setContent(request.getContent());
@@ -31,8 +34,8 @@ public class CommentServiceImpl implements CommentService{
 	}
 
 	@Override
-	public Comment findByUserIdAndPostId(String userId, String postId) {
-		return commentRepository.findByUserIdAndPostId(userId, postId);
+	public Comment findByCommentId(String commentId) {
+		return commentRepository.findByCommentId(commentId);
 	}
 
 	@Override

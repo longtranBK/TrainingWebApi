@@ -2,13 +2,10 @@ package com.example.demo.controller;
 
 import java.text.ParseException;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.transaction.Transactional;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -19,14 +16,11 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.example.demo.constant.Constants;
 import com.example.demo.dto.request.ForgotPasswordReqDto;
 import com.example.demo.dto.request.SigninReqDto;
 import com.example.demo.dto.request.SignupReqDto;
 import com.example.demo.dto.request.ValidateOtpReqDto;
-import com.example.demo.dto.response.ForgotPasswordResDto;
 import com.example.demo.dto.response.SigninResDto;
-import com.example.demo.dto.response.ValidateOtpResDto;
 import com.example.demo.entity.User;
 import com.example.demo.security.jwt.JwtUtils;
 import com.example.demo.service.AuthService;
@@ -80,23 +74,20 @@ public class AuthController {
 
 	@Operation(summary = "Check otp after run api signin")
 	@PostMapping(value = { "/validate-otp" })
-	public ResponseEntity<ValidateOtpResDto> validateOtp(@Valid @RequestBody ValidateOtpReqDto request) {
+	public ResponseEntity<?> validateOtp(@Valid @RequestBody ValidateOtpReqDto request) {
 
 		String username = request.getUsername();
 		int requestOtp = request.getOtp();
 		int serverOtp = otpService.getOtp(username);
-
-		ValidateOtpResDto response = new ValidateOtpResDto();
-		response.setToken(null);
-
+		String jwtToken = "";
+		
 		if (requestOtp == serverOtp) {
 			otpService.clearOTP(username);
 			// Create jwt token
-			String jwtToken = jwtUtils.generateJwtToken(username);
-			response.setToken(jwtToken);
+			jwtToken = jwtUtils.generateJwtToken(username);
 		}
 		
-		return ResponseEntity.ok().body(response);
+		return ResponseEntity.ok().body(jwtToken);
 	}
 
 	@Operation(summary = "Register new user")
@@ -112,25 +103,17 @@ public class AuthController {
 
 	@Operation(summary = "Forgot password and get token")
 	@PostMapping(value = { "/forgot-password" })
-	@Transactional(rollbackOn = { Exception.class, Throwable.class })
-	@Secured(Constants.ROLE_USER_NAME)
-	public ResponseEntity<ForgotPasswordResDto> forgotPassword(@Valid @RequestBody ForgotPasswordReqDto requestDto,
-			HttpServletRequest request) {
-		ForgotPasswordResDto response = new ForgotPasswordResDto();
-		User user = userService.getByUsername(requestDto.getUsername());
+	public ResponseEntity<?> forgotPassword(@Valid @RequestBody ForgotPasswordReqDto request) {
+
+		User user = userService.getByUsername(request.getUsername());
 		if (user == null) {
-			response.setMsg("Username is valid!");
-			return ResponseEntity.ok().body(response);
+			return ResponseEntity.ok().body("Username is valid!");
 		}
 
 		// Create jwt token
-		String jwtToken = jwtUtils.generateJwtToken(requestDto.getUsername());
-		String resetPasswordLink = request.getRequestURL().toString() + "/reset_password?token=" + jwtToken;
+		String jwtToken = jwtUtils.generateJwtToken(request.getUsername());
 
-		response.setLinkResetPassword(resetPasswordLink);
-		response.setMsg("We have sent a reset password link to your email. Please check.");
-
-		return ResponseEntity.ok().body(response);
+		return ResponseEntity.ok().body(jwtToken);
 	}
 
 }

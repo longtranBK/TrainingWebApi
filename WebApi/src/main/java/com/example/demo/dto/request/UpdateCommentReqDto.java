@@ -9,12 +9,8 @@ import lombok.Data;
 public class UpdateCommentReqDto {
 	
 	@Size(max = 36)
-	@NotBlank(message = "The userId is required.")
-	private String userId;
-	
-	@Size(max = 36)
-	@NotBlank(message = "The postId is required.")
-	private String postId;
+	@NotBlank(message = "The commentId is required.")
+	private String commentId;
 
 	@Size(max = 1024)
 	@NotBlank(message = "The content is required.")

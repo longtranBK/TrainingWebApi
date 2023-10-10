@@ -4,6 +4,8 @@ import java.sql.Timestamp;
 
 public interface CommentCustomResDto {
 	
+	String getCommentId();
+	
 	String getUserId();
 
 	String getContent();

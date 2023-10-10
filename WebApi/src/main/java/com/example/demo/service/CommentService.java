@@ -15,11 +15,10 @@ public interface CommentService {
 	/**
 	 * Search comment
 	 * 
-	 * @param userId
-	 * @param postId
+	 * @param commentId
 	 * @return comment
 	 */
-	Comment findByUserIdAndPostId(String userId, String postId);
+	Comment findByCommentId(String commentId);
 	
 	/**
 	 * Update comment
