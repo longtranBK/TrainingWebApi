@@ -86,4 +86,10 @@ public interface UserService {
 	 */
 	void unFriend(String userId1, String userId2);
 	
+	/**
+	 * 
+	 * @return
+	 */
+	String getUserId();
+	
 }

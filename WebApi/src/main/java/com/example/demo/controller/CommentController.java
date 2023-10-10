@@ -22,6 +22,7 @@ import com.example.demo.entity.Comment;
 import com.example.demo.entity.Post;
 import com.example.demo.service.CommentService;
 import com.example.demo.service.PostService;
+import com.example.demo.service.UserService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -36,6 +37,9 @@ public class CommentController {
 
 	@Autowired
 	private CommentService commentService;
+	
+	@Autowired
+	private UserService userService;
 
 	@Operation(summary = "Comment to post")
 	@PostMapping
@@ -46,7 +50,7 @@ public class CommentController {
 		if (post == null) {
 			return ResponseEntity.ok().body("Post not found!");
 		}
-		commentService.insertComment(request);
+		commentService.insertComment(request, userService.getUserId());
 
 		return ResponseEntity.ok().body("Insert comment successful!");
 
@@ -57,11 +61,13 @@ public class CommentController {
 	@Secured(Constants.ROLE_USER_NAME)
 	public ResponseEntity<?> updateComment(@Valid @RequestBody UpdateCommentReqDto request) {
 
-		Comment comment = commentService.findByCommentId(request.getCommentId());
+		Comment comment = commentService.findByCommentIdAndUserId(request.getCommentId(), userService.getUserId());
 		if (comment == null) {
 			return ResponseEntity.notFound().build();
 		}
 
+		commentService.updateComment(comment, request.getContent());
+		
 		return ResponseEntity.ok().body("Update comment successful!");
 	}
 
@@ -70,7 +76,7 @@ public class CommentController {
 	@Secured(Constants.ROLE_USER_NAME)
 	public ResponseEntity<?> deleteComment(@PathVariable @NotBlank @Size(max = 36) String commentId) {
 
-		Comment comment = commentService.findByCommentId(commentId);
+		Comment comment = commentService.findByCommentIdAndUserId(commentId, userService.getUserId());
 		if (comment == null) {
 			return ResponseEntity.notFound().build();
 		}

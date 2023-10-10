@@ -68,7 +68,6 @@ public class CommentControllerTest {
 	void insertComment_postNotExists() throws Exception {
 		InsertCommentReqDto request = new InsertCommentReqDto();
 		request.setPostId("1");
-		request.setUserId("1");
 		request.setContent("test");
 
 		when(postService.findByPostId(request.getPostId())).thenReturn(null);
@@ -87,11 +86,10 @@ public class CommentControllerTest {
 	void insertComment_postExists() throws Exception {
 		InsertCommentReqDto request = new InsertCommentReqDto();
 		request.setPostId("1");
-		request.setUserId("1");
 		request.setContent("test");
 
 		when(postService.findByPostId(request.getPostId())).thenReturn(new Post());
-		doNothing().when(commentService).insertComment(request);
+		doNothing().when(commentService).insertComment(request,"");
 		MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post(uri).contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(request))).andReturn();
 

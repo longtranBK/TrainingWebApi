@@ -9,6 +9,8 @@ import java.util.UUID;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -30,7 +32,7 @@ import com.example.demo.service.UserService;
 
 @Service
 public class UserServiceImpl implements UserService {
-	
+
 	@Autowired
 	private FileService fileService;
 
@@ -48,17 +50,16 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	private UserFriendRepository userFriendRepository;
-	
+
 	@Override
 	public User getByUserId(String userId) {
 		return userRepository.findByUserId(userId);
 	}
-	
+
 	@Override
 	public User getByUsername(String username) {
 		return userRepository.findByUsername(username);
 	}
-
 
 	@Override
 	@Transactional(rollbackOn = { Exception.class, Throwable.class })
@@ -92,7 +93,6 @@ public class UserServiceImpl implements UserService {
 		userInfor.setUpdateTs(upadteTs);
 
 		userInforRepository.save(userInfor);
-		
 
 	}
 
@@ -109,7 +109,8 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	@Transactional(rollbackOn = { Exception.class, Throwable.class })
-	public void updateUserInfor(User user, UpdateUserInforReqDto request, MultipartFile avatarFile) throws ParseException {
+	public void updateUserInfor(User user, UpdateUserInforReqDto request, MultipartFile avatarFile)
+			throws ParseException {
 		Timestamp upadteTs = new java.sql.Timestamp(System.currentTimeMillis());
 		user.setFullName(request.getFullName());
 		user.setAvatarUrl(fileService.save(avatarFile));
@@ -131,7 +132,7 @@ public class UserServiceImpl implements UserService {
 		userInfor.setUpdateTs(upadteTs);
 
 		userInforRepository.save(userInfor);
-		
+
 	}
 
 	@Override
@@ -147,13 +148,23 @@ public class UserServiceImpl implements UserService {
 		userFriend.setUser1(userId1);
 		userFriend.setUser2(userId2);
 		userFriend.setCreateTs(createTs);
-		
+
 		userFriendRepository.save(userFriend);
 	}
 
 	@Override
 	public void unFriend(String userId1, String userId2) {
 		userFriendRepository.unFriend(userId1, userId2);
+	}
+
+	@Override
+	public String getUserId() {
+
+		SecurityContext securityContext = SecurityContextHolder.getContext();
+		String username = securityContext.getAuthentication().getName();
+		User user = userRepository.findByUsername(username);
+
+		return user.getUserId();
 	}
 
 }

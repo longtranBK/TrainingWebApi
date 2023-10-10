@@ -1,18 +1,18 @@
 package com.example.demo.controller;
 
-import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.constant.Constants;
-import com.example.demo.dto.request.FriendReqDto;
 import com.example.demo.service.UserService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,27 +27,30 @@ public class FriendController {
 	private UserService userService;
 	
 	@Operation(summary = "Add friend")
-	@PostMapping(value = { "" })
+	@PostMapping(value = { "/{userIdFriend}" })
 	@Secured(Constants.ROLE_USER_NAME)
-	public ResponseEntity<?> addFriend(@Valid @RequestBody FriendReqDto request) {
+	public ResponseEntity<?> addFriend(@PathVariable @NotBlank @Size(max = 36) String userIdFriend) {
 
-		if(userService.isFriend(request.getUserIdCurrent(), request.getUserIdFriend())) {
+		String userIdCurrent = userService.getUserId();
+		
+		if(userService.isFriend(userIdCurrent, userIdFriend)) {
 			return ResponseEntity.ok().body("User was friend!");
 		}
-		userService.addFriend(request.getUserIdCurrent(), request.getUserIdFriend());
+		userService.addFriend(userIdCurrent, userIdFriend);
 		
 		return ResponseEntity.ok().body("Add friend successful!");
 	}
 	
 	@Operation(summary = "Unfriend")
-	@DeleteMapping(value = { "" })
+	@DeleteMapping(value = { "{userIdFriend}" })
 	@Secured(Constants.ROLE_USER_NAME)
-	public ResponseEntity<?> unFriend(@Valid @RequestBody FriendReqDto request) {
+	public ResponseEntity<?> unFriend(@PathVariable @NotBlank @Size(max = 36) String userIdFriend) {
 
-		if(!userService.isFriend(request.getUserIdCurrent(), request.getUserIdFriend())) {
+		String userIdCurrent = userService.getUserId();
+		if(!userService.isFriend(userIdCurrent, userIdFriend)) {
 			return ResponseEntity.ok().body("User was not friend!");
 		}
-		userService.unFriend(request.getUserIdCurrent(), request.getUserIdFriend());
+		userService.unFriend(userIdCurrent, userIdFriend);
 		
 		return ResponseEntity.ok().body("Unfriend successful!");
 	}

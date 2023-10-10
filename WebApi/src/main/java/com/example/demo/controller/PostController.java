@@ -4,7 +4,6 @@ import java.sql.Date;
 import java.text.ParseException;
 import java.util.List;
 
-import javax.transaction.Transactional;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +31,6 @@ import com.example.demo.dto.request.LikePostReqDto;
 import com.example.demo.dto.request.UpdatePostReqDto;
 import com.example.demo.dto.response.GetPostResDto;
 import com.example.demo.entity.Post;
-import com.example.demo.entity.User;
 import com.example.demo.service.FileService;
 import com.example.demo.service.PostService;
 import com.example.demo.service.UserService;
@@ -60,12 +58,7 @@ public class PostController {
 	public ResponseEntity<?> insertPost(@Valid @RequestPart("request") InsertPostReqDto request,
 			@RequestPart("files") MultipartFile[] avatarFiles) {
 
-		User user = userService.getByUserId(request.getUserId());
-		if (user == null) {
-			return ResponseEntity.ok().body("User id not found!");
-		}
-
-		postService.insertPost(request, avatarFiles);
+		postService.insertPost(request, avatarFiles, userService.getUserId());
 		return ResponseEntity.ok().body("Insert post successful!");
 	}
 
@@ -86,12 +79,11 @@ public class PostController {
 	@Operation(summary = "Update post")
 	@PutMapping(value = { "/{postId}" })
 	@Secured(Constants.ROLE_USER_NAME)
-	@Transactional(rollbackOn = { Exception.class, Throwable.class })
 	public ResponseEntity<?> updatePost(@PathVariable(value = "postId") String postId,
-			@Valid @RequestPart("request") UpdatePostReqDto request, @RequestPart("files") MultipartFile[] avatarFiles) throws ParseException {
+			@Valid @RequestPart("request") UpdatePostReqDto request, @RequestPart("files") MultipartFile[] avatarFiles)
+			throws ParseException {
 
-		Post post = postService.findByPostId(postId);
-
+		Post post = postService.findByPostIdAndUserId(postId, userService.getUserId());
 		if (post == null) {
 			return ResponseEntity.notFound().build();
 		}
@@ -105,7 +97,7 @@ public class PostController {
 	@Secured(Constants.ROLE_USER_NAME)
 	public ResponseEntity<?> deletePost(@PathVariable(value = "postId") String postId) {
 
-		Post post = postService.findByPostId(postId);
+		Post post = postService.findByPostIdAndUserId(postId, userService.getUserId());
 		if (post == null) {
 			return ResponseEntity.notFound().build();
 		}
@@ -120,7 +112,7 @@ public class PostController {
 	public @ResponseBody ResponseEntity<List<GetPostResDto>> getPostTimeLine(
 			@RequestParam("numbers-post") int numbersPost) {
 
-		List<GetPostResDto> response = postService.getPostTimeLine(numbersPost);
+		List<GetPostResDto> response = postService.getPostTimeLine(numbersPost, userService.getUserId());
 		if (response.size() == 0) {
 			return ResponseEntity.notFound().build();
 		}
@@ -133,10 +125,11 @@ public class PostController {
 	@Secured(Constants.ROLE_USER_NAME)
 	public ResponseEntity<?> likePost(@Valid @RequestBody LikePostReqDto request) {
 
-		if (postService.hasLike(request.getUserId(), request.getPostId())) {
+		String userId = userService.getUserId();
+		if (postService.hasLike(userId, request.getPostId())) {
 			return ResponseEntity.ok().body("User had liked!");
 		}
-		postService.likePost(request.getUserId(), request.getPostId());
+		postService.likePost(userId, request.getPostId());
 
 		return ResponseEntity.ok().body("Like post successful!");
 	}
@@ -146,14 +139,15 @@ public class PostController {
 	@Secured(Constants.ROLE_USER_NAME)
 	public ResponseEntity<?> dislikePost(@Valid @RequestBody LikePostReqDto request) {
 
-		if (!postService.hasLike(request.getUserId(), request.getPostId())) {
+		String userId = userService.getUserId(); 
+		if (!postService.hasLike(userId, request.getPostId())) {
 			return ResponseEntity.ok().body("User had not like!");
 		}
-		postService.dislikePost(request.getUserId(), request.getPostId());
+		postService.dislikePost(userId, request.getPostId());
 
 		return ResponseEntity.ok().body("Unlike successful!");
 	}
-	
+
 	@Operation(summary = "Get capture of post by file name")
 	@GetMapping("/captures/{filename:.+}")
 	@ResponseBody

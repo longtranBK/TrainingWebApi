@@ -21,12 +21,21 @@ public interface PostService {
 	Post findByPostId(String postId);
 	
 	/**
+	 * Find post
+	 * 
+	 * @param postId
+	 * @return post
+	 */
+	Post findByPostIdAndUserId(String postId, String userId);
+	
+	/**
 	 * Insert post
 	 * 
 	 * @param request
 	 * @param avatarList
+	 * @param userId
 	 */
-	void insertPost(InsertPostReqDto request, MultipartFile[] avatarList);
+	void insertPost(InsertPostReqDto request, MultipartFile[] avatarList, String userId);
 	
 	/**
 	 * Find post with condition
@@ -61,7 +70,7 @@ public interface PostService {
 	 * @param numbersPost
 	 * @return
 	 */
-	List<GetPostResDto> getPostTimeLine(int numbersPost);
+	List<GetPostResDto> getPostTimeLine(int numbersPost, String userId);
 	
 	/**
 	 * Check lisk of post

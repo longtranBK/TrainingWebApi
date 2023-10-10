@@ -12,6 +12,8 @@ public interface LikeRepository   extends JpaRepository<Like, String> {
 	@Query(value = "SELECT user_id FROM likes WHERE post_id = ?1", nativeQuery = true)
 	List<String> findByPostId(String postId);
 	
+	void deleteByPostIdAndUserId(String postId, String userId);
+	
 	void deleteByPostId(String postId);
 	
 	@Query(value = "SELECT"

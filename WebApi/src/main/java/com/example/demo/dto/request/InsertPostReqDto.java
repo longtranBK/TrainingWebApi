@@ -11,10 +11,6 @@ import lombok.Data;
 @Data
 public class InsertPostReqDto {
 	
-	@Size(max = 36)
-	@NotBlank(message = "The userId is required.")
-	private String userId;
-	
 	@Size(max = 5000)
 	@NotBlank(message = "The content is required.")
 	private String content;

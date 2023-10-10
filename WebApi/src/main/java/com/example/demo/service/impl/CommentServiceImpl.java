@@ -18,14 +18,14 @@ public class CommentServiceImpl implements CommentService{
 	private CommentRepository commentRepository;
 	
 	@Override
-	public void insertComment(InsertCommentReqDto request) {
+	public void insertComment(InsertCommentReqDto request, String userId) {
 		Timestamp upadteTs = new java.sql.Timestamp(System.currentTimeMillis());
 		String commentId = UUID.randomUUID().toString();
 		
 		Comment comment = new Comment();
 		comment.setCommentId(commentId);
 		comment.setPostId(request.getPostId());
-		comment.setUserId(request.getUserId());
+		comment.setUserId(userId);
 		comment.setContent(request.getContent());
 		comment.setCreateTs(upadteTs);
 		comment.setUpdateTs(upadteTs);
@@ -34,8 +34,8 @@ public class CommentServiceImpl implements CommentService{
 	}
 
 	@Override
-	public Comment findByCommentId(String commentId) {
-		return commentRepository.findByCommentId(commentId);
+	public Comment findByCommentIdAndUserId(String commentId, String userId) {
+		return commentRepository.findByCommentIdAndUserId(commentId, userId);
 	}
 
 	@Override

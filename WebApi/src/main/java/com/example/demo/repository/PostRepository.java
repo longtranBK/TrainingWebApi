@@ -22,7 +22,10 @@ public interface PostRepository extends JpaRepository<Post, String>{
 			+ " SELECT"
 			+ " user1 as userid"
 			+ " FROM user_friend"
-			+ " WHERE user2 = ?1)"
+			+ " WHERE user2 = ?1"
+			+ " UNION"
+			+ "	SELECT"
+			+ "	?1 as userid)"
 			+ " ORDER BY"
 			+ " create_ts DESC"
 			+ " LIMIT ?2", nativeQuery = true)

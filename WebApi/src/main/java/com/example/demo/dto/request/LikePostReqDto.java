@@ -9,10 +9,6 @@ import lombok.Data;
 public class LikePostReqDto {
 	
 	@Size(max = 36)
-	@NotBlank(message = "The userId is required.")
-	private String userId;
-	
-	@Size(max = 36)
 	@NotBlank(message = "The postId is required.")
 	private String postId;
 

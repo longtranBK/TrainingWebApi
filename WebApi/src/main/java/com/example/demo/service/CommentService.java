@@ -9,16 +9,18 @@ public interface CommentService {
 	 * Insert comment
 	 * 
 	 * @param request
+	 * @param userId
 	 */
-	void insertComment(InsertCommentReqDto request);
+	void insertComment(InsertCommentReqDto request, String userId);
 	
 	/**
 	 * Search comment
 	 * 
 	 * @param commentId
+	 * @param userId
 	 * @return comment
 	 */
-	Comment findByCommentId(String commentId);
+	Comment findByCommentIdAndUserId(String commentId, String userId);
 	
 	/**
 	 * Update comment

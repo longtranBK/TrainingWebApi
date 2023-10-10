@@ -10,8 +10,6 @@ import java.util.UUID;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,12 +20,10 @@ import com.example.demo.dto.response.GetPostResDto;
 import com.example.demo.entity.Capture;
 import com.example.demo.entity.Like;
 import com.example.demo.entity.Post;
-import com.example.demo.entity.User;
 import com.example.demo.repository.CaptureRepository;
 import com.example.demo.repository.CommentRepository;
 import com.example.demo.repository.LikeRepository;
 import com.example.demo.repository.PostRepository;
-import com.example.demo.repository.UserRepository;
 import com.example.demo.service.FileService;
 import com.example.demo.service.PostService;
 
@@ -49,9 +45,6 @@ public class PostServiceImpl implements PostService {
 	@Autowired
 	private CommentRepository commentRepository;
 
-	@Autowired
-	private UserRepository userRepository;
-
 	@Override
 	public Post findByPostId(String postId) {
 		return postRepository.findByPostId(postId);
@@ -59,13 +52,13 @@ public class PostServiceImpl implements PostService {
 
 	@Override
 	@Transactional(rollbackOn = { Exception.class, Throwable.class })
-	public void insertPost(InsertPostReqDto request, MultipartFile[] avatarList) {
+	public void insertPost(InsertPostReqDto request, MultipartFile[] avatarList, String userId) {
 		String postId = UUID.randomUUID().toString();
 		Timestamp upadteTs = new java.sql.Timestamp(System.currentTimeMillis());
 
 		Post post = new Post();
 		post.setPostId(postId);
-		post.setUserId(request.getUserId());
+		post.setUserId(userId);
 		post.setContent(request.getContent());
 		post.setStatus(request.getStatus());
 		post.setCreateTs(upadteTs);
@@ -106,6 +99,7 @@ public class PostServiceImpl implements PostService {
 	}
 
 	@Override
+	@Transactional(rollbackOn = { Exception.class, Throwable.class })
 	public void updatePost(Post post, UpdatePostReqDto request, MultipartFile[] avatarList) {
 
 		Timestamp upadteTs = new java.sql.Timestamp(System.currentTimeMillis());
@@ -115,7 +109,7 @@ public class PostServiceImpl implements PostService {
 		postRepository.save(post);
 		captureRepository.deleteByPostId(post.getPostId());
 		saveCapturesList(post.getPostId(), avatarList);
-		
+
 	}
 
 	@Override
@@ -137,14 +131,10 @@ public class PostServiceImpl implements PostService {
 	}
 
 	@Override
-	public List<GetPostResDto> getPostTimeLine(int numbersPost) {
+	public List<GetPostResDto> getPostTimeLine(int numbersPost, String userId) {
 		List<GetPostResDto> response = new ArrayList<>();
 
-		SecurityContext securityContext = SecurityContextHolder.getContext();
-		String username = securityContext.getAuthentication().getName();
-		User user = userRepository.findByUsername(username);
-
-		List<Post> postList = postRepository.getPostTimeline(user.getUserId(), numbersPost);
+		List<Post> postList = postRepository.getPostTimeline(userId, numbersPost);
 		if (postList.size() == 0) {
 			return response;
 		}
@@ -187,10 +177,9 @@ public class PostServiceImpl implements PostService {
 
 	@Override
 	public void dislikePost(String userId, String postId) {
-		// TODO Auto-generated method stub
-
+		likeRepository.deleteByPostIdAndUserId(postId, userId);
 	}
-	
+
 	/**
 	 * 
 	 * @param postId
@@ -209,6 +198,11 @@ public class PostServiceImpl implements PostService {
 
 			captureRepository.saveAll(captureList);
 		}
+	}
+
+	@Override
+	public Post findByPostIdAndUserId(String postId, String userId) {
+		return postRepository.findByPostIdAndUserId(postId, userId);
 	}
 
 }
