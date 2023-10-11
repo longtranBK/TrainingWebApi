@@ -23,9 +23,6 @@ public class JwtUtils {
 	@Value("${jwt.expirationMs}")
 	private int jwtExpirationMs;
 
-    @Value("${jwt.expiration}")
-    private long tokenValidityInSeconds;
-    
     /**
      * Create token JWT 
      * 
