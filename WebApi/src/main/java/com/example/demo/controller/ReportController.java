@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.constant.Constants;
 import com.example.demo.service.ReportService;
+import com.example.demo.service.UserService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -29,11 +30,13 @@ public class ReportController {
 	@Autowired
 	private ReportService reportService;
 	
+	@Autowired
+	private UserService userService;
+	
 	@Operation(summary = "Download report")
 	@GetMapping("/download")
 	@Secured(Constants.ROLE_USER_NAME)
 	public ResponseEntity<Resource> getFile(
-			@RequestParam("userId") String userId,
 			@RequestParam("timeStart") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) java.util.Date timeStart,
 			@RequestParam("timeEnd") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) java.util.Date timeEnd,
 			@RequestParam("numbersPost") int numbersPost) {
@@ -42,7 +45,7 @@ public class ReportController {
 		Date end = new java.sql.Date(timeEnd.getTime());
 		
 		String filename = "Report.xlsx";
-		InputStreamResource file = new InputStreamResource(reportService.loadData(userId, start, end, numbersPost));
+		InputStreamResource file = new InputStreamResource(reportService.loadData(userService.getUserId(), start, end, numbersPost));
 
 		return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
 				.contentType(MediaType.parseMediaType("application/vnd.ms-excel")).body(file);

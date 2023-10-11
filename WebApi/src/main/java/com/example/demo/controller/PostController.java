@@ -4,20 +4,16 @@ import java.sql.Date;
 import java.text.ParseException;
 import java.util.List;
 
-import javax.transaction.Transactional;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -32,8 +28,6 @@ import com.example.demo.dto.request.LikePostReqDto;
 import com.example.demo.dto.request.UpdatePostReqDto;
 import com.example.demo.dto.response.GetPostResDto;
 import com.example.demo.entity.Post;
-import com.example.demo.entity.User;
-import com.example.demo.service.FileService;
 import com.example.demo.service.PostService;
 import com.example.demo.service.UserService;
 
@@ -51,22 +45,18 @@ public class PostController {
 	@Autowired
 	private PostService postService;
 
-	@Autowired
-	private FileService fileService;
-
 	@Operation(summary = "Insert new post")
 	@PostMapping(value = { "" })
 	@Secured(Constants.ROLE_USER_NAME)
 	public ResponseEntity<?> insertPost(@Valid @RequestPart("request") InsertPostReqDto request,
 			@RequestPart("files") MultipartFile[] avatarFiles) {
 
-		User user = userService.getByUserId(request.getUserId());
-		if (user == null) {
-			return ResponseEntity.ok().body("User id not found!");
+		if (postService.insertPost(request, avatarFiles, userService.getUserId()) != null) {
+			return ResponseEntity.ok().body("Insert post successful!");
+		} else {
+			return ResponseEntity.ok().body("Insert post error!");
 		}
 
-		postService.insertPost(request, avatarFiles);
-		return ResponseEntity.ok().body("Insert post successful!");
 	}
 
 	@Operation(summary = "Search post")
@@ -84,20 +74,22 @@ public class PostController {
 	}
 
 	@Operation(summary = "Update post")
-	@PutMapping(value = { "/{postId}" })
+	@PostMapping(value = "/{postId}")
 	@Secured(Constants.ROLE_USER_NAME)
-	@Transactional(rollbackOn = { Exception.class, Throwable.class })
 	public ResponseEntity<?> updatePost(@PathVariable(value = "postId") String postId,
-			@Valid @RequestPart("request") UpdatePostReqDto request, @RequestPart("files") MultipartFile[] avatarFiles) throws ParseException {
+			@Valid @RequestPart("request") UpdatePostReqDto request, @RequestPart("files") MultipartFile[] avatarFiles)
+			throws ParseException {
 
-		Post post = postService.findByPostId(postId);
-
+		Post post = postService.findByPostIdAndUserId(postId, userService.getUserId());
 		if (post == null) {
 			return ResponseEntity.notFound().build();
 		}
 
-		postService.updatePost(post, request, avatarFiles);
-		return ResponseEntity.ok().body("Update post successfull!");
+		if(postService.updatePost(post, request, avatarFiles) != null) {
+			return ResponseEntity.ok().body("Update post successfull!");
+		} else {
+			return ResponseEntity.ok().body("Update post error!");
+		}
 	}
 
 	@Operation(summary = "Delete post")
@@ -105,7 +97,7 @@ public class PostController {
 	@Secured(Constants.ROLE_USER_NAME)
 	public ResponseEntity<?> deletePost(@PathVariable(value = "postId") String postId) {
 
-		Post post = postService.findByPostId(postId);
+		Post post = postService.findByPostIdAndUserId(postId, userService.getUserId());
 		if (post == null) {
 			return ResponseEntity.notFound().build();
 		}
@@ -120,11 +112,7 @@ public class PostController {
 	public @ResponseBody ResponseEntity<List<GetPostResDto>> getPostTimeLine(
 			@RequestParam("numbers-post") int numbersPost) {
 
-		List<GetPostResDto> response = postService.getPostTimeLine(numbersPost);
-		if (response.size() == 0) {
-			return ResponseEntity.notFound().build();
-		}
-
+		List<GetPostResDto> response = postService.getPostTimeLine(numbersPost, userService.getUserId());
 		return ResponseEntity.ok().body(response);
 	}
 
@@ -133,12 +121,15 @@ public class PostController {
 	@Secured(Constants.ROLE_USER_NAME)
 	public ResponseEntity<?> likePost(@Valid @RequestBody LikePostReqDto request) {
 
-		if (postService.hasLike(request.getUserId(), request.getPostId())) {
+		String userId = userService.getUserId();
+		if (postService.hasLike(userId, request.getPostId())) {
 			return ResponseEntity.ok().body("User had liked!");
 		}
-		postService.likePost(request.getUserId(), request.getPostId());
-
-		return ResponseEntity.ok().body("Like post successful!");
+		if( postService.likePost(userId, request.getPostId())!= null) {
+			return ResponseEntity.ok().body("Like post successful!");
+		} else {
+			return ResponseEntity.ok().body("Like post error!");
+		}
 	}
 
 	@Operation(summary = "Dislike post")
@@ -146,21 +137,13 @@ public class PostController {
 	@Secured(Constants.ROLE_USER_NAME)
 	public ResponseEntity<?> dislikePost(@Valid @RequestBody LikePostReqDto request) {
 
-		if (!postService.hasLike(request.getUserId(), request.getPostId())) {
+		String userId = userService.getUserId();
+		if (!postService.hasLike(userId, request.getPostId())) {
 			return ResponseEntity.ok().body("User had not like!");
 		}
-		postService.dislikePost(request.getUserId(), request.getPostId());
+		postService.dislikePost(userId, request.getPostId());
 
 		return ResponseEntity.ok().body("Unlike successful!");
 	}
-	
-	@Operation(summary = "Get capture of post by file name")
-	@GetMapping("/captures/{filename:.+}")
-	@ResponseBody
-	public ResponseEntity<Resource> getFile(@PathVariable String filename) {
-		Resource file = fileService.load(filename);
-		return ResponseEntity.ok()
-				.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
-				.body(file);
-	}
+
 }

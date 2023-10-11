@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.example.demo.dto.request.InsertPostReqDto;
 import com.example.demo.dto.request.UpdatePostReqDto;
 import com.example.demo.dto.response.GetPostResDto;
+import com.example.demo.entity.Like;
 import com.example.demo.entity.Post;
 
 public interface PostService {
@@ -21,12 +22,21 @@ public interface PostService {
 	Post findByPostId(String postId);
 	
 	/**
-	 * Insert post
+	 * Find post
+	 * 
+	 * @param postId
+	 * @return post
+	 */
+	Post findByPostIdAndUserId(String postId, String userId);
+	
+	/**
 	 * 
 	 * @param request
 	 * @param avatarList
+	 * @param userId
+	 * @return
 	 */
-	void insertPost(InsertPostReqDto request, MultipartFile[] avatarList);
+	Post insertPost(InsertPostReqDto request, MultipartFile[] avatarList, String userId);
 	
 	/**
 	 * Find post with condition
@@ -40,13 +50,13 @@ public interface PostService {
 	List<GetPostResDto> getPostCustom(String userId, Date startDate, Date endDate, int numbersPost);
 	
 	/**
-	 * Update post
 	 * 
 	 * @param post
 	 * @param request
 	 * @param avatarList
+	 * @return
 	 */
-	void updatePost(Post post, UpdatePostReqDto request, MultipartFile[] avatarList);
+	Post updatePost(Post post, UpdatePostReqDto request, MultipartFile[] avatarList);
 	
 	/**
 	 * Delete post
@@ -61,7 +71,7 @@ public interface PostService {
 	 * @param numbersPost
 	 * @return
 	 */
-	List<GetPostResDto> getPostTimeLine(int numbersPost);
+	List<GetPostResDto> getPostTimeLine(int numbersPost, String userId);
 	
 	/**
 	 * Check lisk of post
@@ -73,12 +83,12 @@ public interface PostService {
 	boolean hasLike(String userId, String postId);
 	
 	/**
-	 * Like post
 	 * 
 	 * @param userId
 	 * @param postId
+	 * @return
 	 */
-	void likePost(String userId, String postId);
+	Like likePost(String userId, String postId);
 	
 	/**
 	 * 

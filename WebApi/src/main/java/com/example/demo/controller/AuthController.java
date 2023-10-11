@@ -93,12 +93,17 @@ public class AuthController {
 	@Operation(summary = "Register new user")
 	@PostMapping(value = { "/signup" })
 	public ResponseEntity<?> signup(@RequestPart("file") MultipartFile avatarFile, @Valid @RequestPart("request") SignupReqDto request) throws ParseException {
+		
 		if (userService.getByUsername(request.getUsername()) != null) {
 			return ResponseEntity.ok().body("Username is already taken!");
 		}
-		userService.saveUser(request, avatarFile);
+		
+		if (userService.saveUser(request, avatarFile) != null) {
+			return ResponseEntity.ok().body("Registration successful");
+		} else {
+			return ResponseEntity.ok().body("Registration error");
+		}
 
-		return ResponseEntity.ok().body("Registration successful");
 	}
 
 	@Operation(summary = "Forgot password and get token")

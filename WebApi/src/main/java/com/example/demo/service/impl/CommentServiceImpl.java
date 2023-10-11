@@ -18,34 +18,34 @@ public class CommentServiceImpl implements CommentService{
 	private CommentRepository commentRepository;
 	
 	@Override
-	public void insertComment(InsertCommentReqDto request) {
+	public Comment insertComment(InsertCommentReqDto request, String userId) {
 		Timestamp upadteTs = new java.sql.Timestamp(System.currentTimeMillis());
 		String commentId = UUID.randomUUID().toString();
 		
 		Comment comment = new Comment();
 		comment.setCommentId(commentId);
 		comment.setPostId(request.getPostId());
-		comment.setUserId(request.getUserId());
+		comment.setUserId(userId);
 		comment.setContent(request.getContent());
 		comment.setCreateTs(upadteTs);
 		comment.setUpdateTs(upadteTs);
-		commentRepository.save(comment);
+		return commentRepository.save(comment);
 		
 	}
 
 	@Override
-	public Comment findByCommentId(String commentId) {
-		return commentRepository.findByCommentId(commentId);
+	public Comment findByCommentIdAndUserId(String commentId, String userId) {
+		return commentRepository.findByCommentIdAndUserId(commentId, userId);
 	}
 
 	@Override
-	public void updateComment(Comment comment, String content) {
+	public Comment updateComment(Comment comment, String content) {
 		Timestamp upadteTs = new java.sql.Timestamp(System.currentTimeMillis());
 
 		comment.setContent(content);
 		comment.setUpdateTs(upadteTs);
 
-		commentRepository.save(comment);
+		return commentRepository.save(comment);
 		
 	}
 

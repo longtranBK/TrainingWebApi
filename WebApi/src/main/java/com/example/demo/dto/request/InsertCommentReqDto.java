@@ -7,10 +7,6 @@ import lombok.Data;
 
 @Data
 public class InsertCommentReqDto {
-
-	@Size(max = 36)
-	@NotBlank(message = "The userId is required.")
-	private String userId;
 	
 	@Size(max = 36)
 	@NotBlank(message = "The postId is required.")

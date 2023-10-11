@@ -8,6 +8,7 @@ import com.example.demo.dto.request.SignupReqDto;
 import com.example.demo.dto.request.UpdateUserInforReqDto;
 import com.example.demo.dto.response.UserInforResDto;
 import com.example.demo.entity.User;
+import com.example.demo.entity.UserFriend;
 
 public interface UserService {
 
@@ -20,21 +21,21 @@ public interface UserService {
 	User getByUserId(String userId);
 	
 	/**
-	 * Save user
 	 * 
 	 * @param req
 	 * @param avatarFile
+	 * @return
 	 * @throws ParseException
 	 */
-	void saveUser(SignupReqDto req, MultipartFile avatarFile) throws ParseException;
+	User saveUser(SignupReqDto req, MultipartFile avatarFile) throws ParseException;
 	
 	/**
-	 * Set new password for user
 	 * 
 	 * @param user
 	 * @param newPws
+	 * @return
 	 */
-	void setNewPws(User user, String newPws);
+	User setNewPws(User user, String newPws);
 	
 	/**
 	 * Get user infor
@@ -45,13 +46,14 @@ public interface UserService {
 	UserInforResDto getUserInfor(String userId);
 	
 	/**
-	 * Update user infor
 	 * 
 	 * @param user
 	 * @param request
+	 * @param avatarFile
+	 * @return
 	 * @throws ParseException
 	 */
-	void updateUserInfor(User user, UpdateUserInforReqDto request, MultipartFile avatarFile) throws ParseException;
+	User updateUserInfor(User user, UpdateUserInforReqDto request, MultipartFile avatarFile) throws ParseException;
 	
 	/**
 	 * Get user by username
@@ -71,19 +73,24 @@ public interface UserService {
 	boolean isFriend(String userId1, String userId2);
 	
 	/**
-	 * Add friend of two user
 	 * 
 	 * @param userId1
 	 * @param userId2
+	 * @return
 	 */
-	void addFriend(String userId1, String userId2);
+	UserFriend addFriend(String userId1, String userId2);
 	
 	/**
-	 * Unfriend of two user
 	 * 
 	 * @param userId1
 	 * @param userId2
 	 */
 	void unFriend(String userId1, String userId2);
+	
+	/**
+	 * Get user id of login user
+	 * @return userId
+	 */
+	String getUserId();
 	
 }

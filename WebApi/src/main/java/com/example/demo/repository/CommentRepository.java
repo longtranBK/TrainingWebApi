@@ -22,7 +22,7 @@ public interface CommentRepository extends JpaRepository<Comment, String> {
 	
 	void deleteByPostId(String postId);
 	
-	Comment findByCommentId(String commentId);
+	Comment findByCommentIdAndUserId(String commentId, String userId);
 	
 	@Query(value = "SELECT * FROM comment"
 			+ " WHERE create_ts >= ?1 AND create_ts <= ?2"
