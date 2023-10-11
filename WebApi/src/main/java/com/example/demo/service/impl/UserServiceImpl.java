@@ -63,7 +63,7 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	@Transactional(rollbackOn = { Exception.class, Throwable.class })
-	public void saveUser(SignupReqDto request, MultipartFile avatarFile) throws ParseException {
+	public User saveUser(SignupReqDto request, MultipartFile avatarFile) throws ParseException {
 		Timestamp upadteTs = new java.sql.Timestamp(System.currentTimeMillis());
 		String uuid = UUID.randomUUID().toString();
 		User user = new User();
@@ -80,7 +80,7 @@ public class UserServiceImpl implements UserService {
 		user.setCreateTs(upadteTs);
 		user.setUpdateTs(upadteTs);
 
-		userRepository.save(user);
+		User userSave = userRepository.save(user);
 
 		UserInfor userInfor = new UserInfor();
 		userInfor.setUserId(uuid);
@@ -92,14 +92,17 @@ public class UserServiceImpl implements UserService {
 		userInfor.setCreateTs(upadteTs);
 		userInfor.setUpdateTs(upadteTs);
 
-		userInforRepository.save(userInfor);
+		if (userSave != null && userInforRepository.save(userInfor)!= null) {
+			return userSave;
+		}
+		return null;
 
 	}
 
 	@Override
-	public void setNewPws(User user, String newPws) {
+	public User setNewPws(User user, String newPws) {
 		user.setPassword(passwordEncoder.encode(newPws));
-		userRepository.save(user);
+		return userRepository.save(user);
 	}
 
 	@Override
@@ -109,13 +112,13 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	@Transactional(rollbackOn = { Exception.class, Throwable.class })
-	public void updateUserInfor(User user, UpdateUserInforReqDto request, MultipartFile avatarFile)
+	public User updateUserInfor(User user, UpdateUserInforReqDto request, MultipartFile avatarFile)
 			throws ParseException {
 		Timestamp upadteTs = new java.sql.Timestamp(System.currentTimeMillis());
 		user.setFullName(request.getFullName());
 		user.setAvatarUrl(fileService.save(avatarFile));
 		user.setUpdateTs(upadteTs);
-		userRepository.save(user);
+		User userSave = userRepository.save(user);
 
 		UserInfor userInfor = userInforRepository.findUserInforById(user.getUserId());
 		userInfor.setSex(request.getSex());
@@ -128,11 +131,13 @@ public class UserServiceImpl implements UserService {
 			Date parsed = format.parse(request.getDateOfBirth());
 			userInfor.setDateOfBirth(new java.sql.Date(parsed.getTime()));
 		}
-
 		userInfor.setUpdateTs(upadteTs);
 
-		userInforRepository.save(userInfor);
-
+		if (userSave != null && userInforRepository.save(userInfor) != null) {
+			return userSave;
+		}
+		
+		return null;
 	}
 
 	@Override
@@ -141,7 +146,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public void addFriend(String userId1, String userId2) {
+	public UserFriend addFriend(String userId1, String userId2) {
 
 		Timestamp createTs = new java.sql.Timestamp(System.currentTimeMillis());
 		UserFriend userFriend = new UserFriend();
@@ -149,7 +154,7 @@ public class UserServiceImpl implements UserService {
 		userFriend.setUser2(userId2);
 		userFriend.setCreateTs(createTs);
 
-		userFriendRepository.save(userFriend);
+		return userFriendRepository.save(userFriend);
 	}
 
 	@Override

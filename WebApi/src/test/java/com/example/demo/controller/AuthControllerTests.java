@@ -185,7 +185,7 @@ public class AuthControllerTests {
 	}
 
 	@Test
-	void signup_usernameNotExists() throws Exception {
+	void signup_usernameNotExists_saveOk() throws Exception {
 		SignupReqDto req = new SignupReqDto();
 		req.setFullName("Trần Hoàng Long");
 		req.setUsername("longth@gmail.com");
@@ -198,7 +198,32 @@ public class AuthControllerTests {
 				objectMapper.writeValueAsString(req).getBytes());
 
 		when(userService.getByUsername(req.getUsername())).thenReturn(null);
-		doNothing().when(userService).saveUser(req, avatarFile);
+		when(userService.saveUser(req, avatarFile)).thenReturn(new User());
+
+		MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.multipart(uriApiSignup).file(avatarFile)
+				.file(request).contentType(MediaType.MULTIPART_FORM_DATA).content("")).andReturn();
+		int status = mvcResult.getResponse().getStatus();
+		assertEquals(200, status);
+
+		String token = mvcResult.getResponse().getContentAsString();
+		assertEquals("Registration successful", token);
+	}
+	
+	@Test
+	void signup_usernameNotExists_saveNg() throws Exception {
+		SignupReqDto req = new SignupReqDto();
+		req.setFullName("Trần Hoàng Long");
+		req.setUsername("longth@gmail.com");
+		req.setPassword("longth");
+		req.setSex(1);
+		req.setDateOfBirth("1993-02-09");
+
+		MockMultipartFile avatarFile = new MockMultipartFile("file", "", "image/png", "Avatar of user".getBytes());
+		MockMultipartFile request = new MockMultipartFile("request", "", "application/json",
+				objectMapper.writeValueAsString(req).getBytes());
+
+		when(userService.getByUsername(req.getUsername())).thenReturn(null);
+		when(userService.saveUser(req, avatarFile)).thenReturn(null);
 
 		MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.multipart(uriApiSignup).file(avatarFile)
 				.file(request).contentType(MediaType.MULTIPART_FORM_DATA).content("")).andReturn();
@@ -207,7 +232,7 @@ public class AuthControllerTests {
 		assertEquals(200, status);
 
 		String token = mvcResult.getResponse().getContentAsString();
-		assertEquals("Registration successful", token);
+		assertEquals("Registration error", token);
 	}
 
 	@Test
@@ -224,7 +249,6 @@ public class AuthControllerTests {
 				objectMapper.writeValueAsString(req).getBytes());
 
 		when(userService.getByUsername(req.getUsername())).thenReturn(new User());
-		doNothing().when(userService).saveUser(req, avatarFile);
 
 		MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.multipart(uriApiSignup).file(avatarFile)
 				.file(request).contentType(MediaType.MULTIPART_FORM_DATA).content("")).andReturn();

@@ -52,7 +52,7 @@ public class PostServiceImpl implements PostService {
 
 	@Override
 	@Transactional(rollbackOn = { Exception.class, Throwable.class })
-	public void insertPost(InsertPostReqDto request, MultipartFile[] avatarList, String userId) {
+	public Post insertPost(InsertPostReqDto request, MultipartFile[] avatarList, String userId) {
 		String postId = UUID.randomUUID().toString();
 		Timestamp upadteTs = new java.sql.Timestamp(System.currentTimeMillis());
 
@@ -63,9 +63,11 @@ public class PostServiceImpl implements PostService {
 		post.setStatus(request.getStatus());
 		post.setCreateTs(upadteTs);
 		post.setUpdateTs(upadteTs);
-		postRepository.save(post);
-		saveCapturesList(postId, avatarList);
-
+		Post postSave = postRepository.save(post);
+		if (postSave != null && saveCapturesList(postId, avatarList).size() != 0) {
+			return postSave;
+		}
+		return null;
 	}
 
 	@Override
@@ -100,16 +102,18 @@ public class PostServiceImpl implements PostService {
 
 	@Override
 	@Transactional(rollbackOn = { Exception.class, Throwable.class })
-	public void updatePost(Post post, UpdatePostReqDto request, MultipartFile[] avatarList) {
+	public Post updatePost(Post post, UpdatePostReqDto request, MultipartFile[] avatarList) {
 
 		Timestamp upadteTs = new java.sql.Timestamp(System.currentTimeMillis());
 		post.setContent(request.getContent());
 		post.setStatus(request.getStatus());
 		post.setUpdateTs(upadteTs);
-		postRepository.save(post);
+		Post postSave = postRepository.save(post);
 		captureRepository.deleteByPostId(post.getPostId());
-		saveCapturesList(post.getPostId(), avatarList);
-
+		if (postSave!= null &&  saveCapturesList(post.getPostId(), avatarList).size() != 0) {
+			return postSave;
+		}
+		return null;
 	}
 
 	@Override
@@ -168,11 +172,11 @@ public class PostServiceImpl implements PostService {
 	}
 
 	@Override
-	public void likePost(String userId, String postId) {
+	public Like likePost(String userId, String postId) {
 		Like likePost = new Like();
 		likePost.setUserId(userId);
 		likePost.setPostId(postId);
-		likeRepository.save(likePost);
+		return likeRepository.save(likePost);
 	}
 
 	@Override
@@ -184,20 +188,19 @@ public class PostServiceImpl implements PostService {
 	 * 
 	 * @param postId
 	 * @param avatarList
+	 * @return
 	 */
-	private void saveCapturesList(String postId, MultipartFile[] avatarList) {
+	private List<Capture> saveCapturesList(String postId, MultipartFile[] avatarList) {
+		List<Capture> captureList = new ArrayList<>();
 		if (avatarList.length > 0) {
-			List<Capture> captureList = new ArrayList<>();
-
 			Arrays.asList(avatarList).stream().forEach(file -> {
 				Capture capture = new Capture();
 				capture.setCaptureUrl(fileService.save(file));
 				capture.setPostId(postId);
 				captureList.add(capture);
 			});
-
-			captureRepository.saveAll(captureList);
 		}
+		return captureRepository.saveAll(captureList);
 	}
 
 	@Override

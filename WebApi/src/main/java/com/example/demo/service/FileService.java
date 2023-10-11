@@ -1,6 +1,5 @@
 package com.example.demo.service;
 
-import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface FileService {
@@ -17,13 +16,5 @@ public interface FileService {
 	 * @return url file
 	 */
 	public String save(MultipartFile file);
-
-	/**
-	 * Load file upload
-	 * 
-	 * @param filename
-	 * @return Respurce
-	 */
-	public Resource load(String filename);
 
 }

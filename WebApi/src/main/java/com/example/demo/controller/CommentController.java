@@ -37,7 +37,7 @@ public class CommentController {
 
 	@Autowired
 	private CommentService commentService;
-	
+
 	@Autowired
 	private UserService userService;
 
@@ -50,10 +50,11 @@ public class CommentController {
 		if (post == null) {
 			return ResponseEntity.ok().body("Post not found!");
 		}
-		commentService.insertComment(request, userService.getUserId());
-
-		return ResponseEntity.ok().body("Insert comment successful!");
-
+		if (commentService.insertComment(request, userService.getUserId()) != null) {
+			return ResponseEntity.ok().body("Insert comment successful!");
+		} else {
+			return ResponseEntity.ok().body("Insert comment error!");
+		}
 	}
 
 	@Operation(summary = "Edit comment in post")
@@ -66,9 +67,11 @@ public class CommentController {
 			return ResponseEntity.notFound().build();
 		}
 
-		commentService.updateComment(comment, request.getContent());
-		
-		return ResponseEntity.ok().body("Update comment successful!");
+		if (commentService.updateComment(comment, request.getContent()) != null) {
+			return ResponseEntity.ok().body("Update comment successful!");
+		} else {
+			return ResponseEntity.ok().body("Update comment error!");
+		}
 	}
 
 	@Operation(summary = "Delete comment in post")

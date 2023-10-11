@@ -10,6 +10,7 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,26 +38,28 @@ public class UsersController {
 
 	@GetMapping(value = "/user-details/{userId}")
 	@Secured(Constants.ROLE_USER_NAME)
-	public ResponseEntity<UserInforResDto> getUserDetails(@PathVariable(value = "userId") String userId) {
+	public ResponseEntity<?> getUserDetails(@PathVariable(value = "userId") String userId) {
 
 		User user = userService.getByUserId(userId);
 		if (user == null) {
-			throw new UsernameNotFoundException("User not found!");
+			return ResponseEntity.ok().body("User not found!");
 		}
 		UserInforResDto infor = userService.getUserInfor(user.getUserId());
 
 		return ResponseEntity.ok().body(infor);
 	}
 
-	@PutMapping(value = { "/user-details" })
+	@PostMapping(value = { "/user-details" })
 	@Secured(Constants.ROLE_USER_NAME)
 	public ResponseEntity<?> updateUserInfor(@Valid @RequestPart("request") UpdateUserInforReqDto request,
 			@RequestPart("file") MultipartFile avatarFile) throws ParseException {
 
 		User user = userService.getByUserId(userService.getUserId());
-		userService.updateUserInfor(user, request, avatarFile);
-
-		return ResponseEntity.ok().body("User details updated!");
+		if (userService.updateUserInfor(user, request, avatarFile) != null) {
+			return ResponseEntity.ok().body("User details updated!");
+		} else {
+			return ResponseEntity.ok().body("User details error!");
+		}
 	}
 
 	@GetMapping(value = "/timeline/{userId}")
@@ -92,9 +95,12 @@ public class UsersController {
 	@PutMapping(value = { "/reset-password" })
 	@Secured(Constants.ROLE_USER_NAME)
 	public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordReqDto request) {
+		
 		User user = userService.getByUserId(userService.getUserId());
-		userService.setNewPws(user, request.getNewPassword());
-
-		return ResponseEntity.ok().body("Password update succcessful!");
+		if (userService.setNewPws(user, request.getNewPassword()) != null) {
+			return ResponseEntity.ok().body("Password update succcessful!");
+		} else {
+			return ResponseEntity.ok().body("Password update error!");
+		}
 	}
 }

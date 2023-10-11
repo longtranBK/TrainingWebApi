@@ -13,7 +13,7 @@ import lombok.Data;
 @Data
 @Validated
 public class UpdatePostReqDto {
-
+	
 	@Size(max = 5000)
 	@NotBlank(message = "The content is required.")
 	private String content;

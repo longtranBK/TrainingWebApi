@@ -10,8 +10,9 @@ public interface CommentService {
 	 * 
 	 * @param request
 	 * @param userId
+	 * @return
 	 */
-	void insertComment(InsertCommentReqDto request, String userId);
+	Comment insertComment(InsertCommentReqDto request, String userId);
 	
 	/**
 	 * Search comment
@@ -27,8 +28,9 @@ public interface CommentService {
 	 * 
 	 * @param comment
 	 * @param content
+	 * @return
 	 */
-	void updateComment(Comment comment, String content);
+	Comment updateComment(Comment comment, String content);
 	
 	/**
 	 * Delete comment

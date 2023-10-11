@@ -22,36 +22,40 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 @RequestMapping("api/friends")
 public class FriendController {
-	
+
 	@Autowired
 	private UserService userService;
-	
+
 	@Operation(summary = "Add friend")
 	@PostMapping(value = { "/{userIdFriend}" })
 	@Secured(Constants.ROLE_USER_NAME)
 	public ResponseEntity<?> addFriend(@PathVariable @NotBlank @Size(max = 36) String userIdFriend) {
 
 		String userIdCurrent = userService.getUserId();
-		
-		if(userService.isFriend(userIdCurrent, userIdFriend)) {
+
+		if (userService.isFriend(userIdCurrent, userIdFriend)) {
 			return ResponseEntity.ok().body("User was friend!");
 		}
-		userService.addFriend(userIdCurrent, userIdFriend);
-		
-		return ResponseEntity.ok().body("Add friend successful!");
+
+		if (userService.addFriend(userIdCurrent, userIdFriend) != null) {
+			return ResponseEntity.ok().body("Add friend successful!");
+		} else {
+			return ResponseEntity.ok().body("Add friend error!");
+		}
+
 	}
-	
+
 	@Operation(summary = "Unfriend")
 	@DeleteMapping(value = { "{userIdFriend}" })
 	@Secured(Constants.ROLE_USER_NAME)
 	public ResponseEntity<?> unFriend(@PathVariable @NotBlank @Size(max = 36) String userIdFriend) {
 
 		String userIdCurrent = userService.getUserId();
-		if(!userService.isFriend(userIdCurrent, userIdFriend)) {
+		if (!userService.isFriend(userIdCurrent, userIdFriend)) {
 			return ResponseEntity.ok().body("User was not friend!");
 		}
 		userService.unFriend(userIdCurrent, userIdFriend);
-		
+
 		return ResponseEntity.ok().body("Unfriend successful!");
 	}
 }
