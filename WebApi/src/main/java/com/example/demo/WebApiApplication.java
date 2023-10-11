@@ -2,14 +2,13 @@ package com.example.demo;
 
 import javax.annotation.Resource;
 
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import com.example.demo.service.FileService;
 
 @SpringBootApplication
-public class WebApiApplication implements CommandLineRunner {
+public class WebApiApplication {
 
 	@Resource
 	FileService fileService;
@@ -18,8 +17,4 @@ public class WebApiApplication implements CommandLineRunner {
 		SpringApplication.run(WebApiApplication.class, args);
 	}
 
-	@Override
-	public void run(String... arg) throws Exception {
-		fileService.init();
-	}
 }

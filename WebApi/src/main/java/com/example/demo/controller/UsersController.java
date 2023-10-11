@@ -7,7 +7,6 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -64,11 +63,11 @@ public class UsersController {
 
 	@GetMapping(value = "/timeline/{userId}")
 	@Secured(Constants.ROLE_USER_NAME)
-	public ResponseEntity<GetUserTimelineResDto> getUserTimeline(@PathVariable(value = "userId") String userId) {
+	public ResponseEntity<?> getUserTimeline(@PathVariable(value = "userId") String userId) {
 
 		User user = userService.getByUserId(userId);
 		if (user == null) {
-			throw new UsernameNotFoundException("User not found!");
+			return ResponseEntity.ok().body("User not found!");
 		}
 		GetUserTimelineResDto response = new GetUserTimelineResDto();
 		response.setUserId(userId);

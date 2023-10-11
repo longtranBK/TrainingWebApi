@@ -1,15 +1,12 @@
 package com.example.demo.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,8 +25,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import com.example.demo.constant.Constants;
+import com.example.demo.dto.request.ResetPasswordReqDto;
 import com.example.demo.dto.request.UpdateUserInforReqDto;
-import com.example.demo.dto.response.UserInforResDto;
 import com.example.demo.entity.User;
 import com.example.demo.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -148,5 +145,82 @@ public class UsersControllerTests {
 		
 		String msg = mvcResult.getResponse().getContentAsString();
 		assertEquals("User details error!", msg);
+	}
+	
+	@Test
+	void getUserTimeline_userNotExists() throws Exception {
+		
+		when(userService.getByUserId("userId")).thenReturn(null);
+		MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(uri+"/timeline/{userId}", "userId")
+				.contentType(MediaType.APPLICATION_JSON).content("")).andReturn();
+		
+		int status = mvcResult.getResponse().getStatus();
+		assertEquals(200, status);
+		
+		String msg = mvcResult.getResponse().getContentAsString();
+		assertEquals("User not found!", msg);
+	}
+
+	@Test
+	void getUserTimeline_userExists() throws Exception {
+		User user = new User();
+		user.setFullName("Test");
+		user.setAvatarUrl("Test");
+
+		when(userService.getByUserId("userId")).thenReturn(user);
+		MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(uri+"/timeline/{userId}", "userId")
+				.contentType(MediaType.APPLICATION_JSON).content("")).andReturn();
+		
+		int status = mvcResult.getResponse().getStatus();
+		assertEquals(200, status);
+	}
+
+	@Test
+	void getCurrentUserTimeline_Ok() throws Exception {
+		when(userService.getUserId()).thenReturn("userId");
+		when(userService.getByUserId("userId")).thenReturn(new User());
+		MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(uri+"/timeline/user-current", "userId")
+				.contentType(MediaType.APPLICATION_JSON).content("")).andReturn();
+		
+		int status = mvcResult.getResponse().getStatus();
+		assertEquals(200, status);
+	}
+
+	@Test
+	void resetPassword_resetOk() throws Exception {
+		ResetPasswordReqDto request = new ResetPasswordReqDto();
+		request.setNewPassword("test");
+		
+		User user = new User();
+		when(userService.getUserId()).thenReturn("userId");
+		when(userService.getByUserId("userId")).thenReturn(user);
+		when(userService.setNewPws(user,request.getNewPassword())).thenReturn(user);
+		MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.put(uri+"/reset-password")
+				.contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(request))).andReturn();
+		
+		int status = mvcResult.getResponse().getStatus();
+		assertEquals(200, status);
+
+		String msg = mvcResult.getResponse().getContentAsString();
+		assertEquals("Password update succcessful!", msg);
+	}
+
+	@Test
+	void resetPassword_resetNg() throws Exception {
+		ResetPasswordReqDto request = new ResetPasswordReqDto();
+		request.setNewPassword("test");
+		
+		User user = new User();
+		when(userService.getUserId()).thenReturn("userId");
+		when(userService.getByUserId("userId")).thenReturn(user);
+		when(userService.setNewPws(user,request.getNewPassword())).thenReturn(null);
+		MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.put(uri+"/reset-password")
+				.contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(request))).andReturn();
+		
+		int status = mvcResult.getResponse().getStatus();
+		assertEquals(200, status);
+
+		String msg = mvcResult.getResponse().getContentAsString();
+		assertEquals("Password update error!", msg);
 	}
 }

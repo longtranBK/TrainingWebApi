@@ -5,11 +5,6 @@ import org.springframework.web.multipart.MultipartFile;
 public interface FileService {
 
 	/**
-	 * Init file service when start application
-	 */
-	public void init();
-
-	/**
 	 * Save file upload
 	 * 
 	 * @param file
