@@ -22,29 +22,31 @@ public class CommentServiceImplTest {
 	private CommentServiceImpl commentServiceImpl;
 
 	@Test
-	void insertComment_withInput_excuteSuccess() {
+	void insertComment_withInput_returnComment() {
 		InsertCommentReqDto input = new InsertCommentReqDto();
 		Comment comment = new Comment();
 
 		when(commentRepository.save(any())).thenReturn(comment);
-		commentServiceImpl.insertComment(input);
-	}
-
-	@Test
-	void findByCommentId_withInput_returnComment() {
-		Comment comment = new Comment();
-		when(commentRepository.findByCommentId(any())).thenReturn(comment);
-
-		Comment result = commentServiceImpl.findByCommentId("id");
+		Comment result = commentServiceImpl.insertComment(input, "id");
 		assertNotEquals(null, result);
 	}
 
 	@Test
-	void updateComment_withInput_excuteSuccess() {
+	void findByCommentIdAndUserId_withInput_returnComment() {
+		Comment comment = new Comment();
+		when(commentRepository.findByCommentIdAndUserId(any(), any())).thenReturn(comment);
+
+		Comment result = commentServiceImpl.findByCommentIdAndUserId("id", "id");
+		assertNotEquals(null, result);
+	}
+
+	@Test
+	void updateComment_withInput_returnComment() {
 		Comment comment = new Comment();
 
 		when(commentRepository.save(any())).thenReturn(comment);
-		commentServiceImpl.updateComment(comment, "content");
+		Comment result = commentServiceImpl.updateComment(comment, "content");
+		assertNotEquals(null, result);
 	}
 
 	@Test
