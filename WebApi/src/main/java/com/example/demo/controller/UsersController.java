@@ -64,11 +64,11 @@ public class UsersController {
 
 	@GetMapping(value = "/timeline/{userId}")
 	@Secured(Constants.ROLE_USER_NAME)
-	public ResponseEntity<GetUserTimelineResDto> getUserTimeline(@PathVariable(value = "userId") String userId) {
+	public ResponseEntity<?> getUserTimeline(@PathVariable(value = "userId") String userId) {
 
 		User user = userService.getByUserId(userId);
 		if (user == null) {
-			throw new UsernameNotFoundException("User not found!");
+			return ResponseEntity.ok().body("User not found!");
 		}
 		GetUserTimelineResDto response = new GetUserTimelineResDto();
 		response.setUserId(userId);
