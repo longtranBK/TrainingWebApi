@@ -22,7 +22,6 @@ import com.example.demo.dto.request.SigninReqDto;
 import com.example.demo.dto.request.SignupReqDto;
 import com.example.demo.dto.request.ValidateOtpReqDto;
 import com.example.demo.dto.response.SigninResDto;
-import com.example.demo.entity.Post;
 import com.example.demo.entity.User;
 import com.example.demo.security.jwt.JwtUtils;
 import com.example.demo.service.AuthService;
@@ -30,10 +29,6 @@ import com.example.demo.service.OTPService;
 import com.example.demo.service.UserService;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @Tag(name = "Auth", description = "API thực hiện xác thực user, đăng ký mới user")
@@ -41,6 +36,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping("/api/auth")
 public class AuthController {
 
+	private String prefixAuthen = "Bearer ";
+	
 	@Autowired
 	private AuthService authService;
 
@@ -96,7 +93,7 @@ public class AuthController {
 			jwtToken = jwtUtils.generateJwtToken(username);
 		}
 		
-		return ResponseEntity.ok().body(jwtToken);
+		return ResponseEntity.ok().body(prefixAuthen + jwtToken);
 	}
 
 	@Operation(summary = "Register new user")
@@ -119,9 +116,6 @@ public class AuthController {
 
 	@Operation(summary = "Forgot password and get token")
 	@PostMapping(value = { "/forgot-password" })
-	 @ApiResponses({
-         @ApiResponse(responseCode = "200", content = {
-                 @Content(schema = @Schema(implementation = String.class), mediaType = "application/json") }) })
 	public ResponseEntity<?> forgotPassword(
 			@Valid @RequestBody(required = true) ForgotPasswordReqDto request) {
 
@@ -133,7 +127,7 @@ public class AuthController {
 		// Create jwt token
 		String jwtToken = jwtUtils.generateJwtToken(request.getUsername());
 
-		return ResponseEntity.ok().body(jwtToken);
+		return ResponseEntity.ok().body(prefixAuthen + jwtToken);
 	}
 
 }

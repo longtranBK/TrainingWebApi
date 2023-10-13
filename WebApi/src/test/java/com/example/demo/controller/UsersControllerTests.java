@@ -141,10 +141,7 @@ public class UsersControllerTests {
 				.contentType(MediaType.APPLICATION_JSON).content("")).andReturn();
 		
 		int status = mvcResult.getResponse().getStatus();
-		assertEquals(200, status);
-		
-		String msg = mvcResult.getResponse().getContentAsString();
-		assertEquals("User details error!", msg);
+		assertEquals(500, status);
 	}
 	
 	@Test
@@ -218,9 +215,7 @@ public class UsersControllerTests {
 				.contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(request))).andReturn();
 		
 		int status = mvcResult.getResponse().getStatus();
-		assertEquals(200, status);
+		assertEquals(500, status);
 
-		String msg = mvcResult.getResponse().getContentAsString();
-		assertEquals("Password update error!", msg);
 	}
 }

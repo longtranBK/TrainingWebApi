@@ -65,7 +65,7 @@ public class UsersController {
 		if (userService.updateUserInfor(user, request, avatarFile) != null) {
 			return ResponseEntity.ok().body("User details updated!");
 		} else {
-			return ResponseEntity.ok().body("User details error!");
+			return ResponseEntity.internalServerError().body("User details error!");
 		}
 	}
 
@@ -112,7 +112,7 @@ public class UsersController {
 		if (userService.setNewPws(user, request.getNewPassword()) != null) {
 			return ResponseEntity.ok().body("Password update succcessful!");
 		} else {
-			return ResponseEntity.ok().body("Password update error!");
+			return ResponseEntity.internalServerError().body("Password update error!");
 		}
 	}
 }

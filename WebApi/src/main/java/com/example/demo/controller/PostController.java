@@ -58,7 +58,7 @@ public class PostController {
 		if (postService.insertPost(request, avatarFiles, userService.getUserId()) != null) {
 			return ResponseEntity.ok().body("Insert post successful!");
 		} else {
-			return ResponseEntity.ok().body("Insert post error!");
+			return ResponseEntity.internalServerError().body("Insert post error!");
 		}
 	}
 
@@ -94,7 +94,7 @@ public class PostController {
 		if(postService.updatePost(post, request, avatarFiles) != null) {
 			return ResponseEntity.ok().body("Update post successfull!");
 		} else {
-			return ResponseEntity.ok().body("Update post error!");
+			return ResponseEntity.internalServerError().body("Update post error!");
 		}
 	}
 
@@ -136,7 +136,7 @@ public class PostController {
 		if( postService.likePost(userId, request.getPostId())!= null) {
 			return ResponseEntity.ok().body("Like post successful!");
 		} else {
-			return ResponseEntity.ok().body("Like post error!");
+			return ResponseEntity.internalServerError().body("Like post error!");
 		}
 	}
 

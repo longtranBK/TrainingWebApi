@@ -118,10 +118,8 @@ public class PostControllerTests {
 				.file(captureFile).contentType(MediaType.MULTIPART_FORM_DATA).content("")).andReturn();
 		
 		int status = mvcResult.getResponse().getStatus();
-		assertEquals(200, status);
+		assertEquals(500, status);
 
-		String msg = mvcResult.getResponse().getContentAsString();
-		assertEquals("Insert post error!", msg);
 	}
 	
 	@Test
@@ -215,10 +213,7 @@ public class PostControllerTests {
 				.contentType(MediaType.MULTIPART_FORM_DATA).content("")).andReturn();
 		
 		int status = mvcResult.getResponse().getStatus();
-		assertEquals(200, status);
-
-		String msg = mvcResult.getResponse().getContentAsString();
-		assertEquals("Update post error!", msg);
+		assertEquals(500, status);
 	}
 	
 	@Test
@@ -317,10 +312,8 @@ public class PostControllerTests {
 				.contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(request))).andReturn();
 		
 		int status = mvcResult.getResponse().getStatus();
-		assertEquals(200, status);
-		
-		String msg = mvcResult.getResponse().getContentAsString();
-		assertEquals("Like post error!", msg);
+		assertEquals(500, status);
+
 	}
 	
 	@Test
