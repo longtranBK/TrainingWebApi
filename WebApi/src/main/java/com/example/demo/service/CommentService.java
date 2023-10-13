@@ -10,7 +10,7 @@ public interface CommentService {
 	 * 
 	 * @param request
 	 * @param userId
-	 * @return
+	 * @return Comment if insert success
 	 */
 	Comment insertComment(InsertCommentReqDto request, String userId);
 	
@@ -28,7 +28,7 @@ public interface CommentService {
 	 * 
 	 * @param comment
 	 * @param content
-	 * @return
+	 * @return Comment if update success
 	 */
 	Comment updateComment(Comment comment, String content);
 	

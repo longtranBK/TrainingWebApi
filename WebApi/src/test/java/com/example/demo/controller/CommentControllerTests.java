@@ -116,10 +116,8 @@ public class CommentControllerTests {
 				.content(objectMapper.writeValueAsString(request))).andReturn();
 
 		int status = mvcResult.getResponse().getStatus();
-		assertEquals(200, status);
+		assertEquals(500, status);
 
-		String msg = mvcResult.getResponse().getContentAsString();
-		assertEquals("Insert comment error!", msg);
 	}
 	
 	@Test
@@ -131,7 +129,7 @@ public class CommentControllerTests {
 		when(userService.getUserId()).thenReturn("userId");
 		when(commentService.findByCommentIdAndUserId(request.getCommentId(), userService.getUserId())).thenReturn(null);
 		
-		MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post(uri).contentType(MediaType.APPLICATION_JSON)
+		MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.put(uri).contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(request))).andReturn();
 		
 		int status = mvcResult.getResponse().getStatus();
@@ -173,9 +171,7 @@ public class CommentControllerTests {
 				.content(objectMapper.writeValueAsString(request))).andReturn();
 		
 		int status = mvcResult.getResponse().getStatus();
-		assertEquals(200, status);
-		String msg = mvcResult.getResponse().getContentAsString();
-		assertEquals("Update comment error!", msg);
+		assertEquals(500, status);
 	}
 	
 	@Test

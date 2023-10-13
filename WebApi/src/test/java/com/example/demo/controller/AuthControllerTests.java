@@ -229,10 +229,7 @@ public class AuthControllerTests {
 				.file(request).contentType(MediaType.MULTIPART_FORM_DATA).content("")).andReturn();
 
 		int status = mvcResult.getResponse().getStatus();
-		assertEquals(200, status);
-
-		String token = mvcResult.getResponse().getContentAsString();
-		assertEquals("Registration error", token);
+		assertEquals(500, status);
 	}
 
 	@Test

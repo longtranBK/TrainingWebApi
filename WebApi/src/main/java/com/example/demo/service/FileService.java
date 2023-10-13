@@ -5,11 +5,12 @@ import org.springframework.web.multipart.MultipartFile;
 public interface FileService {
 
 	/**
-	 * Save file upload
+	 * Save file and return file path
 	 * 
 	 * @param file
-	 * @return url file
+	 * @param userId
+	 * @return path file
 	 */
-	public String save(MultipartFile file);
+	public String save(MultipartFile file, String userId);
 
 }

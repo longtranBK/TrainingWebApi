@@ -12,10 +12,10 @@ public class Constants {
 			+ "|^(((19|2[0-9])[0-9]{2})-(0[469]|11)-(0[1-9]|[12][0-9]|30))$";
 	
 	// Value role admin
-	public static final int ROLE_ADMIN_VALUE = 1;
+	public static final String ROLE_ADMIN_VALUE = "1";
 	
 	// Value  role user
-	public static final int ROLE_USER_VALUE = 2;
+	public static final String ROLE_USER_VALUE = "2";
 	
 	// Role name admin
 	public static final String ROLE_ADMIN_NAME = "ROLE_ADMIN";

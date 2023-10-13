@@ -59,10 +59,11 @@ public class ReportServiceImpl implements ReportService {
 			row.createCell(2).setCellValue(commentList.size());
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
 			workbook.write(out);
+			workbook.close();
 			
 			return new ByteArrayInputStream(out.toByteArray());
 		} catch (IOException e) {
-			throw new RuntimeException("fail to import data to Excel file: " + e.getMessage());
+			throw new RuntimeException("Fail to import data to Excel file: " + e.getMessage());
 		}
 	}
 }

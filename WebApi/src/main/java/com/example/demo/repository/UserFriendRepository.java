@@ -3,7 +3,10 @@ package com.example.demo.repository;
 import java.sql.Date;
 import java.util.List;
 
+import org.springframework.transaction.annotation.Transactional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import com.example.demo.entity.UserFriend;
@@ -12,14 +15,16 @@ public interface UserFriendRepository  extends JpaRepository<UserFriend, String>
 
 	@Query(value = "SELECT"
 			+ " CASE"
-			+ "    WHEN count(*) = 1 THEN TRUE"
-			+ "    ELSE FALSE"
+			+ "    WHEN count(*) = 1 THEN 'true'"
+			+ "    ELSE 'false'"
 			+ " END"
 			+ " FROM user_friend"
 			+ " WHERE (user1 = ?1 AND user2 = ?2)"
 			+ " OR (user2 = ?1 AND user1 = ?2);", nativeQuery = true)
-	Boolean isFriend(String userId1, String userId2);
+	boolean isFriend(String userId1, String userId2);
 	
+	@Transactional
+	@Modifying
 	@Query(value = "DELETE"
 			+ " FROM user_friend"
 			+ " WHERE (user1 = ?1 AND user2 = ?2)"

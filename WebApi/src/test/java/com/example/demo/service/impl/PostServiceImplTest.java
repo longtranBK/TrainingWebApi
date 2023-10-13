@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -58,31 +59,43 @@ public class PostServiceImplTest {
 	}
 
 	@Test
-	void insertPost_withInput_returnNull() {
-		when(postRepository.save(any())).thenReturn(new Post());
+	void insertPost_withInput_returnPost() {
+		when(postRepository.save(any(Post.class))).thenReturn(new Post());
 		InsertPostReqDto insertPostReqDto = new InsertPostReqDto();
-		byte[] content = "test".getBytes();
-		MultipartFile[] file = {new MockMultipartFile("name", "file.txt", "text/plain", content)};
-		Post result = postServiceImpl.insertPost(insertPostReqDto, file, "userId");
-		assertEquals(null, result);
-		
+		Post result = postServiceImpl.insertPost(insertPostReqDto, null, "userId");
+		assertNotEquals(null, result);
 	}
 
 	@Test
-	void insertPost_withInput_returnPost() {
+	void insertPost_withInput_noCapture_returnPost() {
+		List<Capture> captureList = new ArrayList<>();
 		when(postRepository.save(any())).thenReturn(new Post());
-		when(captureRepository.saveAll(any())).thenReturn(List.of(new Capture()));
+		when(captureRepository.saveAll(any())).thenReturn(captureList);
 		InsertPostReqDto insertPostReqDto = new InsertPostReqDto();
-		byte[] content = "test".getBytes();
-		MultipartFile[] file = {new MockMultipartFile("name", "file.txt", "text/plain", content)};
+		MultipartFile[] file = {};
 		Post result = postServiceImpl.insertPost(insertPostReqDto, file, "userId");
 		assertNotEquals(null, result);
-		
+	}
+	
+	@Test
+	void insertPost_withInput_hadCapture_returnPost() {
+		List<Capture> captureList = new ArrayList<>();
+		Capture capture = new Capture();
+		captureList.add(capture);
+		when(postRepository.save(any())).thenReturn(new Post());
+		when(captureRepository.saveAll(any())).thenReturn(captureList);
+		InsertPostReqDto insertPostReqDto = new InsertPostReqDto();
+		byte[] content = "test".getBytes();
+		MultipartFile[] file = { new MockMultipartFile("name", "file.txt", "text/plain", content) };
+		Post result = postServiceImpl.insertPost(insertPostReqDto, file, "userId");
+		assertNotEquals(null, result);
 	}
 
 	@Test
 	void getPostCustom_withInput_returnEmpty() {
-		when(postRepository.getPostsCustom(anyString(), any(Date.class), any(Date.class), anyInt())).thenReturn(List.of());
+		List<Post> postList = new ArrayList<>();
+		when(postRepository.getPostsCustom(anyString(), any(Date.class), any(Date.class), anyInt()))
+				.thenReturn(postList);
 		List<GetPostResDto> result = postServiceImpl.getPostCustom("id", new Date(1), new Date(1), 0);
 		assertEquals(0, result.size());
 	}
@@ -96,8 +109,10 @@ public class PostServiceImplTest {
 		post.setStatus(0);
 		post.setUpdateTs(new Timestamp(0));
 		post.setUserId("id");
+		List<Post> postList = new ArrayList<>();
+		postList.add(post);
 		when(postRepository.getPostsCustom(anyString(), any(Date.class), any(Date.class), anyInt()))
-				.thenReturn(List.of(post));
+				.thenReturn(postList);
 		List<GetPostResDto> result = postServiceImpl.getPostCustom("id", new Date(1), new Date(1), 0);
 		assertEquals(1, result.size());
 	}
@@ -114,15 +129,30 @@ public class PostServiceImplTest {
 	}
 
 	@Test
-	void updatePost_withInput_returnPost() {
+	void updatePost_withInput_hadCapture_returnPost() {
+		List<Capture> captureList = new ArrayList<>();
+		captureList.add(new Capture());
 		when(postRepository.save(any())).thenReturn(new Post());
-		when(captureRepository.saveAll(any())).thenReturn(List.of(new Capture()));
+		when(captureRepository.saveAll(any())).thenReturn(captureList);
 		UpdatePostReqDto updatePostReqDto = new UpdatePostReqDto();
 		byte[] content = "test".getBytes();
-		MultipartFile[] file = {new MockMultipartFile("name", "file.txt", "text/plain", content)};
+		MultipartFile[] file = { new MockMultipartFile("name", "file.txt", "text/plain", content) };
 		Post result = postServiceImpl.updatePost(new Post(), updatePostReqDto, file);
 		assertNotEquals(null, result);
-		
+
+	}
+	
+
+	@Test
+	void updatePost_withInput_noCapture_returnPost() {
+		List<Capture> captureList = new ArrayList<>();
+		when(postRepository.save(any())).thenReturn(new Post());
+		when(captureRepository.saveAll(any())).thenReturn(captureList);
+		UpdatePostReqDto updatePostReqDto = new UpdatePostReqDto();
+		MultipartFile[] file = { };
+		Post result = postServiceImpl.updatePost(new Post(), updatePostReqDto, file);
+		assertNotEquals(null, result);
+
 	}
 
 	@Test
@@ -132,8 +162,9 @@ public class PostServiceImplTest {
 
 	@Test
 	void getPostTimeLine_withInput_returnEmpty() {
-		when(postRepository.getPostTimeline(anyString(), anyInt())).thenReturn(List.of());
-		List<GetPostResDto> result = postServiceImpl.getPostTimeLine(0, "id");
+		List<Post> postList = new ArrayList<>();
+		when(postRepository.getPostTimeline(anyString(), anyInt())).thenReturn(postList);
+		List<GetPostResDto> result = postServiceImpl.getPostTimeline("id", 0);
 		assertEquals(0, result.size());
 	}
 
@@ -146,8 +177,10 @@ public class PostServiceImplTest {
 		post.setStatus(0);
 		post.setUpdateTs(new Timestamp(0));
 		post.setUserId("id");
-		when(postRepository.getPostTimeline(anyString(), anyInt())).thenReturn(List.of(post));
-		List<GetPostResDto> result = postServiceImpl.getPostTimeLine(0, "id");
+		List<Post> postList = new ArrayList<>();
+		postList.add(post);
+		when(postRepository.getPostTimeline(anyString(), anyInt())).thenReturn(postList);
+		List<GetPostResDto> result = postServiceImpl.getPostTimeline("id", 0);
 		assertEquals(1, result.size());
 	}
 

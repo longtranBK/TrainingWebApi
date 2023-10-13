@@ -21,19 +21,21 @@ public interface UserService {
 	User getByUserId(String userId);
 	
 	/**
+	 * Save user
 	 * 
 	 * @param req
 	 * @param avatarFile
-	 * @return
-	 * @throws ParseException
+	 * @return user if save success
+	 * @throws ParseException if parse date fail
 	 */
 	User saveUser(SignupReqDto req, MultipartFile avatarFile) throws ParseException;
 	
 	/**
+	 * Update new password user
 	 * 
 	 * @param user
 	 * @param newPws
-	 * @return
+	 * @return User if update success
 	 */
 	User setNewPws(User user, String newPws);
 	
@@ -46,12 +48,13 @@ public interface UserService {
 	UserInforResDto getUserInfor(String userId);
 	
 	/**
+	 * Update user infor
 	 * 
 	 * @param user
 	 * @param request
 	 * @param avatarFile
-	 * @return
-	 * @throws ParseException
+	 * @return User if update success
+	 * @throws ParseException  if parse date fail
 	 */
 	User updateUserInfor(User user, UpdateUserInforReqDto request, MultipartFile avatarFile) throws ParseException;
 	
@@ -73,14 +76,16 @@ public interface UserService {
 	boolean isFriend(String userId1, String userId2);
 	
 	/**
+	 * Add friend
 	 * 
 	 * @param userId1
 	 * @param userId2
-	 * @return
+	 * @return UserFriend if add friend success
 	 */
 	UserFriend addFriend(String userId1, String userId2);
 	
 	/**
+	 * Unfriend
 	 * 
 	 * @param userId1
 	 * @param userId2
@@ -89,6 +94,7 @@ public interface UserService {
 	
 	/**
 	 * Get user id of login user
+	 * 
 	 * @return userId
 	 */
 	String getUserId();

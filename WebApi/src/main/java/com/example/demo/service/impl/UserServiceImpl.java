@@ -70,11 +70,11 @@ public class UserServiceImpl implements UserService {
 
 		user.setUserId(uuid);
 		user.setFullName(request.getFullName());
-		user.setAvatarUrl(fileService.save(avatarFile));
+		user.setAvatarUrl(fileService.save(avatarFile, uuid + "/"));
 		user.setUsername(request.getUsername());
 		user.setPassword(passwordEncoder.encode(request.getPassword()));
 
-		Role role = roleRepository.findByRoleName(Constants.ROLE_USER_NAME).get();
+		Role role = roleRepository.findByRoleName(Constants.ROLE_USER_NAME);
 		user.addRole(role);
 
 		user.setCreateTs(upadteTs);
@@ -116,7 +116,7 @@ public class UserServiceImpl implements UserService {
 			throws ParseException {
 		Timestamp upadteTs = new java.sql.Timestamp(System.currentTimeMillis());
 		user.setFullName(request.getFullName());
-		user.setAvatarUrl(fileService.save(avatarFile));
+		user.setAvatarUrl(fileService.save(avatarFile, user.getUserId() + "/"));
 		user.setUpdateTs(upadteTs);
 		User userSave = userRepository.save(user);
 

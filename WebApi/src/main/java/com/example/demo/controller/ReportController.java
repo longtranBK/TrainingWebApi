@@ -10,6 +10,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -23,6 +24,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @Tag(name = "Report", description = "API thao tác với report")
+@Validated
 @RestController
 @RequestMapping("/api/report")
 public class ReportController {
@@ -37,9 +39,9 @@ public class ReportController {
 	@GetMapping("/download")
 	@Secured(Constants.ROLE_USER_NAME)
 	public ResponseEntity<Resource> getFile(
-			@RequestParam("timeStart") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) java.util.Date timeStart,
-			@RequestParam("timeEnd") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) java.util.Date timeEnd,
-			@RequestParam("numbersPost") int numbersPost) {
+			@RequestParam(value = "timeStart", required = true) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) java.util.Date timeStart,
+			@RequestParam(value = "timeEnd", required = true) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) java.util.Date timeEnd,
+			@RequestParam(value = "numbersPost", required = true) int numbersPost) {
 		
 		Date start = new java.sql.Date(timeStart.getTime());
 		Date end = new java.sql.Date(timeEnd.getTime());

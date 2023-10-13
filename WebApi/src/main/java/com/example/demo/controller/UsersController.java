@@ -3,10 +3,12 @@ package com.example.demo.controller;
 import java.text.ParseException;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Size;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,9 +27,11 @@ import com.example.demo.dto.response.UserInforResDto;
 import com.example.demo.entity.User;
 import com.example.demo.service.UserService;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @Tag(name = "User", description = "API thao tác với user")
+@Validated
 @RestController
 @RequestMapping("api/users")
 public class UsersController {
@@ -35,9 +39,11 @@ public class UsersController {
 	@Autowired
 	private UserService userService;
 
+	@Operation(summary = "Get user-details with userid")
 	@GetMapping(value = "/user-details/{userId}")
 	@Secured(Constants.ROLE_USER_NAME)
-	public ResponseEntity<?> getUserDetails(@PathVariable(value = "userId") String userId) {
+	public ResponseEntity<?> getUserDetails(
+			@PathVariable(value = "userId", required = true) @Size(max = 36) String userId) {
 
 		User user = userService.getByUserId(userId);
 		if (user == null) {
@@ -48,10 +54,12 @@ public class UsersController {
 		return ResponseEntity.ok().body(infor);
 	}
 
+	@Operation(summary = "Update infor user")
 	@PostMapping(value = { "/user-details" })
 	@Secured(Constants.ROLE_USER_NAME)
-	public ResponseEntity<?> updateUserInfor(@Valid @RequestPart("request") UpdateUserInforReqDto request,
-			@RequestPart("file") MultipartFile avatarFile) throws ParseException {
+	public ResponseEntity<?> updateUserInfor(
+			@Valid @RequestPart(value = "request", required = true) UpdateUserInforReqDto request,
+			@RequestPart(value = "file", required = false) MultipartFile avatarFile) throws ParseException {
 
 		User user = userService.getByUserId(userService.getUserId());
 		if (userService.updateUserInfor(user, request, avatarFile) != null) {
@@ -61,9 +69,11 @@ public class UsersController {
 		}
 	}
 
+	@Operation(summary = "Get infor timeline with userid")
 	@GetMapping(value = "/timeline/{userId}")
 	@Secured(Constants.ROLE_USER_NAME)
-	public ResponseEntity<?> getUserTimeline(@PathVariable(value = "userId") String userId) {
+	public ResponseEntity<?> getUserTimeline(
+			@PathVariable(value = "userId", required = true) @Size(max = 36) String userId) {
 
 		User user = userService.getByUserId(userId);
 		if (user == null) {
@@ -77,6 +87,7 @@ public class UsersController {
 		return ResponseEntity.ok().body(response);
 	}
 
+	@Operation(summary = "Get infor timeline of current user")
 	@GetMapping(value = "/timeline/user-current")
 	@Secured(Constants.ROLE_USER_NAME)
 	public ResponseEntity<GetUserTimelineResDto> getCurrentUserTimeline() {
@@ -91,9 +102,11 @@ public class UsersController {
 		return ResponseEntity.ok().body(response);
 	}
 
+	@Operation(summary = "Reset and set new password")
 	@PutMapping(value = { "/reset-password" })
 	@Secured(Constants.ROLE_USER_NAME)
-	public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordReqDto request) {
+	public ResponseEntity<?> resetPassword(
+			@Valid @RequestBody(required = true) ResetPasswordReqDto request) {
 		
 		User user = userService.getByUserId(userService.getUserId());
 		if (userService.setNewPws(user, request.getNewPassword()) != null) {

@@ -253,7 +253,7 @@ public class PostControllerTests {
 	void getPostTimeLine_Ok() throws Exception {	
 		when(userService.getUserId()).thenReturn("userId");
 		List<GetPostResDto> res = new ArrayList<>();
-		when(postService.getPostTimeLine(10, userService.getUserId())).thenReturn(res);
+		when(postService.getPostTimeline(userService.getUserId(), 10)).thenReturn(res);
 		doNothing().when(postService).deletePost(any(Post.class));
 		
 		MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(uri+"/timeline")

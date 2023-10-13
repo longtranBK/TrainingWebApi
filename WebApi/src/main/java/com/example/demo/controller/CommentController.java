@@ -1,12 +1,12 @@
 package com.example.demo.controller;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,6 +28,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @Tag(name = "Comment", description = "API thao tác với comment")
+@Validated
 @RestController
 @RequestMapping("api/comments")
 public class CommentController {
@@ -44,7 +45,8 @@ public class CommentController {
 	@Operation(summary = "Comment to post")
 	@PostMapping
 	@Secured(Constants.ROLE_USER_NAME)
-	public ResponseEntity<?> insertComment(@Valid @RequestBody InsertCommentReqDto request) {
+	public ResponseEntity<?> insertComment(
+			@Valid @RequestBody(required = true) InsertCommentReqDto request) {
 
 		Post post = postService.findByPostId(request.getPostId());
 		if (post == null) {
@@ -53,14 +55,15 @@ public class CommentController {
 		if (commentService.insertComment(request, userService.getUserId()) != null) {
 			return ResponseEntity.ok().body("Insert comment successful!");
 		} else {
-			return ResponseEntity.ok().body("Insert comment error!");
+			return ResponseEntity.internalServerError().body("Insert comment error!");
 		}
 	}
 
 	@Operation(summary = "Edit comment in post")
-	@PutMapping(value = { "" })
+	@PutMapping
 	@Secured(Constants.ROLE_USER_NAME)
-	public ResponseEntity<?> updateComment(@Valid @RequestBody UpdateCommentReqDto request) {
+	public ResponseEntity<?> updateComment(
+			@Valid @RequestBody(required = true) UpdateCommentReqDto request) {
 
 		Comment comment = commentService.findByCommentIdAndUserId(request.getCommentId(), userService.getUserId());
 		if (comment == null) {
@@ -70,14 +73,15 @@ public class CommentController {
 		if (commentService.updateComment(comment, request.getContent()) != null) {
 			return ResponseEntity.ok().body("Update comment successful!");
 		} else {
-			return ResponseEntity.ok().body("Update comment error!");
+			return ResponseEntity.internalServerError().body("Update comment error!");
 		}
 	}
 
 	@Operation(summary = "Delete comment in post")
 	@DeleteMapping(value = { "/{commentId}" })
 	@Secured(Constants.ROLE_USER_NAME)
-	public ResponseEntity<?> deleteComment(@PathVariable @NotBlank @Size(max = 36) String commentId) {
+	public ResponseEntity<?> deleteComment(
+			@PathVariable(required = true) @Size(max = 36) String commentId) {
 
 		Comment comment = commentService.findByCommentIdAndUserId(commentId, userService.getUserId());
 		if (comment == null) {

@@ -6,7 +6,7 @@ public interface UserInforResDto {
 
 	String getFullname();
 
-	String getAvataUrl();
+	String getAvatarUrl();
 
 	int getSex();
 
@@ -14,7 +14,7 @@ public interface UserInforResDto {
 
 	String getWorkingAt();
 
-	String getFavories();
+	String getFavorites();
 
 	String getOtherInfor();
 

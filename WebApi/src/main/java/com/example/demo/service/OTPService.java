@@ -3,7 +3,7 @@ package com.example.demo.service;
 public interface OTPService {
 	
 	/**
-	 * Gen OTP
+	 * Generate OTP
 	 * 
 	 * @param key
 	 * @return otp

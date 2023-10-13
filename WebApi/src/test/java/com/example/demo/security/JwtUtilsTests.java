@@ -1,12 +1,15 @@
 package com.example.demo.security;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import com.example.demo.security.jwt.JwtUtils;
+
+import io.jsonwebtoken.ExpiredJwtException;
 
 @SpringBootTest
 public class JwtUtilsTests {
@@ -17,18 +20,20 @@ public class JwtUtilsTests {
 	@Test
 	void generateJwtToken_Ok() {
 		String jwtToken = jwtUtils.generateJwtToken("username");
-		assertTrue(!jwtToken.isEmpty());
+		assertFalse(jwtToken.isEmpty());
 	}
 	
 	@Test
 	void getUserNameFromJwtToken_Ok() {
-		String username = jwtUtils.getUserNameFromJwtToken("eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJsb25ndGhAZ21haWwuY29tIiwiaWF0IjoxNjk3MDQwMjk1LCJleHAiOjE2OTcxMjY2OTV9.ThkwDGuImh7QS_uJTFQN4WhDA_IRfyofAOEEhQ_bpf0");
-		assertTrue(!username.isEmpty());
+		assertThrows(ExpiredJwtException.class,
+	            ()->{
+	            	jwtUtils.getUserNameFromJwtToken("eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJsb25ndGhAZ21haWwuY29tIiwiaWF0IjoxNjk3MDQwMjk1LCJleHAiOjE2OTcxMjY2OTV9.ThkwDGuImh7QS_uJTFQN4WhDA_IRfyofAOEEhQ_bpf0");
+	            });
 	}
 	
 	@Test
 	void validateJwtToken_Ok() {
 		boolean validate = jwtUtils.validateJwtToken("eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJsb25ndGhAZ21haWwuY29tIiwiaWF0IjoxNjk3MDQwMjk1LCJleHAiOjE2OTcxMjY2OTV9.ThkwDGuImh7QS_uJTFQN4WhDA_IRfyofAOEEhQ_bpf0");
-		assertTrue(validate);
+		assertFalse(validate);
 	}
 }

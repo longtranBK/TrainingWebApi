@@ -1,6 +1,6 @@
 package com.example.demo.service.impl;
 
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +17,7 @@ public class FileServiceImplTest {
 	void save_withInput_returnPath() {
 		byte[] content = "test".getBytes();
 		MultipartFile file = new MockMultipartFile("name", "file.txt", "text/plain", content);
-		String result = fileServiceImpl.save(file);
-		assertNotEquals("uploads\\file.txt", result);
+		String result = fileServiceImpl.save(file, "test/");
+		assertEquals("D:/uploads/test/file.txt", result);
 	}
 }

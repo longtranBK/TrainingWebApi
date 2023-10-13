@@ -30,11 +30,12 @@ public interface PostService {
 	Post findByPostIdAndUserId(String postId, String userId);
 	
 	/**
+	 * Insert new post
 	 * 
 	 * @param request
 	 * @param avatarList
 	 * @param userId
-	 * @return
+	 * @return Post if insert success
 	 */
 	Post insertPost(InsertPostReqDto request, MultipartFile[] avatarList, String userId);
 	
@@ -50,11 +51,12 @@ public interface PostService {
 	List<GetPostResDto> getPostCustom(String userId, Date startDate, Date endDate, int numbersPost);
 	
 	/**
+	 * Update post
 	 * 
 	 * @param post
 	 * @param request
 	 * @param avatarList
-	 * @return
+	 * @return Post if update success
 	 */
 	Post updatePost(Post post, UpdatePostReqDto request, MultipartFile[] avatarList);
 	
@@ -66,15 +68,16 @@ public interface PostService {
 	void deletePost(Post post);
 	
 	/**
-	 * Get post on time line
+	 * Get post timeline
 	 * 
+	 * @param userId
 	 * @param numbersPost
-	 * @return
+	 * @return List<GetPostResDto>
 	 */
-	List<GetPostResDto> getPostTimeLine(int numbersPost, String userId);
+	List<GetPostResDto> getPostTimeline(String userId, int numbersPost);
 	
 	/**
-	 * Check lisk of post
+	 * Check like of post
 	 * 
 	 * @param userId
 	 * @param postId
@@ -83,14 +86,16 @@ public interface PostService {
 	boolean hasLike(String userId, String postId);
 	
 	/**
+	 * Like a post
 	 * 
 	 * @param userId
 	 * @param postId
-	 * @return
+	 * @return true if like success
 	 */
 	Like likePost(String userId, String postId);
 	
 	/**
+	 * Dislike a post
 	 * 
 	 * Dislike post
 	 * @param userId

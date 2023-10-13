@@ -18,13 +18,14 @@ public class FileServiceImpl implements FileService {
 	private String uploadPath;
 
 	@Override
-	public String save(MultipartFile file) {
+	public String save(MultipartFile file, String subPath) {
 		try {
-			Files.createDirectories(Paths.get(uploadPath));
-			Path path = Paths.get(uploadPath + file.getOriginalFilename());
+			String pathStr = uploadPath + subPath;
+			Files.createDirectories(Paths.get(pathStr));
+			Path path = Paths.get(pathStr + file.getOriginalFilename());
 			Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
 			System.gc();
-			return uploadPath + file.getOriginalFilename();
+			return pathStr + file.getOriginalFilename();
 		} catch (Exception e) {
 			throw new RuntimeException(e.getMessage());
 		}

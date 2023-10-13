@@ -24,6 +24,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import com.example.demo.constant.Constants;
+import com.example.demo.entity.User;
 import com.example.demo.entity.UserFriend;
 import com.example.demo.service.UserService;
 
@@ -66,11 +67,44 @@ public class FriendControllerTests {
 	}
 	
 	@Test
-	void addFriend_notFriend_addOk() throws Exception {
+	void addFriend_notFriend_notExist() throws Exception {
 
 		when(userService.getUserId()).thenReturn("userId");
 		when(userService.isFriend("userId", "userIdFriend")).thenReturn(false);
+		when(userService.getByUserId("userIdFriend")).thenReturn(null);
+		MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post(uri+"/{userIdFriend}","userIdFriend").contentType(MediaType.APPLICATION_JSON)
+				.content("")).andReturn();
+
+		int status = mvcResult.getResponse().getStatus();
+		assertEquals(200, status);
+
+		String msg = mvcResult.getResponse().getContentAsString();
+		assertEquals("Userfriend not found!", msg);
+	}
+	
+	@Test
+	void addFriend_notFriend_exist_isCurrentUser() throws Exception {
+
+		when(userService.getUserId()).thenReturn("userIdFriend");
+		when(userService.isFriend("userIdFriend", "userIdFriend")).thenReturn(false);
+		when(userService.getByUserId("userIdFriend")).thenReturn(new User());
+		
+		MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post(uri+"/{userIdFriend}","userIdFriend").contentType(MediaType.APPLICATION_JSON)
+				.content("")).andReturn();
+
+		int status = mvcResult.getResponse().getStatus();
+		assertEquals(500, status);
+
+	}
+	
+	@Test
+	void addFriend_notFriend_exist_notCurrentUser_Ok() throws Exception {
+
+		when(userService.getUserId()).thenReturn("userId");
+		when(userService.isFriend("userId", "userIdFriend")).thenReturn(false);
+		when(userService.getByUserId("userIdFriend")).thenReturn(new User());
 		when(userService.addFriend("userId", "userIdFriend")).thenReturn(new UserFriend());
+		
 		MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post(uri+"/{userIdFriend}","userIdFriend").contentType(MediaType.APPLICATION_JSON)
 				.content("")).andReturn();
 
@@ -82,25 +116,39 @@ public class FriendControllerTests {
 	}
 	
 	@Test
-	void addFriend_notFriend_addNg() throws Exception {
+	void addFriend_notFriend_exist_notCurrentUser_Ng() throws Exception {
 
 		when(userService.getUserId()).thenReturn("userId");
 		when(userService.isFriend("userId", "userIdFriend")).thenReturn(false);
+		when(userService.getByUserId("userIdFriend")).thenReturn(new User());
 		when(userService.addFriend("userId", "userIdFriend")).thenReturn(null);
+		
 		MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post(uri+"/{userIdFriend}","userIdFriend").contentType(MediaType.APPLICATION_JSON)
+				.content("")).andReturn();
+
+		int status = mvcResult.getResponse().getStatus();
+		assertEquals(500, status);
+
+	}
+	
+	@Test
+	void unFriend_friendNotExists() throws Exception {
+		when(userService.getUserId()).thenReturn("userId");
+		when(userService.getByUserId("userIdFriend")).thenReturn(null);
+		MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.delete(uri+"/{userIdFriend}","userIdFriend").contentType(MediaType.APPLICATION_JSON)
 				.content("")).andReturn();
 
 		int status = mvcResult.getResponse().getStatus();
 		assertEquals(200, status);
 
 		String msg = mvcResult.getResponse().getContentAsString();
-		assertEquals("Add friend error!", msg);
+		assertEquals("Userfriend not found!", msg);
 	}
 	
 	@Test
-	void unFriend_notFriend() throws Exception {
-
+	void unFriend_friendExists_notFriend() throws Exception {
 		when(userService.getUserId()).thenReturn("userId");
+		when(userService.getByUserId("userIdFriend")).thenReturn(new User());
 		when(userService.isFriend("userId", "userIdFriend")).thenReturn(false);
 		MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.delete(uri+"/{userIdFriend}","userIdFriend").contentType(MediaType.APPLICATION_JSON)
 				.content("")).andReturn();
@@ -113,9 +161,9 @@ public class FriendControllerTests {
 	}
 	
 	@Test
-	void unFriend_hadFriend() throws Exception {
-
+	void unFriend_friendExists_friend() throws Exception {
 		when(userService.getUserId()).thenReturn("userId");
+		when(userService.getByUserId("userIdFriend")).thenReturn(new User());
 		when(userService.isFriend("userId", "userIdFriend")).thenReturn(true);
 		doNothing().when(userService).unFriend("userId", "userIdFriend");
 		MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.delete(uri+"/{userIdFriend}","userIdFriend").contentType(MediaType.APPLICATION_JSON)

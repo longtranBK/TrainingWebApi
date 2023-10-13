@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import com.example.demo.entity.Like;
 
-public interface LikeRepository   extends JpaRepository<Like, String> {
+public interface LikeRepository extends JpaRepository<Like, String> {
 
 	@Query(value = "SELECT user_id FROM likes WHERE post_id = ?1", nativeQuery = true)
 	List<String> findByPostId(String postId);
@@ -18,8 +18,8 @@ public interface LikeRepository   extends JpaRepository<Like, String> {
 	
 	@Query(value = "SELECT"
 			+ " CASE"
-			+ " WHEN COUNT(*) = 1 THEN TRUE"
-			+ " ELSE FALSE"
+			+ " WHEN COUNT(*) = 1 THEN 'true'"
+			+ " ELSE 'false'"
 			+ " END"
 			+ " FROM likes"
 			+ " WHERE user_id = ?1 AND post_id = ?2", nativeQuery = true)

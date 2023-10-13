@@ -63,11 +63,13 @@ public class PostServiceImpl implements PostService {
 		post.setStatus(request.getStatus());
 		post.setCreateTs(upadteTs);
 		post.setUpdateTs(upadteTs);
+		String path = post.getUserId() + "/" + post.getPostId() + "/";
 		Post postSave = postRepository.save(post);
-		if (postSave != null && saveCapturesList(postId, avatarList).size() != 0) {
+		if (avatarList == null || (avatarList.length == saveCapturesList(post.getPostId(), avatarList, path).size())) {
 			return postSave;
 		}
 		return null;
+		
 	}
 
 	@Override
@@ -77,27 +79,7 @@ public class PostServiceImpl implements PostService {
 		if (postList.size() == 0) {
 			return response;
 		}
-
-		for (int i = 0; i < postList.size(); i++) {
-			GetPostResDto post = new GetPostResDto();
-			post.setPostId(postList.get(i).getPostId());
-			post.setContent(postList.get(i).getContent());
-			post.setStatus(postList.get(i).getStatus());
-			post.setCreateTs(postList.get(i).getCreateTs());
-			post.setUpdateTs(postList.get(i).getUpdateTs());
-
-			List<String> captureUrlList = captureRepository.findByPostId(postList.get(i).getPostId());
-			post.setCaptureUrlList(captureUrlList);
-
-			List<String> userIdLikeList = likeRepository.findByPostId(postList.get(i).getPostId());
-			post.setUserIdLikeList(userIdLikeList);
-
-			List<CommentCustomResDto> commentList = commentRepository.findByPostIdCustom(postList.get(i).getPostId());
-			post.setCommentList(commentList);
-
-			response.add(post);
-		}
-		return response;
+		return getData(postList);
 	}
 
 	@Override
@@ -109,8 +91,9 @@ public class PostServiceImpl implements PostService {
 		post.setStatus(request.getStatus());
 		post.setUpdateTs(upadteTs);
 		Post postSave = postRepository.save(post);
-		captureRepository.deleteByPostId(post.getPostId());
-		if (postSave!= null &&  saveCapturesList(post.getPostId(), avatarList).size() != 0) {
+		String path = post.getUserId() + "/" + post.getPostId() + "/";
+
+		if (avatarList == null || (avatarList.length == saveCapturesList(post.getPostId(), avatarList, path).size())) {
 			return postSave;
 		}
 		return null;
@@ -135,7 +118,7 @@ public class PostServiceImpl implements PostService {
 	}
 
 	@Override
-	public List<GetPostResDto> getPostTimeLine(int numbersPost, String userId) {
+	public List<GetPostResDto> getPostTimeline(String userId, int numbersPost) {
 		List<GetPostResDto> response = new ArrayList<>();
 
 		List<Post> postList = postRepository.getPostTimeline(userId, numbersPost);
@@ -143,25 +126,35 @@ public class PostServiceImpl implements PostService {
 			return response;
 		}
 
-		for (int i = 0; i < postList.size(); i++) {
-			GetPostResDto post = new GetPostResDto();
-			post.setPostId(postList.get(i).getPostId());
-			post.setContent(postList.get(i).getContent());
-			post.setStatus(postList.get(i).getStatus());
-			post.setCreateTs(postList.get(i).getCreateTs());
-			post.setUpdateTs(postList.get(i).getUpdateTs());
+		return getData(postList);
+	}
 
-			List<String> captureUrlList = captureRepository.findByPostId(postList.get(i).getPostId());
-			post.setCaptureUrlList(captureUrlList);
+	/**
+	 * 
+	 * @param postList
+	 * @return
+	 */
+	private List<GetPostResDto> getData(List<Post> postList) {
+		List<GetPostResDto> response = new ArrayList<>();
+		postList.forEach(post -> {
+			GetPostResDto postInser = new GetPostResDto();
+			postInser.setPostId(post.getPostId());
+			postInser.setContent(post.getContent());
+			postInser.setStatus(post.getStatus());
+			postInser.setCreateTs(post.getCreateTs());
+			postInser.setUpdateTs(post.getUpdateTs());
 
-			List<String> userIdLikeList = likeRepository.findByPostId(postList.get(i).getPostId());
-			post.setUserIdLikeList(userIdLikeList);
+			List<String> captureUrlList = captureRepository.findByPostId(post.getPostId());
+			postInser.setCaptureUrlList(captureUrlList);
 
-			List<CommentCustomResDto> commentList = commentRepository.findByPostIdCustom(postList.get(i).getPostId());
-			post.setCommentList(commentList);
+			List<String> userIdLikeList = likeRepository.findByPostId(post.getPostId());
+			postInser.setUserIdLikeList(userIdLikeList);
 
-			response.add(post);
-		}
+			List<CommentCustomResDto> commentList = commentRepository.findByPostIdCustom(post.getPostId());
+			postInser.setCommentList(commentList);
+
+			response.add(postInser);
+		});
 
 		return response;
 	}
@@ -190,12 +183,13 @@ public class PostServiceImpl implements PostService {
 	 * @param avatarList
 	 * @return
 	 */
-	private List<Capture> saveCapturesList(String postId, MultipartFile[] avatarList) {
+	private List<Capture> saveCapturesList(String postId, MultipartFile[] avatarList, String path) {
 		List<Capture> captureList = new ArrayList<>();
 		if (avatarList.length > 0) {
+			captureRepository.deleteByPostId(postId);
 			Arrays.asList(avatarList).stream().forEach(file -> {
 				Capture capture = new Capture();
-				capture.setCaptureUrl(fileService.save(file));
+				capture.setCaptureUrl(fileService.save(file, path));
 				capture.setPostId(postId);
 				captureList.add(capture);
 			});
