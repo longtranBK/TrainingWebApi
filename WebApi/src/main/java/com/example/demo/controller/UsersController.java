@@ -55,7 +55,7 @@ public class UsersController {
 	}
 
 	@Operation(summary = "Update infor user")
-	@PostMapping(value = { "/user-details" })
+	@PostMapping(value = { "/user-details" }, consumes = "multipart/form-data")
 	@Secured(Constants.ROLE_USER_NAME)
 	public ResponseEntity<?> updateUserInfor(
 			@Valid @RequestPart(value = "request", required = true) UpdateUserInforReqDto request,

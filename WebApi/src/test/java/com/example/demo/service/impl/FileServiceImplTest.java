@@ -20,4 +20,11 @@ public class FileServiceImplTest {
 		String result = fileServiceImpl.save(file, "test/");
 		assertEquals("D:/uploads/test/file.txt", result);
 	}
+	
+	@Test
+	void save_withInput_returnBlank() {
+		MultipartFile file = null;
+		String result = fileServiceImpl.save(file, "test/");
+		assertEquals("", result);
+	}
 }

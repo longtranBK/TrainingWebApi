@@ -105,7 +105,7 @@ public class UsersControllerTests {
 		MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.multipart(uri+"/user-details")
 				.file(request)
 				.file(captureFile)
-				.contentType(MediaType.APPLICATION_JSON).content("")).andReturn();
+				.contentType(MediaType.MULTIPART_FORM_DATA).content("")).andReturn();
 		
 		int status = mvcResult.getResponse().getStatus();
 		assertEquals(200, status);
@@ -138,7 +138,7 @@ public class UsersControllerTests {
 		MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.multipart(uri+"/user-details")
 				.file(request)
 				.file(captureFile)
-				.contentType(MediaType.APPLICATION_JSON).content("")).andReturn();
+				.contentType(MediaType.MULTIPART_FORM_DATA).content("")).andReturn();
 		
 		int status = mvcResult.getResponse().getStatus();
 		assertEquals(500, status);

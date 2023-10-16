@@ -4,7 +4,9 @@ import java.sql.Date;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.demo.dto.response.CommentCustomResDto;
 import com.example.demo.entity.Comment;
@@ -20,6 +22,8 @@ public interface CommentRepository extends JpaRepository<Comment, String> {
 			+ " FROM comment WHERE post_id = ?1 ORDER BY createTs DESC", nativeQuery = true)
 	List<CommentCustomResDto> findByPostIdCustom(String postId);
 	
+	@Transactional
+	@Modifying
 	void deleteByPostId(String postId);
 	
 	Comment findByCommentIdAndUserId(String commentId, String userId);

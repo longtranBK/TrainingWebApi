@@ -164,7 +164,7 @@ public class AuthControllerTests {
 		assertEquals(200, status);
 
 		String token = mvcResult.getResponse().getContentAsString();
-		assertEquals("jwtToken", token);
+		assertEquals("Bearer jwtToken", token);
 	}
 
 	@Test
@@ -181,7 +181,7 @@ public class AuthControllerTests {
 		assertEquals(200, status);
 
 		String token = mvcResult.getResponse().getContentAsString();
-		assertEquals("", token);
+		assertEquals("Bearer ", token);
 	}
 
 	@Test
@@ -289,6 +289,6 @@ public class AuthControllerTests {
 		assertEquals(200, status);
 
 		String token = mvcResult.getResponse().getContentAsString();
-		assertEquals("jwtToken", token);
+		assertEquals("Bearer jwtToken", token);
 	}
 }

@@ -20,6 +20,9 @@ public class FileServiceImpl implements FileService {
 	@Override
 	public String save(MultipartFile file, String subPath) {
 		try {
+			if(file == null) {
+				return "";
+			}
 			String pathStr = uploadPath + subPath;
 			Files.createDirectories(Paths.get(pathStr));
 			Path path = Paths.get(pathStr + file.getOriginalFilename());
