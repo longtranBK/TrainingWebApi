@@ -27,17 +27,17 @@ public class User {
 	@Column(name = "id", nullable = false)
 	private String userId;
 	
-	@Column(name = "full_name", nullable = false)
-	private String fullName;
-	
-	@Column(name = "avatar_url")
-	private String avatarUrl;
-
 	@Column(name = "username", nullable = false)
 	private String username;
 	
 	@Column(name = "password", nullable = false)
 	private String password;
+	
+	@Column(name = "email", nullable = false)
+	private String email;
+	
+	@Column(name = "reset_pasword_token", nullable = false)
+	private String resetPaswordToken;
 	
 	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinTable(name = "user_roles", 

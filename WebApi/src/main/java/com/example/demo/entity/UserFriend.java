@@ -28,6 +28,12 @@ public class UserFriend {
 	@Column(name = "user2", nullable = false)
 	private String user2;
 	
+	@Column(name = "status")
+	private String status;
+	
 	@Column(name = "create_ts", nullable = false)
 	private Timestamp createTs;
+	
+	@Column(name = "update_ts")
+	private Timestamp updateTs;
 }

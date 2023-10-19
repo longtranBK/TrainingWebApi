@@ -21,8 +21,17 @@ public class UserInfor {
 	@Column(name = "id", nullable = false)
 	private String userId;
 	
-	@Column(name = "is_active", nullable = false)
+	@Column(name = "full_name")
+	private String fullName;
+	
+	@Column(name = "avatar_url")
+	private String avatarUrl;
+	
+	@Column(name = "is_active")
 	private int isActive;
+	
+	@Column(name = "sex")
+	private int sex;
 	
 	@Column(name = "study_at")
 	private String studyAt;
@@ -36,11 +45,8 @@ public class UserInfor {
 	@Column(name = "other_infor")
 	private String otherInfor;
 	
-	@Column(name = "date_of_birth", nullable = false)
+	@Column(name = "date_of_birth")
 	private Date dateOfBirth;
-	
-	@Column(name = "sex", nullable = false)
-	private int sex;
 	
 	@Column(name = "create_ts")
     private Timestamp createTs;

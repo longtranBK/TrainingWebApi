@@ -29,7 +29,7 @@ public interface CommentRepository extends JpaRepository<Comment, String> {
 	Comment findByCommentIdAndUserId(String commentId, String userId);
 	
 	@Query(value = "SELECT * FROM comment"
-			+ " WHERE create_ts >= ?1 AND create_ts <= ?2"
+			+ " WHERE user_id = ?1 AND create_ts >= ?2 AND create_ts <= ?3"
 			+ " ORDER BY create_ts DESC", nativeQuery = true)
-	List<Comment> getCommentList(Date startDate, Date endDate);
+	List<Comment> getCommentList(String userId, Date startDate, Date endDate);
 }

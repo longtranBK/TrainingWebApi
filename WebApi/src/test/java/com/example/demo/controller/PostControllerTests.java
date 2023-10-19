@@ -34,8 +34,8 @@ import com.example.demo.dto.request.InsertPostReqDto;
 import com.example.demo.dto.request.LikePostReqDto;
 import com.example.demo.dto.request.UpdatePostReqDto;
 import com.example.demo.dto.response.GetPostResDto;
-import com.example.demo.entity.Like;
 import com.example.demo.entity.Post;
+import com.example.demo.entity.PostLike;
 import com.example.demo.service.FileService;
 import com.example.demo.service.PostService;
 import com.example.demo.service.UserService;
@@ -287,7 +287,7 @@ public class PostControllerTests {
 		request.setPostId("postId");
 		
 		when(postService.hasLike("userId", request.getPostId())).thenReturn(false);
-		when(postService.likePost("userId", request.getPostId())).thenReturn(new Like());
+		when(postService.likePost("userId", request.getPostId())).thenReturn(new PostLike());
 		
 		MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post(uri+"/like")
 				.contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(request))).andReturn();

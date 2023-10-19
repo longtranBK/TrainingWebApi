@@ -7,11 +7,11 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.demo.entity.Capture;
+import com.example.demo.entity.PostImage;
 
-public interface CaptureRepository  extends JpaRepository<Capture, String> {
+public interface PostImageRepository  extends JpaRepository<PostImage, String> {
 
-	@Query(value = "SELECT capture_url FROM captures WHERE post_id = ?1", nativeQuery = true)
+	@Query(value = "SELECT image_url FROM post_image WHERE post_id = ?1", nativeQuery = true)
 	List<String> findByPostId(String postId);
 	
 	@Transactional

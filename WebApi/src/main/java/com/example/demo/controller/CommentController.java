@@ -30,7 +30,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "Comment", description = "API thao tác với comment")
 @Validated
 @RestController
-@RequestMapping("api/comments")
+@RequestMapping("/v1/comments")
 public class CommentController {
 
 	@Autowired

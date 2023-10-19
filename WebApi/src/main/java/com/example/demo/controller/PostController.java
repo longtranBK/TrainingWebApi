@@ -40,7 +40,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "Post", description = "API thao tác với post")
 @Validated
 @RestController
-@RequestMapping("api/posts")
+@RequestMapping("/v1/posts")
 public class PostController {
 
 	@Autowired
@@ -133,7 +133,7 @@ public class PostController {
 		if (postService.hasLike(userId, request.getPostId())) {
 			return ResponseEntity.ok().body("User had liked!");
 		}
-		if( postService.likePost(userId, request.getPostId())!= null) {
+		if(postService.likePost(userId, request.getPostId())!= null) {
 			return ResponseEntity.ok().body("Like post successful!");
 		} else {
 			return ResponseEntity.internalServerError().body("Like post error!");

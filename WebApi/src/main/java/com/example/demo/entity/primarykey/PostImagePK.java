@@ -5,9 +5,9 @@ import java.io.Serializable;
 /**
  * PK of table captures
  */
-public class CapturePK implements Serializable{
+public class PostImagePK implements Serializable{
 	
 	private String postId;
 	
-	private String captureUrl;
+	private String imageUrl;
 }

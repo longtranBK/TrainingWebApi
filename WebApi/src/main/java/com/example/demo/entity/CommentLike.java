@@ -5,7 +5,10 @@ import java.sql.Timestamp;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.IdClass;
 import javax.persistence.Table;
+
+import com.example.demo.entity.primarykey.CommentLikePK;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -13,28 +16,18 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "comment")
-public class Comment {
-	
+@Table(name = "comment_likes")
+@IdClass(CommentLikePK.class)
+public class CommentLike {
+
 	@Id
-	@Column(name = "comment_id", nullable = false)
-	private String commentId;
-	
 	@Column(name = "user_id", nullable = false)
 	private String userId;
 
-	@Column(name = "post_id", nullable = false)
-	private String postId;
+	@Id
+	@Column(name = "comment_id", nullable = false)
+	private String commentId;
 
-	@Column(name = "content", nullable = false)
-	private String content;
-
-	@Column(name = "delFlg")
-	private boolean delFlg;
-	
 	@Column(name = "create_ts", nullable = false)
 	private Timestamp createTs;
-
-	@Column(name = "update_ts", nullable = false)
-	private Timestamp updateTs;
 }

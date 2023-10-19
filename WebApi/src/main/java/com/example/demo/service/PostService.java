@@ -8,8 +8,8 @@ import org.springframework.web.multipart.MultipartFile;
 import com.example.demo.dto.request.InsertPostReqDto;
 import com.example.demo.dto.request.UpdatePostReqDto;
 import com.example.demo.dto.response.GetPostResDto;
-import com.example.demo.entity.Like;
 import com.example.demo.entity.Post;
+import com.example.demo.entity.PostLike;
 
 public interface PostService {
 	
@@ -92,7 +92,7 @@ public interface PostService {
 	 * @param postId
 	 * @return true if like success
 	 */
-	Like likePost(String userId, String postId);
+	PostLike likePost(String userId, String postId);
 	
 	/**
 	 * Dislike a post

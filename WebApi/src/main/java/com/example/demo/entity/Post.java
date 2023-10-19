@@ -29,6 +29,9 @@ public class Post {
 	@Column(name = "status", nullable = false)
 	private int status;
 	
+	@Column(name = "delFlg")
+	private boolean delFlg;
+	
 	@Column(name = "create_ts")
     private Timestamp createTs;
 	

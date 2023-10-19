@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.demo.constant.Constants;
+import com.example.demo.constant.RoleEnum;
 import com.example.demo.dto.request.SignupReqDto;
 import com.example.demo.dto.request.UpdateUserInforReqDto;
 import com.example.demo.dto.response.UserInforResDto;
@@ -57,40 +58,31 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public User getByUsername(String username) {
+	public User findByUsername(String username) {
 		return userRepository.findByUsername(username);
 	}
 
 	@Override
 	@Transactional(rollbackOn = { Exception.class, Throwable.class })
-	public User saveUser(SignupReqDto request, MultipartFile avatarFile) throws ParseException {
-		Timestamp upadteTs = new java.sql.Timestamp(System.currentTimeMillis());
+	public User saveUser(SignupReqDto request) throws ParseException {
+		Timestamp createTs = new java.sql.Timestamp(System.currentTimeMillis());
 		String uuid = UUID.randomUUID().toString();
 		User user = new User();
 
 		user.setUserId(uuid);
-		user.setFullName(request.getFullName());
-		user.setAvatarUrl(fileService.save(avatarFile, uuid + "/"));
 		user.setUsername(request.getUsername());
+		user.setEmail(request.getEmail());
 		user.setPassword(passwordEncoder.encode(request.getPassword()));
 
-		Role role = roleRepository.findByRoleName(Constants.ROLE_USER_NAME);
+		Role role = roleRepository.findByRoleName(RoleEnum.USER.getValue());
 		user.addRole(role);
 
-		user.setCreateTs(upadteTs);
-		user.setUpdateTs(upadteTs);
-
+		user.setCreateTs(createTs);
 		User userSave = userRepository.save(user);
 
 		UserInfor userInfor = new UserInfor();
 		userInfor.setUserId(uuid);
-		userInfor.setIsActive(1);
-		userInfor.setSex(request.getSex());
-		SimpleDateFormat format = new SimpleDateFormat(Constants.DATE_FORMAT);
-		Date parsed = format.parse(request.getDateOfBirth());
-		userInfor.setDateOfBirth(new java.sql.Date(parsed.getTime()));
-		userInfor.setCreateTs(upadteTs);
-		userInfor.setUpdateTs(upadteTs);
+		userInfor.setCreateTs(createTs);
 
 		if (userSave != null && userInforRepository.save(userInfor)!= null) {
 			return userSave;
@@ -101,7 +93,10 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public User setNewPws(User user, String newPws) {
+		Timestamp updateTs = new java.sql.Timestamp(System.currentTimeMillis());
+		user.setResetPaswordToken(null);
 		user.setPassword(passwordEncoder.encode(newPws));
+		user.setUpdateTs(updateTs);
 		return userRepository.save(user);
 	}
 
@@ -115,8 +110,8 @@ public class UserServiceImpl implements UserService {
 	public User updateUserInfor(User user, UpdateUserInforReqDto request, MultipartFile avatarFile)
 			throws ParseException {
 		Timestamp upadteTs = new java.sql.Timestamp(System.currentTimeMillis());
-		user.setFullName(request.getFullName());
-		user.setAvatarUrl(fileService.save(avatarFile, user.getUserId() + "/"));
+//		user.setFullName(request.getFullName());
+//		user.setAvatarUrl(fileService.save(avatarFile, user.getUserId() + "/"));
 		user.setUpdateTs(upadteTs);
 		User userSave = userRepository.save(user);
 
@@ -170,6 +165,16 @@ public class UserServiceImpl implements UserService {
 		User user = userRepository.findByUsername(username);
 
 		return user.getUserId();
+	}
+
+	@Override
+	public User findByUsernameOrEmail(String username, String email) {
+		return userRepository.findByUsernameOrEmail(username, email);
+	}
+
+	@Override
+	public User findByUsernameAndToken(String username, String token) {
+		return userRepository.findByUsernameAndResetPasswordToken(username, token);
 	}
 
 }

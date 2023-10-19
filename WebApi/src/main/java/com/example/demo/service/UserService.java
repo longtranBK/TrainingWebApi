@@ -24,11 +24,10 @@ public interface UserService {
 	 * Save user
 	 * 
 	 * @param req
-	 * @param avatarFile
 	 * @return user if save success
 	 * @throws ParseException if parse date fail
 	 */
-	User saveUser(SignupReqDto req, MultipartFile avatarFile) throws ParseException;
+	User saveUser(SignupReqDto req) throws ParseException;
 	
 	/**
 	 * Update new password user
@@ -64,7 +63,7 @@ public interface UserService {
 	 * @param username
 	 * @return User
 	 */
-	User getByUsername(String username);
+	User findByUsername(String username);
 	
 	/**
 	 * Check friend of two user
@@ -98,5 +97,22 @@ public interface UserService {
 	 * @return userId
 	 */
 	String getUserId();
+	
+	/**
+	 * Find user by username or email
+	 * 
+	 * @param username
+	 * @return User
+	 */
+	User findByUsernameOrEmail(String username, String email);
+	
+	/**
+	 * Find user by username and token
+	 * 
+	 * @param username
+	 * @param token
+	 * @return User
+	 */
+	User findByUsernameAndToken(String username, String token);
 	
 }

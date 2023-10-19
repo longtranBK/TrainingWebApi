@@ -3,7 +3,6 @@ package com.example.demo.service.impl;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -17,12 +16,11 @@ import com.example.demo.dto.request.InsertPostReqDto;
 import com.example.demo.dto.request.UpdatePostReqDto;
 import com.example.demo.dto.response.CommentCustomResDto;
 import com.example.demo.dto.response.GetPostResDto;
-import com.example.demo.entity.Capture;
-import com.example.demo.entity.Like;
 import com.example.demo.entity.Post;
-import com.example.demo.repository.CaptureRepository;
+import com.example.demo.entity.PostLike;
 import com.example.demo.repository.CommentRepository;
-import com.example.demo.repository.LikeRepository;
+import com.example.demo.repository.PostImageRepository;
+import com.example.demo.repository.PostLikeRepository;
 import com.example.demo.repository.PostRepository;
 import com.example.demo.service.FileService;
 import com.example.demo.service.PostService;
@@ -37,10 +35,10 @@ public class PostServiceImpl implements PostService {
 	private PostRepository postRepository;
 
 	@Autowired
-	private CaptureRepository captureRepository;
+	private PostImageRepository postImageRepository;
 
 	@Autowired
-	private LikeRepository likeRepository;
+	private PostLikeRepository postLikeRepository;
 
 	@Autowired
 	private CommentRepository commentRepository;
@@ -65,9 +63,9 @@ public class PostServiceImpl implements PostService {
 		post.setUpdateTs(upadteTs);
 		String path = post.getUserId() + "/" + post.getPostId() + "/";
 		Post postSave = postRepository.save(post);
-		if (avatarList == null || (avatarList.length == saveCapturesList(post.getPostId(), avatarList, path).size())) {
-			return postSave;
-		}
+//		if (avatarList == null || (avatarList.length == saveCapturesList(post.getPostId(), avatarList, path).size())) {
+//			return postSave;
+//		}
 		return null;
 		
 	}
@@ -93,9 +91,9 @@ public class PostServiceImpl implements PostService {
 		Post postSave = postRepository.save(post);
 		String path = post.getUserId() + "/" + post.getPostId() + "/";
 
-		if (avatarList == null || (avatarList.length == saveCapturesList(post.getPostId(), avatarList, path).size())) {
-			return postSave;
-		}
+//		if (avatarList == null || (avatarList.length == saveCapturesList(post.getPostId(), avatarList, path).size())) {
+//			return postSave;
+//		}
 		return null;
 	}
 
@@ -105,13 +103,13 @@ public class PostServiceImpl implements PostService {
 		String postId = post.getPostId();
 
 		// Delete table likes
-		likeRepository.deleteByPostId(postId);
+		postLikeRepository.deleteByPostId(postId);
 
 		// Delete table comment
 		commentRepository.deleteByPostId(postId);
 
 		// Delete table captures
-		captureRepository.deleteByPostId(postId);
+		postImageRepository.deleteByPostId(postId);
 
 		// Delete table post
 		postRepository.delete(post);
@@ -144,11 +142,11 @@ public class PostServiceImpl implements PostService {
 			postInser.setCreateTs(post.getCreateTs());
 			postInser.setUpdateTs(post.getUpdateTs());
 
-			List<String> captureUrlList = captureRepository.findByPostId(post.getPostId());
-			postInser.setCaptureUrlList(captureUrlList);
-
-			List<String> userIdLikeList = likeRepository.findByPostId(post.getPostId());
-			postInser.setUserIdLikeList(userIdLikeList);
+//			List<String> captureUrlList = captureRepository.findByPostId(post.getPostId());
+//			postInser.setCaptureUrlList(captureUrlList);
+//
+//			List<String> userIdLikeList = likeRepository.findByPostId(post.getPostId());
+//			postInser.setUserIdLikeList(userIdLikeList);
 
 			List<CommentCustomResDto> commentList = commentRepository.findByPostIdCustom(post.getPostId());
 			postInser.setCommentList(commentList);
@@ -161,20 +159,24 @@ public class PostServiceImpl implements PostService {
 
 	@Override
 	public boolean hasLike(String userId, String postId) {
-		return likeRepository.hasLike(userId, postId);
+//		return likeRepository.hasLike(userId, postId);
+		return false;
 	}
 
 	@Override
-	public Like likePost(String userId, String postId) {
-		Like likePost = new Like();
-		likePost.setUserId(userId);
-		likePost.setPostId(postId);
-		return likeRepository.save(likePost);
+	public PostLike likePost(String userId, String postId) {
+//		Timestamp createTs = new java.sql.Timestamp(System.currentTimeMillis());
+//		Like likePost = new Like();
+//		likePost.setUserId(userId);
+//		likePost.setPostId(postId);
+//		likePost.setCreateTs(createTs);
+//		return likeRepository.save(likePost);
+		return null;
 	}
 
 	@Override
 	public void dislikePost(String userId, String postId) {
-		likeRepository.deleteByPostIdAndUserId(postId, userId);
+//		likeRepository.deleteByPostIdAndUserId(postId, userId);
 	}
 
 	/**
@@ -183,19 +185,19 @@ public class PostServiceImpl implements PostService {
 	 * @param avatarList
 	 * @return
 	 */
-	private List<Capture> saveCapturesList(String postId, MultipartFile[] avatarList, String path) {
-		List<Capture> captureList = new ArrayList<>();
-		if (avatarList.length > 0) {
-			captureRepository.deleteByPostId(postId);
-			Arrays.asList(avatarList).stream().forEach(file -> {
-				Capture capture = new Capture();
-				capture.setCaptureUrl(fileService.save(file, path));
-				capture.setPostId(postId);
-				captureList.add(capture);
-			});
-		}
-		return captureRepository.saveAll(captureList);
-	}
+//	private List<Capture> saveCapturesList(String postId, MultipartFile[] avatarList, String path) {
+//		List<Capture> captureList = new ArrayList<>();
+//		if (avatarList.length > 0) {
+//			captureRepository.deleteByPostId(postId);
+//			Arrays.asList(avatarList).stream().forEach(file -> {
+//				Capture capture = new Capture();
+//				capture.setCaptureUrl(fileService.save(file, path));
+//				capture.setPostId(postId);
+//				captureList.add(capture);
+//			});
+//		}
+//		return captureRepository.saveAll(captureList);
+//	}
 
 	@Override
 	public Post findByPostIdAndUserId(String postId, String userId) {

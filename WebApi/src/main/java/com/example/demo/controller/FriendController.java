@@ -21,7 +21,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "Friend", description = "API thao tác với quan hệ friend")
 @Validated
 @RestController
-@RequestMapping("api/friends")
+@RequestMapping("/v1/friends")
 public class FriendController {
 
 	@Autowired

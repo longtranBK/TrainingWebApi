@@ -81,8 +81,8 @@ public class UsersController {
 		}
 		GetUserTimelineResDto response = new GetUserTimelineResDto();
 		response.setUserId(userId);
-		response.setFullName(user.getFullName());
-		response.setAvatarUrl(user.getAvatarUrl());
+//		response.setFullName(user.getFullName());
+//		response.setAvatarUrl(user.getAvatarUrl());
 
 		return ResponseEntity.ok().body(response);
 	}
@@ -96,8 +96,8 @@ public class UsersController {
 
 		GetUserTimelineResDto response = new GetUserTimelineResDto();
 		response.setUserId(user.getUserId());
-		response.setFullName(user.getFullName());
-		response.setAvatarUrl(user.getAvatarUrl());
+//		response.setFullName(user.getFullName());
+//		response.setAvatarUrl(user.getAvatarUrl());
 
 		return ResponseEntity.ok().body(response);
 	}
