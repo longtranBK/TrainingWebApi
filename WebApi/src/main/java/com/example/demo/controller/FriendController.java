@@ -9,6 +9,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,53 +22,113 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "Friend", description = "API thao tác với quan hệ friend")
 @Validated
 @RestController
-@RequestMapping("/v1/friends")
+@RequestMapping("/v1")
 public class FriendController {
 
 	@Autowired
 	private UserService userService;
 
-	@Operation(summary = "Add friend")
-	@PostMapping(value = { "/{userIdFriend}" })
+	@Operation(summary = "Send request friend")
+	@PostMapping(value = "/request-friend/{userIdFriend}")
 	@Secured(Constants.ROLE_USER_NAME)
 	public ResponseEntity<?> addFriend(
 			@PathVariable(required = true) @Size(max = 36) String userIdFriend) {
-
 		String userIdCurrent = userService.getUserId();
+		if (userIdFriend.equals(userIdCurrent)) {
+			return ResponseEntity.ok().body("UserId have to not current user!");
+		}
+
+		if (userService.getByUserId(userIdFriend) == null) {
+			return ResponseEntity.ok().body("User not found!");
+		}
+
+		if (userService.hasSendRequest(userIdCurrent, userIdFriend)) {
+			return ResponseEntity.ok().body("Request had sent!");
+		}
 
 		if (userService.isFriend(userIdCurrent, userIdFriend)) {
 			return ResponseEntity.ok().body("User was friend!");
 		}
 
-		if(userService.getByUserId(userIdFriend) == null) {
-			return ResponseEntity.ok().body("Userfriend not found!");
+		if (userService.sentRequestFriend(userIdFriend, userIdCurrent) != null) {
+			return ResponseEntity.ok().body("Add friend successful!");
+		} else {
+			return ResponseEntity.internalServerError().body("Add friend error!");
 		}
-		
-		if(!userIdFriend.equals(userIdCurrent)) {
-			if (userService.addFriend(userIdCurrent, userIdFriend) != null) {
-				return ResponseEntity.ok().body("Add friend successful!");
-			}
-		}
-		return ResponseEntity.internalServerError().body("Add friend error!");
 	}
 
+	@Operation(summary = "Cancel request friend")
+	@DeleteMapping(value = "/request-friend/{userIdFriend}")
+	@Secured(Constants.ROLE_USER_NAME)
+	public ResponseEntity<?> cancelRequestFriend(
+			@PathVariable(required = true) @Size(max = 36) String userIdFriend) {
+		
+		String userIdCurrent = userService.getUserId();
+		if (userIdFriend.equals(userIdCurrent)) {
+			return ResponseEntity.ok().body("UserId have to not current user!");
+		}
+
+		if (userService.getByUserId(userIdFriend) == null) {
+			return ResponseEntity.ok().body("User not found!");
+		}
+
+		if (userService.cancelSendRequest(userIdFriend, userIdCurrent) != 0) {
+			return ResponseEntity.ok().body("Cancel request success!");
+		} else {
+			return ResponseEntity.ok().body("Cancel request error!");
+		}
+	}
+	
+	@Operation(summary = "Access request friend")
+	@PutMapping(value = "/request-friend/{userIdFriend}")
+	@Secured(Constants.ROLE_USER_NAME)
+	public ResponseEntity<?> acceptFriend(
+			@PathVariable(required = true) @Size(max = 36) String userIdFriend) {
+		
+		String userIdCurrent = userService.getUserId();
+		if (userIdFriend.equals(userIdCurrent)) {
+			return ResponseEntity.ok().body("UserId have to not current user!");
+		}
+
+		if (userService.getByUserId(userIdFriend) == null) {
+			return ResponseEntity.ok().body("User not found!");
+		}
+
+		if (userService.isFriend(userIdCurrent, userIdFriend)) {
+			return ResponseEntity.ok().body("User was friend!");
+		}
+
+		if (!userService.hasSendRequest(userIdCurrent, userIdFriend)) {
+			return ResponseEntity.ok().body("Request friend not found!");
+		}
+
+		if (userService.acceptFriend(userIdFriend, userIdCurrent) != null) {
+			return ResponseEntity.ok().body("Accept request success!");
+		} else {
+			return ResponseEntity.ok().body("Accept request error!");
+		}
+	}
+	
 	@Operation(summary = "Unfriend")
-	@DeleteMapping(value = { "{userIdFriend}" })
+	@DeleteMapping(value = "/friends/{userIdFriend}")
 	@Secured(Constants.ROLE_USER_NAME)
 	public ResponseEntity<?> unFriend(
 			@PathVariable(required = true) @Size(max = 36) String userIdFriend) {
-
+		
 		String userIdCurrent = userService.getUserId();
-		
-		if(userService.getByUserId(userIdFriend) == null) {
-			return ResponseEntity.ok().body("Userfriend not found!");
+		if (userIdFriend.equals(userIdCurrent)) {
+			return ResponseEntity.ok().body("UserId have to not current user!");
 		}
-		
+
+		if (userService.getByUserId(userIdFriend) == null) {
+			return ResponseEntity.ok().body("User not found!");
+		}
+
 		if (!userService.isFriend(userIdCurrent, userIdFriend)) {
 			return ResponseEntity.ok().body("User was not friend!");
 		}
-		userService.unFriend(userIdCurrent, userIdFriend);
-
+		userService.unFriend(userIdFriend, userIdCurrent);
 		return ResponseEntity.ok().body("Unfriend successful!");
+		
 	}
 }

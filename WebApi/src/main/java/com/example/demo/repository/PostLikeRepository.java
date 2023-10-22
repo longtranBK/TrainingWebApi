@@ -22,7 +22,7 @@ public interface PostLikeRepository extends JpaRepository<PostLike, String> {
 			+ " WHERE user_id = ?1 AND post_id = ?2", nativeQuery = true)
 	boolean hasLike(String userId, String postId);
 	
-	@Query(value = "SELECT count(user_id) FROM likes"
+	@Query(value = "SELECT count(user_id) FROM post_likes"
 			+ " WHERE user_id =?1 AND create_ts >= ?2 AND create_ts <= ?3", nativeQuery = true)
 	int countLike(String userId, Date startDate, Date endDate);
 	

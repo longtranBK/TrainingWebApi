@@ -52,7 +52,7 @@ public class CommentController {
 		if (post == null) {
 			return ResponseEntity.ok().body("Post not found!");
 		}
-		if (commentService.insertComment(request, userService.getUserId()) != null) {
+		if (commentService.insertComment(request) != null) {
 			return ResponseEntity.ok().body("Insert comment successful!");
 		} else {
 			return ResponseEntity.internalServerError().body("Insert comment error!");
@@ -60,25 +60,27 @@ public class CommentController {
 	}
 
 	@Operation(summary = "Edit comment in post")
-	@PutMapping
+	@PutMapping(value = "/{commentId}")
 	@Secured(Constants.ROLE_USER_NAME)
 	public ResponseEntity<?> updateComment(
+			@PathVariable(required = true) @Size(max = 36) String commentId,
 			@Valid @RequestBody(required = true) UpdateCommentReqDto request) {
 
-		Comment comment = commentService.findByCommentIdAndUserId(request.getCommentId(), userService.getUserId());
+		Comment comment = commentService.findByCommentIdAndUserId(commentId, userService.getUserId());
 		if (comment == null) {
 			return ResponseEntity.notFound().build();
 		}
 
-		if (commentService.updateComment(comment, request.getContent()) != null) {
-			return ResponseEntity.ok().body("Update comment successful!");
+		Comment commentRes = commentService.updateComment(comment, request.getContent());
+		if (commentRes != null) {
+			return ResponseEntity.ok().body(commentRes);
 		} else {
 			return ResponseEntity.internalServerError().body("Update comment error!");
 		}
 	}
 
 	@Operation(summary = "Delete comment in post")
-	@DeleteMapping(value = { "/{commentId}" })
+	@DeleteMapping(value = "/{commentId}")
 	@Secured(Constants.ROLE_USER_NAME)
 	public ResponseEntity<?> deleteComment(
 			@PathVariable(required = true) @Size(max = 36) String commentId) {
@@ -87,8 +89,7 @@ public class CommentController {
 		if (comment == null) {
 			return ResponseEntity.notFound().build();
 		}
-
-		commentService.deleteComment(comment);
+		commentService.deleteComment(commentId);
 		return ResponseEntity.ok().body("Delete comment successful!");
 	}
 }

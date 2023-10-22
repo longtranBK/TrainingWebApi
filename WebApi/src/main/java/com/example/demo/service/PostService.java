@@ -11,7 +11,6 @@ import com.example.demo.dto.request.UpdatePostReqDto;
 import com.example.demo.dto.response.GetPostResDto;
 import com.example.demo.dto.response.PostUpdateResDto;
 import com.example.demo.entity.Post;
-import com.example.demo.entity.PostLike;
 
 public interface PostService {
 	
@@ -71,31 +70,14 @@ public interface PostService {
 	 */
 	void deletePost(String postId);
 
-	
 	/**
-	 * Check like of post
+	 * Get post of me or friend
 	 * 
-	 * @param userId
 	 * @param postId
-	 * @return true if liked
+	 * @param limitComment
+	 * @param offsetComment
+	 * @return GetPostResDto list
 	 */
-	boolean hasLike(String userId, String postId);
+	GetPostResDto getPost(String postId, int limitComment, int offsetComment);
 	
-	/**
-	 * Like a post
-	 * 
-	 * @param userId
-	 * @param postId
-	 * @return true if like success
-	 */
-	PostLike likePost(String userId, String postId);
-	
-	/**
-	 * Dislike a post
-	 * 
-	 * Dislike post
-	 * @param userId
-	 * @param postId
-	 */
-	void dislikePost(String userId, String postId);
 }

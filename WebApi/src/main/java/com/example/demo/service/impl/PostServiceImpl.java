@@ -15,11 +15,12 @@ import org.springframework.web.multipart.MultipartFile;
 import com.example.demo.dto.request.InsertPostReqDto;
 import com.example.demo.dto.request.UpdatePostReqDto;
 import com.example.demo.dto.response.CommentCustomResDto;
+import com.example.demo.dto.response.CommentInfor;
 import com.example.demo.dto.response.GetPostResDto;
 import com.example.demo.dto.response.PostUpdateResDto;
 import com.example.demo.entity.Post;
 import com.example.demo.entity.PostImage;
-import com.example.demo.entity.PostLike;
+import com.example.demo.repository.CommentLikeRepository;
 import com.example.demo.repository.CommentRepository;
 import com.example.demo.repository.PostImageRepository;
 import com.example.demo.repository.PostLikeRepository;
@@ -45,13 +46,18 @@ public class PostServiceImpl implements PostService {
 
 	@Autowired
 	private PostLikeRepository postLikeRepository;
+	
+	@Autowired
+	private CommentLikeRepository commentLikeRepository;
+
 
 	@Autowired
 	private CommentRepository commentRepository;
 
 	@Override
 	public Post findByPostId(String postId) {
-		return postRepository.findByPostId(postId);
+		String userId = userService.getUserId();
+		return postRepository.findByPostIdOfmeOrFriend(userId, postId);
 	}
 
 	@Override
@@ -103,28 +109,6 @@ public class PostServiceImpl implements PostService {
 		commentRepository.updateDelFlg(postId, true);
 	}
 
-	@Override
-	public boolean hasLike(String userId, String postId) {
-//		return likeRepository.hasLike(userId, postId);
-		return false;
-	}
-
-	@Override
-	public PostLike likePost(String userId, String postId) {
-//		Timestamp createTs = new java.sql.Timestamp(System.currentTimeMillis());
-//		Like likePost = new Like();
-//		likePost.setUserId(userId);
-//		likePost.setPostId(postId);
-//		likePost.setCreateTs(createTs);
-//		return likeRepository.save(likePost);
-		return null;
-	}
-
-	@Override
-	public void dislikePost(String userId, String postId) {
-//		likeRepository.deleteByPostIdAndUserId(postId, userId);
-	}
-
 	/**
 	 * Save all image of post
 	 * 
@@ -173,14 +157,52 @@ public class PostServiceImpl implements PostService {
 
 			postData.setCountLikes(postLikeRepository.countTotalLike(post.getPostId()));
 
-			List<CommentCustomResDto> commentList = commentRepository.findByPostIdCustom(post.getPostId());
-			postData.setCommentList(commentList);
+			List<CommentCustomResDto> commentListCus = commentRepository.findByPostIdCustom(post.getPostId(), limitComment, offsetComment);
 			
-			
-
+			List<CommentInfor> listCommentView = new ArrayList<>();
+			commentListCus.forEach(comment -> {
+				CommentInfor cmt = new CommentInfor();
+				cmt.setCommentId(comment.getCommentId());
+				cmt.setContent(comment.getContent());
+				cmt.setCreateTs(comment.getCreateTs());
+				cmt.setUpdateTs(comment.getUpdateTs());
+				cmt.setCountLike(commentLikeRepository.countLike(comment.getCommentId()));
+				listCommentView.add(cmt);
+			});
+			postData.setCommentList(listCommentView);
 			response.add(postData);
 		});
 		return response;
 	}
 
+	@Override
+	public GetPostResDto getPost(String postId, int limitComment, int offsetComment) {
+		Post post = postRepository.findPost(userService.getUserId(), postId, limitComment, offsetComment);
+		if (post == null) {
+			return null;
+		}
+		GetPostResDto postData = new GetPostResDto();
+		
+		postData.setPostId(post.getPostId());
+		postData.setContent(post.getContent());
+		List<String> captureUrlList = postImageRepository.findByPostId(post.getPostId());
+		postData.setCaptureUrlList(captureUrlList);
+		postData.setCountLikes(postLikeRepository.countTotalLike(post.getPostId()));
+		List<CommentCustomResDto> commentListCus = commentRepository.findByPostIdCustom(post.getPostId(), limitComment, offsetComment);
+		
+		List<CommentInfor> listCommentView = new ArrayList<>();
+		commentListCus.forEach(comment -> {
+			CommentInfor cmt = new CommentInfor();
+			cmt.setCommentId(comment.getCommentId());
+			cmt.setContent(comment.getContent());
+			cmt.setCreateTs(comment.getCreateTs());
+			cmt.setUpdateTs(comment.getUpdateTs());
+			cmt.setCountLike(commentLikeRepository.countLike(comment.getCommentId()));
+			listCommentView.add(cmt);
+		});
+		postData.setCommentList(listCommentView);
+		
+		return postData;
+	}
+	
 }

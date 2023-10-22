@@ -5,7 +5,6 @@ import java.util.Date;
 import java.util.List;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +17,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -28,7 +26,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.example.demo.constant.Constants;
 import com.example.demo.dto.request.InsertPostReqDto;
-import com.example.demo.dto.request.LikePostReqDto;
 import com.example.demo.dto.request.UpdatePostReqDto;
 import com.example.demo.dto.response.GetPostResDto;
 import com.example.demo.dto.response.PostUpdateResDto;
@@ -104,7 +101,7 @@ public class PostController {
 	@Operation(summary = "Get all post of me and friend")
 	@GetMapping
 	@Secured(Constants.ROLE_USER_NAME)
-	public @ResponseBody ResponseEntity<List<GetPostResDto>> getPost( 
+	public @ResponseBody ResponseEntity<List<GetPostResDto>> getAllPost( 
 			@RequestParam(value = "timeStart", required = true) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date timeStart,
 			@RequestParam(value = "timeEnd", required = true) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date timeEnd,
 			@RequestParam(value = "limit-post", required = true) int limitPost,
@@ -114,37 +111,16 @@ public class PostController {
 		List<GetPostResDto> response = postService.getAllPost(timeStart, timeEnd, limitPost, offsetPost, limitComment, offsetComment);
 		return ResponseEntity.ok().body(response);
 	}
-
-	@Operation(summary = "Like post")
-	@PostMapping(value = { "/like" })
+	
+	@Operation(summary = "Get post of me or friend")
+	@GetMapping(value = "/{postId}")
 	@Secured(Constants.ROLE_USER_NAME)
-	public ResponseEntity<?> likePost(
-			@Valid @RequestBody(required = true) LikePostReqDto request) {
-
-		String userId = userService.getUserId();
-		if (postService.hasLike(userId, request.getPostId())) {
-			return ResponseEntity.ok().body("User had liked!");
-		}
-		if(postService.likePost(userId, request.getPostId())!= null) {
-			return ResponseEntity.ok().body("Like post successful!");
-		} else {
-			return ResponseEntity.internalServerError().body("Like post error!");
-		}
-	}
-
-	@Operation(summary = "Dislike post")
-	@DeleteMapping(value = { "/dislike" })
-	@Secured(Constants.ROLE_USER_NAME)
-	public ResponseEntity<?> dislikePost(
-			@Valid @RequestBody(required = true) LikePostReqDto request) {
-
-		String userId = userService.getUserId();
-		if (!postService.hasLike(userId, request.getPostId())) {
-			return ResponseEntity.ok().body("User had not like!");
-		}
-		postService.dislikePost(userId, request.getPostId());
-
-		return ResponseEntity.ok().body("Unlike successful!");
+	public @ResponseBody ResponseEntity<GetPostResDto> getPost( 
+			@PathVariable(value = "postId", required = true) @Size(max = 36) String postId,
+			@RequestParam(value = "limit-comment", required = true) int limitComment,
+			@RequestParam(value = "offset-comment", required = true) int offsetComment) {
+		GetPostResDto response = postService.getPost(postId, limitComment, offsetComment);
+		return ResponseEntity.ok().body(response);
 	}
 
 }

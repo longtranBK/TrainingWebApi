@@ -245,95 +245,95 @@ public class PostControllerTests {
 	}
 	
 	
-	@Test
-	void likePost_postNotExists() throws Exception {	
-		when(userService.getUserId()).thenReturn("userId");
-		LikePostReqDto request = new LikePostReqDto();
-		request.setPostId("postId");
-		
-		when(postService.hasLike("userId", request.getPostId())).thenReturn(true);
-		
-		MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post(uri+"/like")
-				.contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(request))).andReturn();
-		
-		int status = mvcResult.getResponse().getStatus();
-		assertEquals(200, status);
-		
-		String msg = mvcResult.getResponse().getContentAsString();
-		assertEquals("User had liked!", msg);
-	}
-	
-	@Test
-	void likePost_postExists_likeOk() throws Exception {	
-		when(userService.getUserId()).thenReturn("userId");
-		LikePostReqDto request = new LikePostReqDto();
-		request.setPostId("postId");
-		
-		when(postService.hasLike("userId", request.getPostId())).thenReturn(false);
-		when(postService.likePost("userId", request.getPostId())).thenReturn(new PostLike());
-		
-		MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post(uri+"/like")
-				.contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(request))).andReturn();
-		
-		int status = mvcResult.getResponse().getStatus();
-		assertEquals(200, status);
-		
-		String msg = mvcResult.getResponse().getContentAsString();
-		assertEquals("Like post successful!", msg);
-	}
-	
-	@Test
-	void likePost_postExists_likeNg() throws Exception {	
-		when(userService.getUserId()).thenReturn("userId");
-		LikePostReqDto request = new LikePostReqDto();
-		request.setPostId("postId");
-		
-		when(postService.hasLike("userId", request.getPostId())).thenReturn(false);
-		when(postService.likePost("userId", request.getPostId())).thenReturn(null);
-		
-		MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post(uri+"/like")
-				.contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(request))).andReturn();
-		
-		int status = mvcResult.getResponse().getStatus();
-		assertEquals(500, status);
-
-	}
-	
-	@Test
-	void dislikePost_postNotExists() throws Exception {	
-		when(userService.getUserId()).thenReturn("userId");
-		LikePostReqDto request = new LikePostReqDto();
-		request.setPostId("postId");
-		
-		when(postService.hasLike("userId", request.getPostId())).thenReturn(false);
-		
-		MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.delete(uri+"/dislike")
-				.contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(request))).andReturn();
-		
-		int status = mvcResult.getResponse().getStatus();
-		assertEquals(200, status);
-		
-		String msg = mvcResult.getResponse().getContentAsString();
-		assertEquals("User had not like!", msg);
-	}
-	
-	@Test
-	void likePost_postExists_dislikeOk() throws Exception {	
-		when(userService.getUserId()).thenReturn("userId");
-		LikePostReqDto request = new LikePostReqDto();
-		request.setPostId("postId");
-		
-		when(postService.hasLike("userId", request.getPostId())).thenReturn(true);
-		doNothing().when(postService).dislikePost("userId", "postId");
-		
-		MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.delete(uri+"/dislike")
-				.contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(request))).andReturn();
-		
-		int status = mvcResult.getResponse().getStatus();
-		assertEquals(200, status);
-		
-		String msg = mvcResult.getResponse().getContentAsString();
-		assertEquals("Unlike successful!", msg);
-	}
+//	@Test
+//	void likePost_postNotExists() throws Exception {	
+//		when(userService.getUserId()).thenReturn("userId");
+//		LikePostReqDto request = new LikePostReqDto();
+//		request.setPostId("postId");
+//		
+//		when(postService.hasLike("userId", request.getPostId())).thenReturn(true);
+//		
+//		MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post(uri+"/like")
+//				.contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(request))).andReturn();
+//		
+//		int status = mvcResult.getResponse().getStatus();
+//		assertEquals(200, status);
+//		
+//		String msg = mvcResult.getResponse().getContentAsString();
+//		assertEquals("User had liked!", msg);
+//	}
+//	
+//	@Test
+//	void likePost_postExists_likeOk() throws Exception {	
+//		when(userService.getUserId()).thenReturn("userId");
+//		LikePostReqDto request = new LikePostReqDto();
+//		request.setPostId("postId");
+//		
+//		when(postService.hasLike("userId", request.getPostId())).thenReturn(false);
+//		when(postService.likePost("userId", request.getPostId())).thenReturn(new PostLike());
+//		
+//		MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post(uri+"/like")
+//				.contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(request))).andReturn();
+//		
+//		int status = mvcResult.getResponse().getStatus();
+//		assertEquals(200, status);
+//		
+//		String msg = mvcResult.getResponse().getContentAsString();
+//		assertEquals("Like post successful!", msg);
+//	}
+//	
+//	@Test
+//	void likePost_postExists_likeNg() throws Exception {	
+//		when(userService.getUserId()).thenReturn("userId");
+//		LikePostReqDto request = new LikePostReqDto();
+//		request.setPostId("postId");
+//		
+//		when(postService.hasLike("userId", request.getPostId())).thenReturn(false);
+//		when(postService.likePost("userId", request.getPostId())).thenReturn(null);
+//		
+//		MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post(uri+"/like")
+//				.contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(request))).andReturn();
+//		
+//		int status = mvcResult.getResponse().getStatus();
+//		assertEquals(500, status);
+//
+//	}
+//	
+//	@Test
+//	void dislikePost_postNotExists() throws Exception {	
+//		when(userService.getUserId()).thenReturn("userId");
+//		LikePostReqDto request = new LikePostReqDto();
+//		request.setPostId("postId");
+//		
+//		when(postService.hasLike("userId", request.getPostId())).thenReturn(false);
+//		
+//		MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.delete(uri+"/dislike")
+//				.contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(request))).andReturn();
+//		
+//		int status = mvcResult.getResponse().getStatus();
+//		assertEquals(200, status);
+//		
+//		String msg = mvcResult.getResponse().getContentAsString();
+//		assertEquals("User had not like!", msg);
+//	}
+//	
+//	@Test
+//	void likePost_postExists_dislikeOk() throws Exception {	
+//		when(userService.getUserId()).thenReturn("userId");
+//		LikePostReqDto request = new LikePostReqDto();
+//		request.setPostId("postId");
+//		
+//		when(postService.hasLike("userId", request.getPostId())).thenReturn(true);
+//		doNothing().when(postService).dislikePost("userId", "postId");
+//		
+//		MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.delete(uri+"/dislike")
+//				.contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(request))).andReturn();
+//		
+//		int status = mvcResult.getResponse().getStatus();
+//		assertEquals(200, status);
+//		
+//		String msg = mvcResult.getResponse().getContentAsString();
+//		assertEquals("Unlike successful!", msg);
+//	}
 	
 }

@@ -1,6 +1,5 @@
 package com.example.demo.service.impl;
 
-import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -16,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.demo.constant.Constants;
 import com.example.demo.constant.RoleEnum;
+import com.example.demo.constant.StatusFriendEnum;
 import com.example.demo.dto.request.SignupReqDto;
 import com.example.demo.dto.request.UpdateUserInforReqDto;
 import com.example.demo.dto.response.UserInforResDto;
@@ -120,10 +120,11 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public UserFriend addFriend(String userId1, String userId2) {
+	public UserFriend sentRequestFriend(String userId1, String userId2) {
 		UserFriend userFriend = new UserFriend();
 		userFriend.setUser1(userId1);
 		userFriend.setUser2(userId2);
+		userFriend.setStatus(StatusFriendEnum.REQUEST.getValue());
 		return userFriendRepository.save(userFriend);
 	}
 
@@ -167,6 +168,25 @@ public class UserServiceImpl implements UserService {
 		user.setPassword(passwordEncoder.encode(newPassword));
 		userRepository.save(user);
 		return userRepository.save(user);
+	}
+
+	@Override
+	public boolean hasSendRequest(String userCurrentId, String userFriendId) {
+		return userFriendRepository.hasSendRequestFriend(userCurrentId, userFriendId);
+	}
+
+	@Override
+	public int cancelSendRequest(String userCurrentId, String userFriendId) {
+		return userFriendRepository.cancelRequestFriend(userCurrentId, userFriendId);
+	}
+
+	@Override
+	public UserFriend acceptFriend(String userCurrentId, String userFriendId) {
+		UserFriend userFriend = new UserFriend();
+		userFriend.setUser1(userCurrentId);
+		userFriend.setUser2(userFriendId);
+		userFriend.setStatus(StatusFriendEnum.FRIEND.getValue());
+		return userFriendRepository.save(userFriend);
 	}
 
 }

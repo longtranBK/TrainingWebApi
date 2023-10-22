@@ -5,9 +5,7 @@ import lombok.NonNull;
 public enum StatusFriendEnum {
 	
 	REQUEST("0", "SENDED_REQUEST"), 
-	FRIEND("1", "FRIEND"),
-	NOT_FRIEND("2", "NOT_FRIEND");
-	
+	FRIEND("1", "FRIEND");
 
 	private String value;
 	private String label;

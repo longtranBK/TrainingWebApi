@@ -81,13 +81,13 @@ public interface UserService {
 	boolean isFriend(String userId1, String userId2);
 	
 	/**
-	 * Add friend
+	 * Send request friend
 	 * 
 	 * @param userId1
 	 * @param userId2
 	 * @return UserFriend if add friend success
 	 */
-	UserFriend addFriend(String userId1, String userId2);
+	UserFriend sentRequestFriend(String userId1, String userId2);
 	
 	/**
 	 * Unfriend
@@ -129,5 +129,29 @@ public interface UserService {
 	 * @return User if update success
 	 */
 	User updatePassword(String currentPassword, String newPassword);
+	
+	/**
+	 * 
+	 * @param userCurrentId
+	 * @param userFriendId
+	 * @return
+	 */
+	boolean hasSendRequest(String userCurrentId, String userFriendId);
+	
+	/**
+	 * 
+	 * @param userCurrentId
+	 * @param userFriendId
+	 * @return
+	 */
+	int cancelSendRequest(String userCurrentId, String userFriendId);
+	
+	/**
+	 * 
+	 * @param userCurrentId
+	 * @param userFriendId
+	 * @return
+	 */
+	UserFriend acceptFriend(String userCurrentId, String userFriendId);
 	
 }

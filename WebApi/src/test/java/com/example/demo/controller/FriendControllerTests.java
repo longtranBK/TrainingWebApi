@@ -103,7 +103,7 @@ public class FriendControllerTests {
 		when(userService.getUserId()).thenReturn("userId");
 		when(userService.isFriend("userId", "userIdFriend")).thenReturn(false);
 		when(userService.getByUserId("userIdFriend")).thenReturn(new User());
-		when(userService.addFriend("userId", "userIdFriend")).thenReturn(new UserFriend());
+//		when(userService.addFriend("userId", "userIdFriend")).thenReturn(new UserFriend());
 		
 		MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post(uri+"/{userIdFriend}","userIdFriend").contentType(MediaType.APPLICATION_JSON)
 				.content("")).andReturn();
@@ -121,7 +121,7 @@ public class FriendControllerTests {
 		when(userService.getUserId()).thenReturn("userId");
 		when(userService.isFriend("userId", "userIdFriend")).thenReturn(false);
 		when(userService.getByUserId("userIdFriend")).thenReturn(new User());
-		when(userService.addFriend("userId", "userIdFriend")).thenReturn(null);
+//		when(userService.addFriend("userId", "userIdFriend")).thenReturn(null);
 		
 		MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post(uri+"/{userIdFriend}","userIdFriend").contentType(MediaType.APPLICATION_JSON)
 				.content("")).andReturn();

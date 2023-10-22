@@ -3,8 +3,6 @@ package com.example.demo.repository;
 import java.sql.Date;
 import java.util.List;
 
-import org.springframework.transaction.annotation.Transactional;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -15,15 +13,15 @@ public interface UserFriendRepository  extends JpaRepository<UserFriend, String>
 
 	@Query(value = "SELECT"
 			+ " CASE"
-			+ "    WHEN count(*) = 1 THEN 'true'"
+			+ "    WHEN count(1) = 1 THEN 'true'"
 			+ "    ELSE 'false'"
 			+ " END"
 			+ " FROM user_friend"
-			+ " WHERE (user1 = ?1 AND user2 = ?2)"
-			+ " OR (user2 = ?1 AND user1 = ?2);", nativeQuery = true)
+			+ " WHERE ((user1 = ?1 AND user2 = ?2)"
+			+ " OR (user2 = ?1 AND user1 = ?2))"
+			+ " AND status = '1'", nativeQuery = true)
 	boolean isFriend(String userId1, String userId2);
 	
-	@Transactional
 	@Modifying
 	@Query(value = "DELETE"
 			+ " FROM user_friend"
@@ -39,4 +37,22 @@ public interface UserFriendRepository  extends JpaRepository<UserFriend, String>
 			+ " FROM user_friend uf2"
 			+ " WHERE uf2.user2 = ?1 AND create_ts >= ?2 AND create_ts <= ?3", nativeQuery = true)
 	List<String> getUserIdFriendList(String userId, Date startTime, Date endTime);
+	
+	@Query(value = "SELECT"
+			+ " CASE"
+			+ "    WHEN count(1) = 1 THEN 'true'"
+			+ "    ELSE 'false'"
+			+ " END"
+			+ " FROM user_friend"
+			+ " WHERE ((user1 = ?1 AND user2 = ?2)"
+			+ " OR (user2 = ?1 AND user1 = ?2))"
+			+ " AND status = '0'", nativeQuery = true)
+	boolean hasSendRequestFriend(String userId1, String userId2);
+	
+	@Modifying
+	@Query(value = "DELETE"
+			+ " FROM user_friend"
+			+ " WHERE ((user1 = ?1 AND user2 = ?2)"
+			+ " OR (user2 = ?1 AND user1 = ?2)) AND status = '0'", nativeQuery = true)
+	int cancelRequestFriend(String userId1, String userId2);
 }

@@ -18,17 +18,18 @@ public interface CommentRepository extends JpaRepository<Comment, String> {
 			+ " content,"
 			+ " create_ts AS createTs,"
 			+ " update_ts AS updateTs"
-			+ " FROM comment WHERE post_id = ?1 ORDER BY createTs DESC", nativeQuery = true)
-	List<CommentCustomResDto> findByPostIdCustom(String postId);
+			+ " FROM comments WHERE post_id = ?1 AND delFlg = false ORDER BY createTs DESC"
+			+ " LIMIT ?4,?3", nativeQuery = true)
+	List<CommentCustomResDto> findByPostIdCustom(String postId, int limit, int offset);
 	
 	@Modifying
 	@Query("update comments c set c.delFlg = ?2 where c.postId= ?1")
 	void updateDelFlg(String postId, boolean delFlg);
 	
-	Comment findByCommentIdAndUserId(String commentId, String userId);
+	Comment findByCommentIdAndUserIdAndDelFlg(String commentId, String userId, boolean delFlg);
 	
 	@Query(value = "SELECT * FROM comment"
-			+ " WHERE user_id = ?1 AND create_ts >= ?2 AND create_ts <= ?3"
+			+ " WHERE user_id = ?1 AND delFlg = false AND create_ts >= ?2 AND create_ts <= ?3"
 			+ " ORDER BY create_ts DESC", nativeQuery = true)
 	List<Comment> getCommentList(String userId, Date startDate, Date endDate);
 }
