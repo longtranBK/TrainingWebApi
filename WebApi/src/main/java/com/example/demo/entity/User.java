@@ -36,8 +36,8 @@ public class User {
 	@Column(name = "email", nullable = false)
 	private String email;
 	
-	@Column(name = "reset_pasword_token", nullable = false)
-	private String resetPaswordToken;
+	@Column(name = "reset_password_token", nullable = false)
+	private String resetPasswordToken;
 	
 	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinTable(name = "user_roles", 
@@ -48,11 +48,5 @@ public class User {
     public void addRole(Role role) {
         this.roles.add(role);
     }
-    
-	@Column(name = "create_ts")
-    private Timestamp createTs;
-    
-	@Column(name = "update_ts")
-    private Timestamp updateTs;
     
 }	

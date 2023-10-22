@@ -1,7 +1,5 @@
 package com.example.demo.entity;
 
-import java.sql.Timestamp;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -12,12 +10,12 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@Entity
-@Table(name = "comment")
+@Entity(name = "comments")
+@Table(name = "comments")
 public class Comment {
 	
 	@Id
-	@Column(name = "comment_id", nullable = false)
+	@Column(name = "id", nullable = false)
 	private String commentId;
 	
 	@Column(name = "user_id", nullable = false)
@@ -31,10 +29,4 @@ public class Comment {
 
 	@Column(name = "delFlg")
 	private boolean delFlg;
-	
-	@Column(name = "create_ts", nullable = false)
-	private Timestamp createTs;
-
-	@Column(name = "update_ts", nullable = false)
-	private Timestamp updateTs;
 }

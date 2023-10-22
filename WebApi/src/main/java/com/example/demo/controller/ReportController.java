@@ -40,14 +40,13 @@ public class ReportController {
 	@Secured(Constants.ROLE_USER_NAME)
 	public ResponseEntity<Resource> getFile(
 			@RequestParam(value = "timeStart", required = true) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) java.util.Date timeStart,
-			@RequestParam(value = "timeEnd", required = true) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) java.util.Date timeEnd,
-			@RequestParam(value = "numbersPost", required = true) int numbersPost) {
+			@RequestParam(value = "timeEnd", required = true) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) java.util.Date timeEnd) {
 		
 		Date start = new java.sql.Date(timeStart.getTime());
 		Date end = new java.sql.Date(timeEnd.getTime());
 		
 		String filename = "Report.xlsx";
-		InputStreamResource file = new InputStreamResource(reportService.loadData(userService.getUserId(), start, end, numbersPost));
+		InputStreamResource file = new InputStreamResource(reportService.loadData(userService.getUserId(), start, end));
 
 		return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
 				.contentType(MediaType.parseMediaType("application/vnd.ms-excel")).body(file);

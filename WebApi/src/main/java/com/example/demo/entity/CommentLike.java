@@ -1,7 +1,5 @@
 package com.example.demo.entity;
 
-import java.sql.Timestamp;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -28,6 +26,4 @@ public class CommentLike {
 	@Column(name = "comment_id", nullable = false)
 	private String commentId;
 
-	@Column(name = "create_ts", nullable = false)
-	private Timestamp createTs;
 }

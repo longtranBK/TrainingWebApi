@@ -97,7 +97,7 @@ public class CustomExceptionHandlerTests {
 	void handleConstraintViolationException() throws Exception {
 		InsertPostReqDto req = new InsertPostReqDto();
 		req.setContent("Test123123");
-		req.setStatus(100);
+		req.setStatus("100");
 		MockMultipartFile request = new MockMultipartFile("request", "", "application/json",
 				objectMapper.writeValueAsString(req).getBytes());
 		

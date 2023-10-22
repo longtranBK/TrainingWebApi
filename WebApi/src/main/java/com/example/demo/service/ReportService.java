@@ -11,9 +11,8 @@ public interface ReportService {
 	 * @param userId
 	 * @param startDate
 	 * @param endDate
-	 * @param numbersPost
 	 * @return ByteArrayInputStream
 	 */
-	ByteArrayInputStream loadData(String userId, Date startDate, Date endDate, int numbersPost);
+	ByteArrayInputStream loadData(String userId, Date startDate, Date endDate);
 
 }

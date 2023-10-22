@@ -28,6 +28,4 @@ public class PostLike {
 	@Column(name = "post_id", nullable = false)
 	private String postId;
 
-	@Column(name = "create_ts", nullable = false)
-	private Timestamp createTs;
 }

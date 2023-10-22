@@ -8,21 +8,44 @@ import com.example.demo.entity.UserInfor;
 
 public interface UserInforRepository extends JpaRepository<UserInfor, String>{
 	
-	@Query(value = "SELECT * FROM user_infor WHERE id = ?1", nativeQuery = true)
-	UserInfor findUserInforById(String id);
+	UserInfor findByUserId(String userId);
 	
-	@Query(value = "select "
-			+ "u.id as id, "
-			+ "u.full_name as fullName, "
-			+ "u.avatar_url as avatarUrl, "
-			+ "ui.sex as sex, "
-			+ "ui.study_at as studyAt, "
-			+ "ui.working_at as workingAt, "
-			+ "ui.favorites as favorites, "
-			+ "ui.other_infor as otherInfor, "
-			+ "ui.date_of_birth as dateOfBirth "
-			+ "from users u inner join user_infor ui "
-			+ "on u.id = ui.id "
-			+ "where u.id = ?1", nativeQuery = true)
-	UserInforResDto getUserInfor(String userId);
+	@Query(value = "SELECT"
+			+ "  ui.full_name AS fullName,"
+			+ "  ai.image_url AS avatarUrl,"
+			+ "  ui.sex AS sex,"
+			+ "  ui.study_at AS studyAt,"
+			+ "  ui.working_at AS workingAt,"
+			+ "  ui.favorites AS favorites,"
+			+ "  ui.other_infor As otherInfor,"
+			+ "  ui.date_of_birth AS dateOfBirth"
+			+ "FROM"
+			+ "  users u INNER JOIN user_infor ui ON u.id = ui.id"
+			+ "  LEFT JOIN avatar_image ai ON u.id = ai.user_id"
+			+ "WHERE"
+			+ "  u.id = ?2"
+			+ "  AND u.id in (SELECT user2 as userId"
+			+ "            FROM user_friend uf1"
+			+ "            WHERE uf1.user1 = ?1"
+			+ "            UNION"
+			+ "            SELECT user1 as userId"
+			+ "            FROM user_friend uf2"
+			+ "            WHERE uf2.user2 = ?1)", nativeQuery = true)
+	UserInforResDto getUserInfor(String userId, String userIdFriend);
+	
+	@Query(value = "SELECT"
+			+ "  ui.full_name AS fullName,"
+			+ "  ai.image_url AS avatarUrl,"
+			+ "  ui.sex AS sex,"
+			+ "  ui.study_at AS studyAt,"
+			+ "  ui.working_at AS workingAt,"
+			+ "  ui.favorites AS favorites,"
+			+ "  ui.other_infor As otherInfor,"
+			+ "  ui.date_of_birth AS dateOfBirth"
+			+ "FROM"
+			+ "  users u INNER JOIN user_infor ui ON u.id = ui.id"
+			+ "  LEFT JOIN avatar_image ai ON u.id = ai.user_id"
+			+ "WHERE"
+			+ "  u.id = ?1", nativeQuery = true)
+	UserInforResDto getUserInforMe(String userId);
 }

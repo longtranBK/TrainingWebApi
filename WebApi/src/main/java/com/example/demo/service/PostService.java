@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
-import java.sql.Date;
+
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
@@ -8,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.example.demo.dto.request.InsertPostReqDto;
 import com.example.demo.dto.request.UpdatePostReqDto;
 import com.example.demo.dto.response.GetPostResDto;
+import com.example.demo.dto.response.PostUpdateResDto;
 import com.example.demo.entity.Post;
 import com.example.demo.entity.PostLike;
 
@@ -33,22 +35,24 @@ public interface PostService {
 	 * Insert new post
 	 * 
 	 * @param request
-	 * @param avatarList
+	 * @param imageList
 	 * @param userId
 	 * @return Post if insert success
 	 */
-	Post insertPost(InsertPostReqDto request, MultipartFile[] avatarList, String userId);
+	Post insertPost(InsertPostReqDto request, MultipartFile[] imageList, String userId);
 	
 	/**
-	 * Find post with condition
+	 * Get all post of me and friend
 	 * 
-	 * @param userId
 	 * @param startDate
 	 * @param endDate
-	 * @param numbersPost
-	 * @return list GetPostResDto
+	 * @param limitPost
+	 * @param offsetPost
+	 * @param limitComment
+	 * @param offsetComment
+	 * @return GetPostResDto list
 	 */
-	List<GetPostResDto> getPostCustom(String userId, Date startDate, Date endDate, int numbersPost);
+	List<GetPostResDto> getAllPost(Date startDate, Date endDate, int limitPost, int offsetPost, int limitComment, int offsetComment);
 	
 	/**
 	 * Update post
@@ -56,25 +60,17 @@ public interface PostService {
 	 * @param post
 	 * @param request
 	 * @param avatarList
-	 * @return Post if update success
+	 * @return PostUpdateResDto if update success
 	 */
-	Post updatePost(Post post, UpdatePostReqDto request, MultipartFile[] avatarList);
+	PostUpdateResDto updatePost(Post post, UpdatePostReqDto request, MultipartFile[] avatarList);
 	
 	/**
 	 * Delete post
 	 * 
-	 * @param post
+	 * @param postId
 	 */
-	void deletePost(Post post);
-	
-	/**
-	 * Get post timeline
-	 * 
-	 * @param userId
-	 * @param numbersPost
-	 * @return List<GetPostResDto>
-	 */
-	List<GetPostResDto> getPostTimeline(String userId, int numbersPost);
+	void deletePost(String postId);
+
 	
 	/**
 	 * Check like of post

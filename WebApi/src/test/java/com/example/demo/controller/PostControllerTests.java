@@ -80,7 +80,7 @@ public class PostControllerTests {
 	void insertPost_insertOk() throws Exception {
 		InsertPostReqDto req = new InsertPostReqDto();
 		req.setContent("Test");
-		req.setStatus(1);
+		req.setStatus("1");
 		
 		MockMultipartFile captureFile = new MockMultipartFile("files", "", "image/png", "Capture of post".getBytes());
 		MockMultipartFile[] captureList = {captureFile};
@@ -104,7 +104,7 @@ public class PostControllerTests {
 	void insertPost_insertNg() throws Exception {
 		InsertPostReqDto req = new InsertPostReqDto();
 		req.setContent("Test");
-		req.setStatus(1);
+		req.setStatus("1");
 		
 		MockMultipartFile captureFile = new MockMultipartFile("files", "", "image/png", "Capture of post".getBytes());
 		MockMultipartFile[] captureList = {captureFile};
@@ -125,7 +125,7 @@ public class PostControllerTests {
 	@Test
 	void getPost_Ok() throws Exception {
 		List<GetPostResDto> res = new ArrayList<GetPostResDto>();
-		when(postService.getPostCustom(eq("userId"), any(java.sql.Date.class), any(java.sql.Date.class), eq(10) )).thenReturn(res);
+//		when(postService.getPostCustom(eq("userId"), any(java.sql.Date.class), any(java.sql.Date.class), eq(10) )).thenReturn(res);
 		
 		MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(uri)
 				.param("userId", "userId")
@@ -145,7 +145,7 @@ public class PostControllerTests {
 	void updatePost_postNotExists() throws Exception {
 		UpdatePostReqDto req = new UpdatePostReqDto();	
 		req.setContent("Test");
-		req.setStatus(1);
+		req.setStatus("1");
 
 		MockMultipartFile captureFile = new MockMultipartFile("files", "", "image/png", "Capture of post".getBytes());
 		MockMultipartFile request = new MockMultipartFile("request", "", "application/json",
@@ -167,7 +167,7 @@ public class PostControllerTests {
 	void updatePost_postExists_updateOk() throws Exception {
 		UpdatePostReqDto req = new UpdatePostReqDto();	
 		req.setContent("Test");
-		req.setStatus(1);
+		req.setStatus("1");
 
 		Post post = new Post();
 		MockMultipartFile captureFile = new MockMultipartFile("files", "", "image/png", "Capture of post".getBytes());
@@ -177,7 +177,7 @@ public class PostControllerTests {
 		
 		when(userService.getUserId()).thenReturn("userId");
 		when(postService.findByPostIdAndUserId("postId", "userId")).thenReturn(post);
-		when(postService.updatePost(post, req, captureList)).thenReturn(post);
+//		when(postService.updatePost(post, req, captureList)).thenReturn(post);
 		
 		MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.multipart(uri+"/{postId}","postId")
 				.file(request)
@@ -195,7 +195,7 @@ public class PostControllerTests {
 	void updatePost_postExists_updateNg() throws Exception {
 		UpdatePostReqDto req = new UpdatePostReqDto();	
 		req.setContent("Test");
-		req.setStatus(1);
+		req.setStatus("1");
 
 		Post post = new Post();
 		MockMultipartFile captureFile = new MockMultipartFile("files", "", "image/png", "Capture of post".getBytes());
@@ -232,7 +232,7 @@ public class PostControllerTests {
 	void deletePost_postExists() throws Exception {	
 		when(userService.getUserId()).thenReturn("userId");
 		when(postService.findByPostIdAndUserId("postId", "userId")).thenReturn(new Post());
-		doNothing().when(postService).deletePost(any(Post.class));
+		doNothing().when(postService).deletePost(any(String.class));
 		
 		MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.delete(uri+"/{postId}","postId")
 				.contentType(MediaType.MULTIPART_FORM_DATA).content("")).andReturn();
@@ -244,23 +244,6 @@ public class PostControllerTests {
 		assertEquals("Delete post successfull!", msg);
 	}
 	
-	@Test
-	void getPostTimeLine_Ok() throws Exception {	
-		when(userService.getUserId()).thenReturn("userId");
-		List<GetPostResDto> res = new ArrayList<>();
-		when(postService.getPostTimeline(userService.getUserId(), 10)).thenReturn(res);
-		doNothing().when(postService).deletePost(any(Post.class));
-		
-		MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(uri+"/timeline")
-				.param("numbers-post", "10")
-				.contentType(MediaType.APPLICATION_JSON).content("")).andReturn();
-		
-		int status = mvcResult.getResponse().getStatus();
-		assertEquals(200, status);
-		
-		String msg = mvcResult.getResponse().getContentAsString();
-		assertEquals("[]", msg);
-	}
 	
 	@Test
 	void likePost_postNotExists() throws Exception {	

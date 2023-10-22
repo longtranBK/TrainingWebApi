@@ -6,7 +6,6 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.example.demo.dto.response.CommentCustomResDto;
 import com.example.demo.entity.Comment;
@@ -22,9 +21,9 @@ public interface CommentRepository extends JpaRepository<Comment, String> {
 			+ " FROM comment WHERE post_id = ?1 ORDER BY createTs DESC", nativeQuery = true)
 	List<CommentCustomResDto> findByPostIdCustom(String postId);
 	
-	@Transactional
 	@Modifying
-	void deleteByPostId(String postId);
+	@Query("update comments c set c.delFlg = ?2 where c.postId= ?1")
+	void updateDelFlg(String postId, boolean delFlg);
 	
 	Comment findByCommentIdAndUserId(String commentId, String userId);
 	

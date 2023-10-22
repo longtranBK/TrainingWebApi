@@ -2,13 +2,12 @@ package com.example.demo.service;
 
 import java.text.ParseException;
 
-import org.springframework.web.multipart.MultipartFile;
-
 import com.example.demo.dto.request.SignupReqDto;
 import com.example.demo.dto.request.UpdateUserInforReqDto;
 import com.example.demo.dto.response.UserInforResDto;
 import com.example.demo.entity.User;
 import com.example.demo.entity.UserFriend;
+import com.example.demo.entity.UserInfor;
 
 public interface UserService {
 
@@ -42,20 +41,27 @@ public interface UserService {
 	 * Get user infor
 	 * 
 	 * @param userId
+	 * @param userIdFriend
 	 * @return UserInforResDto
 	 */
-	UserInforResDto getUserInfor(String userId);
+	UserInforResDto getUserInfor(String userId, String userIdFriend);
+	
+	/**
+	 * Get user infor me
+	 * 
+	 * @param userId
+	 * @return UserInforResDto
+	 */
+	UserInforResDto getUserInforMe(String userId);
 	
 	/**
 	 * Update user infor
 	 * 
-	 * @param user
 	 * @param request
-	 * @param avatarFile
 	 * @return User if update success
 	 * @throws ParseException  if parse date fail
 	 */
-	User updateUserInfor(User user, UpdateUserInforReqDto request, MultipartFile avatarFile) throws ParseException;
+	UserInfor updateUserInfor(UpdateUserInforReqDto request) throws ParseException;
 	
 	/**
 	 * Get user by username
@@ -114,5 +120,14 @@ public interface UserService {
 	 * @return User
 	 */
 	User findByUsernameAndToken(String username, String token);
+	
+	/**
+	 * Update password of me
+	 * 
+	 * @param currentPassword
+	 * @param newPassword
+	 * @return User if update success
+	 */
+	User updatePassword(String currentPassword, String newPassword);
 	
 }

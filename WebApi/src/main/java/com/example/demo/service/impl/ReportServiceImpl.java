@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.poi.ss.usermodel.Cell;
@@ -38,12 +39,12 @@ public class ReportServiceImpl implements ReportService {
 	private PostLikeRepository postLikeRepository;
 
 	@Override
-	public ByteArrayInputStream loadData(String userId, Date startDate, Date endDate, int numbersPost) {
+	public ByteArrayInputStream loadData(String userId, Date startDate, Date endDate) {
 		try {
 			String sheetName = "ConsumptionInfor";
 			String[] headers = { "Post numbers", "New friend numbers", "Like numbers", "Comment numbers"};
 
-			List<Post> postList = postRepository.getPostsCustom(userId, startDate, endDate, numbersPost);
+			List<Post> postList = new ArrayList<>();
 			List<String> userIdFriendList = userFriendRepository.getUserIdFriendList(userId, startDate, endDate);
 			int likeNumbers = postLikeRepository.countLike(userId, startDate, endDate);
 			List<Comment> commentList = commentRepository.getCommentList(userId, startDate, endDate);

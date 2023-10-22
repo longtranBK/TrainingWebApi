@@ -13,15 +13,13 @@ public class GetPostResDto {
 	
 	private String content;
 	
-	private int status;
+	private int countLikes;
 	
 	private Timestamp createTs;
 	
 	private Timestamp updateTs;
 	
 	private List<String> captureUrlList = new ArrayList<>();
-	
-	private List<String> userIdLikeList = new ArrayList<>();
 	
 	private List<CommentCustomResDto> commentList = new ArrayList<>();
 }

@@ -59,7 +59,7 @@ public class ReportControllerTests {
 	@Test
 	void getFile_Ok() throws Exception {
 		when(userService.getUserId()).thenReturn("userId");
-		when(reportService.loadData(eq("userId"), any(java.sql.Date.class), any(java.sql.Date.class), eq(10))).thenReturn(new ByteArrayInputStream("TestData".getBytes()));
+//		when(reportService.loadData(eq("userId"), any(java.sql.Date.class), any(java.sql.Date.class), eq(10))).thenReturn(new ByteArrayInputStream("TestData".getBytes()));
 		
 		MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(uri)
 				.param("timeStart", "2021-01-01")

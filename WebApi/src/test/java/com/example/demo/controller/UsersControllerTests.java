@@ -73,7 +73,7 @@ public class UsersControllerTests {
 	void getUserDetails_userExists() throws Exception {
 		
 		when(userService.getByUserId("userId")).thenReturn(new User());
-		when(userService.getUserInfor("userId")).thenReturn(any());
+//		when(userService.getUserInfor("userId")).thenReturn(any());
 		MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(uri+"/user-details/{userId}", "userId")
 				.contentType(MediaType.APPLICATION_JSON).content("")).andReturn();
 		
@@ -85,7 +85,7 @@ public class UsersControllerTests {
 	void updateUserInfor_updateOk() throws Exception {
 		UpdateUserInforReqDto req = new UpdateUserInforReqDto();
 		req.setFullName("test");
-		req.setSex(0);
+		req.setSex("0");
 		req.setFavorites("test");
 		req.setStudyAt("test");
 		req.setWorkingAt("test");
@@ -95,7 +95,7 @@ public class UsersControllerTests {
 		User user = new User();
 		when(userService.getUserId()).thenReturn("userId");
 		when(userService.getByUserId("userId")).thenReturn(user);
-		when(userService.updateUserInfor(any(User.class), any(UpdateUserInforReqDto.class), any(MockMultipartFile.class) )).thenReturn(user);
+//		when(userService.updateUserInfor(any(User.class), any(UpdateUserInforReqDto.class), any(MockMultipartFile.class) )).thenReturn(user);
 		
 		MockMultipartFile captureFile = new MockMultipartFile("file", "", "image/png", "Capture of post".getBytes());
 		MockMultipartFile request = new MockMultipartFile("request", "", "application/json",
@@ -118,7 +118,7 @@ public class UsersControllerTests {
 	void updateUserInfor_updateNg() throws Exception {
 		UpdateUserInforReqDto req = new UpdateUserInforReqDto();
 		req.setFullName("test");
-		req.setSex(0);
+		req.setSex("0");
 		req.setFavorites("test");
 		req.setStudyAt("test");
 		req.setWorkingAt("test");
@@ -128,7 +128,7 @@ public class UsersControllerTests {
 		User user = new User();
 		when(userService.getUserId()).thenReturn("userId");
 		when(userService.getByUserId("userId")).thenReturn(user);
-		when(userService.updateUserInfor(any(User.class), any(UpdateUserInforReqDto.class), any(MockMultipartFile.class) )).thenReturn(null);
+//		when(userService.updateUserInfor(any(User.class), any(UpdateUserInforReqDto.class), any(MockMultipartFile.class) )).thenReturn(null);
 		
 		MockMultipartFile captureFile = new MockMultipartFile("file", "", "image/png", "Capture of post".getBytes());
 		MockMultipartFile request = new MockMultipartFile("request", "", "application/json",

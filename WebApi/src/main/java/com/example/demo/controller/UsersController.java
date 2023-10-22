@@ -11,20 +11,19 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.example.demo.constant.Constants;
 import com.example.demo.dto.request.ResetPasswordReqDto;
+import com.example.demo.dto.request.UpdatePasswordReqDto;
 import com.example.demo.dto.request.UpdateUserInforReqDto;
 import com.example.demo.dto.response.GetUserTimelineResDto;
 import com.example.demo.dto.response.UserInforResDto;
 import com.example.demo.entity.User;
+import com.example.demo.entity.UserInfor;
 import com.example.demo.service.UserService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,86 +32,66 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "User", description = "API thao tác với user")
 @Validated
 @RestController
-@RequestMapping("api/users")
+@RequestMapping("api/user-infor")
 public class UsersController {
 
 	@Autowired
 	private UserService userService;
 
-	@Operation(summary = "Get user-details with userid")
-	@GetMapping(value = "/user-details/{userId}")
+	@Operation(summary = "Get user information of friend with userIdFriend")
+	@GetMapping(value = "/{userId}")
 	@Secured(Constants.ROLE_USER_NAME)
-	public ResponseEntity<?> getUserDetails(
+	public ResponseEntity<?> getUserInfor(
 			@PathVariable(value = "userId", required = true) @Size(max = 36) String userId) {
 
 		User user = userService.getByUserId(userId);
 		if (user == null) {
 			return ResponseEntity.ok().body("User not found!");
 		}
-		UserInforResDto infor = userService.getUserInfor(user.getUserId());
+		UserInforResDto infor = userService.getUserInfor(user.getUserId(), userId);
 
+		if (infor == null) {
+			return ResponseEntity.ok().body("User is not friend!");
+		}
+		
+		return ResponseEntity.ok().body(infor);
+	}
+	
+	@Operation(summary = "Get user information of me")
+	@GetMapping(value = "/me")
+	@Secured(Constants.ROLE_USER_NAME)
+	public ResponseEntity<?> getUserCurrentInfor() {
+		String userId = userService.getUserId();
+		UserInforResDto infor = userService.getUserInforMe(userId);		
 		return ResponseEntity.ok().body(infor);
 	}
 
-	@Operation(summary = "Update infor user")
-	@PostMapping(value = { "/user-details" }, consumes = "multipart/form-data")
+	@Operation(summary = "Update infor of me")
+	@PutMapping(value = { "/me" })
 	@Secured(Constants.ROLE_USER_NAME)
-	public ResponseEntity<?> updateUserInfor(
-			@Valid @RequestPart(value = "request", required = true) UpdateUserInforReqDto request,
-			@RequestPart(value = "file", required = false) MultipartFile avatarFile) throws ParseException {
+	public ResponseEntity<?> updateUserCurrentInfor(
+			@Valid @RequestBody(required = true) UpdateUserInforReqDto request) throws ParseException {
 
-		User user = userService.getByUserId(userService.getUserId());
-		if (userService.updateUserInfor(user, request, avatarFile) != null) {
-			return ResponseEntity.ok().body("User details updated!");
+		UserInfor infor = userService.updateUserInfor(request);
+		if (infor != null) {
+			return ResponseEntity.ok().body(infor);
 		} else {
 			return ResponseEntity.internalServerError().body("User details error!");
 		}
 	}
-
-	@Operation(summary = "Get infor timeline with userid")
-	@GetMapping(value = "/timeline/{userId}")
+	
+	@Operation(summary = "Update password of me")
+	@PutMapping(value = { "/me/password" })
 	@Secured(Constants.ROLE_USER_NAME)
-	public ResponseEntity<?> getUserTimeline(
-			@PathVariable(value = "userId", required = true) @Size(max = 36) String userId) {
+	public ResponseEntity<?> updatePassword(
+			@Valid @RequestBody(required = true) UpdatePasswordReqDto request) throws ParseException {
 
-		User user = userService.getByUserId(userId);
-		if (user == null) {
-			return ResponseEntity.ok().body("User not found!");
-		}
-		GetUserTimelineResDto response = new GetUserTimelineResDto();
-		response.setUserId(userId);
-//		response.setFullName(user.getFullName());
-//		response.setAvatarUrl(user.getAvatarUrl());
-
-		return ResponseEntity.ok().body(response);
-	}
-
-	@Operation(summary = "Get infor timeline of current user")
-	@GetMapping(value = "/timeline/user-current")
-	@Secured(Constants.ROLE_USER_NAME)
-	public ResponseEntity<GetUserTimelineResDto> getCurrentUserTimeline() {
-
-		User user = userService.getByUserId(userService.getUserId());
-
-		GetUserTimelineResDto response = new GetUserTimelineResDto();
-		response.setUserId(user.getUserId());
-//		response.setFullName(user.getFullName());
-//		response.setAvatarUrl(user.getAvatarUrl());
-
-		return ResponseEntity.ok().body(response);
-	}
-
-	@Operation(summary = "Reset and set new password")
-	@PutMapping(value = { "/reset-password" })
-	@Secured(Constants.ROLE_USER_NAME)
-	public ResponseEntity<?> resetPassword(
-			@Valid @RequestBody(required = true) ResetPasswordReqDto request) {
-		
-		User user = userService.getByUserId(userService.getUserId());
-		if (userService.setNewPws(user, request.getNewPassword()) != null) {
-			return ResponseEntity.ok().body("Password update succcessful!");
+		User user = userService.updatePassword(request.getCurrentPassword(), request.getNewPassword());
+		if (user != null) {
+			return ResponseEntity.ok().body("Update password successful!");
 		} else {
-			return ResponseEntity.internalServerError().body("Password update error!");
+			return ResponseEntity.internalServerError().body("Current password is incorrect!");
 		}
 	}
+
 }

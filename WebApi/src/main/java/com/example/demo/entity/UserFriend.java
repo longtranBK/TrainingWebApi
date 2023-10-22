@@ -31,9 +31,4 @@ public class UserFriend {
 	@Column(name = "status")
 	private String status;
 	
-	@Column(name = "create_ts", nullable = false)
-	private Timestamp createTs;
-	
-	@Column(name = "update_ts")
-	private Timestamp updateTs;
 }

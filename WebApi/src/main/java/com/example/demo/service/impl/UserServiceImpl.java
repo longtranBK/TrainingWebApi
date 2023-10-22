@@ -13,7 +13,6 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.example.demo.constant.Constants;
 import com.example.demo.constant.RoleEnum;
@@ -28,14 +27,10 @@ import com.example.demo.repository.RoleRepository;
 import com.example.demo.repository.UserFriendRepository;
 import com.example.demo.repository.UserInforRepository;
 import com.example.demo.repository.UserRepository;
-import com.example.demo.service.FileService;
 import com.example.demo.service.UserService;
 
 @Service
 public class UserServiceImpl implements UserService {
-
-	@Autowired
-	private FileService fileService;
 
 	@Autowired
 	private RoleRepository roleRepository;
@@ -65,7 +60,6 @@ public class UserServiceImpl implements UserService {
 	@Override
 	@Transactional(rollbackOn = { Exception.class, Throwable.class })
 	public User saveUser(SignupReqDto request) throws ParseException {
-		Timestamp createTs = new java.sql.Timestamp(System.currentTimeMillis());
 		String uuid = UUID.randomUUID().toString();
 		User user = new User();
 
@@ -77,12 +71,10 @@ public class UserServiceImpl implements UserService {
 		Role role = roleRepository.findByRoleName(RoleEnum.USER.getValue());
 		user.addRole(role);
 
-		user.setCreateTs(createTs);
 		User userSave = userRepository.save(user);
 
 		UserInfor userInfor = new UserInfor();
 		userInfor.setUserId(uuid);
-		userInfor.setCreateTs(createTs);
 
 		if (userSave != null && userInforRepository.save(userInfor)!= null) {
 			return userSave;
@@ -93,46 +85,33 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public User setNewPws(User user, String newPws) {
-		Timestamp updateTs = new java.sql.Timestamp(System.currentTimeMillis());
-		user.setResetPaswordToken(null);
+		user.setResetPasswordToken(null);
 		user.setPassword(passwordEncoder.encode(newPws));
-		user.setUpdateTs(updateTs);
 		return userRepository.save(user);
 	}
 
 	@Override
-	public UserInforResDto getUserInfor(String userId) {
-		return userInforRepository.getUserInfor(userId);
+	public UserInforResDto getUserInfor(String userId, String userIdFriend) {
+		return userInforRepository.getUserInfor(userId, userIdFriend);
 	}
 
 	@Override
-	@Transactional(rollbackOn = { Exception.class, Throwable.class })
-	public User updateUserInfor(User user, UpdateUserInforReqDto request, MultipartFile avatarFile)
+	public UserInfor updateUserInfor(UpdateUserInforReqDto request)
 			throws ParseException {
-		Timestamp upadteTs = new java.sql.Timestamp(System.currentTimeMillis());
-//		user.setFullName(request.getFullName());
-//		user.setAvatarUrl(fileService.save(avatarFile, user.getUserId() + "/"));
-		user.setUpdateTs(upadteTs);
-		User userSave = userRepository.save(user);
-
-		UserInfor userInfor = userInforRepository.findUserInforById(user.getUserId());
-		userInfor.setSex(request.getSex());
-		userInfor.setStudyAt(request.getStudyAt());
-		userInfor.setWorkingAt(request.getWorkingAt());
-		userInfor.setFavorites(request.getFavorites());
-		userInfor.setOtherInfor(request.getOtherInfor());
-		if (request.getDateOfBirth() != null) {
-			SimpleDateFormat format = new SimpleDateFormat(Constants.DATE_FORMAT);
-			Date parsed = format.parse(request.getDateOfBirth());
-			userInfor.setDateOfBirth(new java.sql.Date(parsed.getTime()));
-		}
-		userInfor.setUpdateTs(upadteTs);
-
-		if (userSave != null && userInforRepository.save(userInfor) != null) {
-			return userSave;
-		}
+		String userId = getUserId();		
+		UserInfor infor = userInforRepository.findByUserId(userId);
+		infor.setFullName(request.getFullName());
+		infor.setSex(request.getSex());
+		infor.setStudyAt(request.getStudyAt());
+		infor.setWorkingAt(request.getWorkingAt());
+		infor.setFavorites(request.getFavorites());
+		infor.setOtherInfor(request.getOtherInfor());
+		SimpleDateFormat format = new SimpleDateFormat(Constants.DATE_FORMAT);
+		Date parsed = format.parse(request.getDateOfBirth());
+		infor.setDateOfBirth(new java.sql.Date(parsed.getTime()));
+		infor.setAvatarUrl(request.getAvatarUrl());
 		
-		return null;
+		return userInforRepository.save(infor);
 	}
 
 	@Override
@@ -142,13 +121,9 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public UserFriend addFriend(String userId1, String userId2) {
-
-		Timestamp createTs = new java.sql.Timestamp(System.currentTimeMillis());
 		UserFriend userFriend = new UserFriend();
 		userFriend.setUser1(userId1);
 		userFriend.setUser2(userId2);
-		userFriend.setCreateTs(createTs);
-
 		return userFriendRepository.save(userFriend);
 	}
 
@@ -175,6 +150,23 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public User findByUsernameAndToken(String username, String token) {
 		return userRepository.findByUsernameAndResetPasswordToken(username, token);
+	}
+
+	@Override
+	public UserInforResDto getUserInforMe(String userId) {
+		return userInforRepository.getUserInforMe(userId);
+	}
+
+	@Override
+	public User updatePassword(String currentPassword, String newPassword) {
+		String userId = getUserId();
+		User user = userRepository.findByUserIdAndPassword(userId, passwordEncoder.encode(currentPassword));
+		if (user == null) {
+			return null;
+		}
+		user.setPassword(passwordEncoder.encode(newPassword));
+		userRepository.save(user);
+		return userRepository.save(user);
 	}
 
 }

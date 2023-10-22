@@ -2,13 +2,13 @@ package com.example.demo.dto.response;
 
 public interface UserInforResDto {
 
-	String getId();
-
 	String getFullname();
 
 	String getAvatarUrl();
 
-	int getSex();
+	String getSex();
+	
+	String setSex(String sex);
 
 	String getStudyAt();
 

@@ -31,7 +31,7 @@ public class UserInfor {
 	private int isActive;
 	
 	@Column(name = "sex")
-	private int sex;
+	private String sex;
 	
 	@Column(name = "study_at")
 	private String studyAt;
@@ -47,11 +47,5 @@ public class UserInfor {
 	
 	@Column(name = "date_of_birth")
 	private Date dateOfBirth;
-	
-	@Column(name = "create_ts")
-    private Timestamp createTs;
-	
-	@Column(name = "update_ts")
-    private Timestamp updateTs;
 	
 }

@@ -9,6 +9,8 @@ public interface UserRepository extends JpaRepository<User, String>{
 
 	User findByUserId(String userId);
 	
+	User findByUserIdAndPassword(String userId, String password);
+	
 	User findByUsername(String username);
     
 	@Query(value = "SELECT is_active FROM user_infor WHERE id = (SELECT id FROM users WHERE username = ?1)", nativeQuery = true)
