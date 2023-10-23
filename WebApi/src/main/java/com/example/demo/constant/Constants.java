@@ -23,5 +23,7 @@ public class Constants {
 	// Role name user
 	public static final String ROLE_USER_NAME = "ROLE_USER";
 	
+	public static final int ACTIVE_USER = 1;
+	
 	public static final String DATE_FORMAT = "yyyy-MM-dd";
 }

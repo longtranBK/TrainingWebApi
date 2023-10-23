@@ -26,7 +26,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "Report", description = "API thao tác với report")
 @Validated
 @RestController
-@RequestMapping("/v1/report")
+@RequestMapping("/v1")
 public class ReportController {
 	
 	@Autowired
@@ -36,7 +36,7 @@ public class ReportController {
 	private UserService userService;
 	
 	@Operation(summary = "Download report")
-	@GetMapping("/download")
+	@GetMapping("/download-report")
 	@Secured(Constants.ROLE_USER_NAME)
 	public ResponseEntity<Resource> getFile(
 			@RequestParam(value = "timeStart", required = true) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) java.util.Date timeStart,

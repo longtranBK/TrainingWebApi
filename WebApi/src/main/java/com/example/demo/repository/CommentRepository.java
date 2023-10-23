@@ -32,4 +32,8 @@ public interface CommentRepository extends JpaRepository<Comment, String> {
 			+ " WHERE user_id = ?1 AND delFlg = false AND create_ts >= ?2 AND create_ts <= ?3"
 			+ " ORDER BY create_ts DESC", nativeQuery = true)
 	List<Comment> getCommentList(String userId, Date startDate, Date endDate);
+	
+	@Query(value = "SELECT count(user_id) FROM comments"
+			+ " WHERE user_id = ?1 AND create_ts >= ?2 AND create_ts <= ?3", nativeQuery = true)
+	int countCommentWithTime(String userId, Date startDate, Date endDate);
 }

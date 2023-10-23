@@ -52,21 +52,12 @@ public interface PostRepository extends JpaRepository<Post, String>{
 	@Query("update posts p set p.delFlg = ?2 where p.id = ?1")
 	void updateDelFlg(String postId, boolean delFlg);
 	
-	@Query(value = "SELECT *"
+	@Query(value = "SELECT count(1)"
 			+ " FROM posts"
 			+ " WHERE"
-			+ "    user_id in (SELECT ?1 as userId"
-			+ "			            UNION"
-			+ "                SELECT user2 as userId"
-			+ "			       FROM user_friend uf1"
-			+ "			       WHERE uf1.user1 = ?1"
-			+ "			       UNION"
-			+ "			       SELECT user1 as userId"
-			+ "			       FROM user_friend uf2"
-			+ "			        WHERE uf2.user2 = ?1)"
-			+ "    AND delFlg = false"
-			+ "    AND id = ?2"			
-			+ "    LIMIT ?4,?3", nativeQuery = true)
-	Post findPost(String userId, String postId, int limit, int offset);
-	
+			+ "    user_id = ?1"
+			+ "    AND create_ts >= ?2"
+			+ "    AND create_ts <= ?3"
+			+ "    AND delFlg = false", nativeQuery = true)
+	int countPostWithTime(String userId, Date startDate, Date endDate);
 }

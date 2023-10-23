@@ -4,8 +4,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.sql.Date;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -15,8 +13,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.example.demo.entity.Comment;
-import com.example.demo.entity.Post;
+import com.example.demo.repository.CommentLikeRepository;
 import com.example.demo.repository.CommentRepository;
 import com.example.demo.repository.PostLikeRepository;
 import com.example.demo.repository.PostRepository;
@@ -30,24 +27,28 @@ public class ReportServiceImpl implements ReportService {
 	private CommentRepository commentRepository;
 
 	@Autowired
+	private PostRepository postRepository;
+
+	@Autowired
 	private UserFriendRepository userFriendRepository;
 
 	@Autowired
-	private PostRepository postRepository;
-	
-	@Autowired
 	private PostLikeRepository postLikeRepository;
+
+	@Autowired
+	private CommentLikeRepository commentLikeRepository;
 
 	@Override
 	public ByteArrayInputStream loadData(String userId, Date startDate, Date endDate) {
 		try {
 			String sheetName = "ConsumptionInfor";
-			String[] headers = { "Post numbers", "New friend numbers", "Like numbers", "Comment numbers"};
+			String[] headers = { "Post numbers", "New friend numbers", "Like numbers", "Comment numbers" };
 
-			List<Post> postList = new ArrayList<>();
-			List<String> userIdFriendList = userFriendRepository.getUserIdFriendList(userId, startDate, endDate);
-			int likeNumbers = postLikeRepository.countLike(userId, startDate, endDate);
-			List<Comment> commentList = commentRepository.getCommentList(userId, startDate, endDate);
+			int postNumbers = postRepository.countPostWithTime(userId, startDate, endDate);
+			int newFriendNumbers = userFriendRepository.countNewFriendWithTime(userId, startDate, endDate);
+			int likeNumbers = postLikeRepository.countLikeWithTime(userId, startDate, endDate)
+					+ commentLikeRepository.countLikeWithTime(userId, startDate, endDate);
+			int commentNumbers = commentRepository.countCommentWithTime(userId, startDate, endDate);
 
 			Workbook workbook = new XSSFWorkbook();
 			Sheet sheet = workbook.createSheet(sheetName);
@@ -60,14 +61,14 @@ public class ReportServiceImpl implements ReportService {
 			}
 
 			Row row = sheet.createRow(1);
-			row.createCell(0).setCellValue(postList.size());
-			row.createCell(1).setCellValue(userIdFriendList.size());
+			row.createCell(0).setCellValue(postNumbers);
+			row.createCell(1).setCellValue(newFriendNumbers);
 			row.createCell(2).setCellValue(likeNumbers);
-			row.createCell(3).setCellValue(commentList.size());
+			row.createCell(3).setCellValue(commentNumbers);
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
 			workbook.write(out);
 			workbook.close();
-			
+
 			return new ByteArrayInputStream(out.toByteArray());
 		} catch (IOException e) {
 			throw new RuntimeException("Fail to import data to Excel file: " + e.getMessage());

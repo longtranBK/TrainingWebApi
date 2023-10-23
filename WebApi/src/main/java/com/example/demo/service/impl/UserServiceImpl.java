@@ -75,6 +75,7 @@ public class UserServiceImpl implements UserService {
 
 		UserInfor userInfor = new UserInfor();
 		userInfor.setUserId(uuid);
+		userInfor.setIsActive(Constants.ACTIVE_USER);
 
 		if (userSave != null && userInforRepository.save(userInfor)!= null) {
 			return userSave;

@@ -92,7 +92,7 @@ public class AuthController {
 			jwtToken = jwtUtils.generateJwtToken(username);
 			
 			ValidateOtpResDto response = new ValidateOtpResDto();
-			response.setUserId(userService.getUserId());
+			response.setUserId(userService.findByUsername(username).getUserId());
 			response.setToken(prefixAuthen + jwtToken);
 			response.setMsg("Token is created!");
 			return ResponseEntity.ok().body(response);

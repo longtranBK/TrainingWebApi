@@ -1,5 +1,7 @@
 package com.example.demo.service.impl;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -8,7 +10,11 @@ import java.util.UUID;
 
 import javax.transaction.Transactional;
 
+import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,13 +31,19 @@ import com.example.demo.repository.CommentRepository;
 import com.example.demo.repository.PostImageRepository;
 import com.example.demo.repository.PostLikeRepository;
 import com.example.demo.repository.PostRepository;
+import com.example.demo.security.jwt.AuthEntryPointJwt;
 import com.example.demo.service.FileService;
 import com.example.demo.service.PostService;
 import com.example.demo.service.UserService;
 
 @Service
 public class PostServiceImpl implements PostService {
+	
+	@Value("${upload.path}")
+	private String uploadPath;
 
+	private static final Logger logger = LoggerFactory.getLogger(AuthEntryPointJwt.class);
+	
 	@Autowired
 	private FileService fileService;
 	
@@ -101,9 +113,13 @@ public class PostServiceImpl implements PostService {
 
 	@Override
 	@Transactional(rollbackOn = { Exception.class, Throwable.class })
-	public void deletePost(String postId) {
+	public void deletePost(String postId) throws IOException {
 		// Delete table post
 		postRepository.updateDelFlg(postId, true);
+		
+		// Delete url post image
+		postImageRepository.deleteImageUrl(postId);
+		FileUtils.deleteDirectory(new File(uploadPath + "/" +userService.getUserId() + "/" + postId));
 		
 		// Delete table comment
 		commentRepository.updateDelFlg(postId, true);
@@ -119,10 +135,14 @@ public class PostServiceImpl implements PostService {
 	private List<PostImage> savePostImageList(String postId, MultipartFile[] imageList, String path) {
 		List<PostImage> postImageList = new ArrayList<>();
 		if (imageList.length > 0) {
-//			postImageRepository.deleteByPostId(postId);
+			postImageRepository.deleteImageUrl(postId);
 			Arrays.asList(imageList).stream().forEach(file -> {
 				PostImage image = new PostImage();
-				image.setImageUrl(fileService.save(file, path));
+				try {
+					image.setImageUrl(fileService.saveOneFile(file, path));
+				} catch (IOException e) {
+					logger.error(e.getMessage());
+				}
 				image.setPostId(postId);
 				postImageList.add(image);
 			});
@@ -177,7 +197,7 @@ public class PostServiceImpl implements PostService {
 
 	@Override
 	public GetPostResDto getPost(String postId, int limitComment, int offsetComment) {
-		Post post = postRepository.findPost(userService.getUserId(), postId, limitComment, offsetComment);
+		Post post = postRepository.findByPostIdOfmeOrFriend(userService.getUserId(), postId);
 		if (post == null) {
 			return null;
 		}

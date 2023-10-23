@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
@@ -87,7 +88,7 @@ public class PostController {
 	@DeleteMapping(value = "/{postId}")
 	@Secured(Constants.ROLE_USER_NAME)
 	public ResponseEntity<?> deletePost(
-			@PathVariable(value = "postId", required = true) @Size(max = 36) String postId) {
+			@PathVariable(value = "postId", required = true) @Size(max = 36) String postId) throws IOException {
 
 		Post post = postService.findByPostIdAndUserId(postId, userService.getUserId());
 		if (post == null) {

@@ -55,4 +55,8 @@ public interface UserFriendRepository  extends JpaRepository<UserFriend, String>
 			+ " WHERE ((user1 = ?1 AND user2 = ?2)"
 			+ " OR (user2 = ?1 AND user1 = ?2)) AND status = '0'", nativeQuery = true)
 	int cancelRequestFriend(String userId1, String userId2);
+	
+	@Query(value = "SELECT count(1) FROM user_friend"
+			+ " WHERE (user1 =?1 or user2 = ?1) AND status = '1' AND create_ts >= ?2 AND create_ts <= ?3", nativeQuery = true)
+	int countNewFriendWithTime(String userId, Date startDate, Date endDate);
 }

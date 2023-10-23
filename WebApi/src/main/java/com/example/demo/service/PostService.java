@@ -1,6 +1,6 @@
 package com.example.demo.service;
 
-
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
@@ -13,7 +13,7 @@ import com.example.demo.dto.response.PostUpdateResDto;
 import com.example.demo.entity.Post;
 
 public interface PostService {
-	
+
 	/**
 	 * Find post
 	 * 
@@ -21,7 +21,7 @@ public interface PostService {
 	 * @return post
 	 */
 	Post findByPostId(String postId);
-	
+
 	/**
 	 * Find post
 	 * 
@@ -29,7 +29,7 @@ public interface PostService {
 	 * @return post
 	 */
 	Post findByPostIdAndUserId(String postId, String userId);
-	
+
 	/**
 	 * Insert new post
 	 * 
@@ -39,7 +39,7 @@ public interface PostService {
 	 * @return Post if insert success
 	 */
 	Post insertPost(InsertPostReqDto request, MultipartFile[] imageList, String userId);
-	
+
 	/**
 	 * Get all post of me and friend
 	 * 
@@ -51,8 +51,9 @@ public interface PostService {
 	 * @param offsetComment
 	 * @return GetPostResDto list
 	 */
-	List<GetPostResDto> getAllPost(Date startDate, Date endDate, int limitPost, int offsetPost, int limitComment, int offsetComment);
-	
+	List<GetPostResDto> getAllPost(Date startDate, Date endDate, int limitPost, int offsetPost, int limitComment,
+			int offsetComment);
+
 	/**
 	 * Update post
 	 * 
@@ -62,13 +63,13 @@ public interface PostService {
 	 * @return PostUpdateResDto if update success
 	 */
 	PostUpdateResDto updatePost(Post post, UpdatePostReqDto request, MultipartFile[] avatarList);
-	
+
 	/**
 	 * Delete post
 	 * 
 	 * @param postId
 	 */
-	void deletePost(String postId);
+	void deletePost(String postId) throws IOException;
 
 	/**
 	 * Get post of me or friend
@@ -79,5 +80,5 @@ public interface PostService {
 	 * @return GetPostResDto list
 	 */
 	GetPostResDto getPost(String postId, int limitComment, int offsetComment);
-	
+
 }
