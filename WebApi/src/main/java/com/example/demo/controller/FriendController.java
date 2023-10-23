@@ -4,7 +4,6 @@ import javax.validation.constraints.Size;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,7 +12,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.demo.constant.Constants;
 import com.example.demo.service.UserService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -30,7 +28,6 @@ public class FriendController {
 
 	@Operation(summary = "Send request friend")
 	@PostMapping(value = "/request-friend/{userIdFriend}")
-	@Secured(Constants.ROLE_USER_NAME)
 	public ResponseEntity<?> addFriend(
 			@PathVariable(required = true) @Size(max = 36) String userIdFriend) {
 		String userIdCurrent = userService.getUserId();
@@ -59,7 +56,6 @@ public class FriendController {
 
 	@Operation(summary = "Cancel request friend")
 	@DeleteMapping(value = "/request-friend/{userIdFriend}")
-	@Secured(Constants.ROLE_USER_NAME)
 	public ResponseEntity<?> cancelRequestFriend(
 			@PathVariable(required = true) @Size(max = 36) String userIdFriend) {
 		
@@ -81,7 +77,6 @@ public class FriendController {
 	
 	@Operation(summary = "Access request friend")
 	@PutMapping(value = "/request-friend/{userIdFriend}")
-	@Secured(Constants.ROLE_USER_NAME)
 	public ResponseEntity<?> acceptFriend(
 			@PathVariable(required = true) @Size(max = 36) String userIdFriend) {
 		
@@ -111,7 +106,6 @@ public class FriendController {
 	
 	@Operation(summary = "Unfriend")
 	@DeleteMapping(value = "/friends/{userIdFriend}")
-	@Secured(Constants.ROLE_USER_NAME)
 	public ResponseEntity<?> unFriend(
 			@PathVariable(required = true) @Size(max = 36) String userIdFriend) {
 		

@@ -5,7 +5,6 @@ import javax.validation.constraints.Size;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.demo.constant.Constants;
 import com.example.demo.dto.request.InsertCommentReqDto;
 import com.example.demo.dto.request.UpdateCommentReqDto;
 import com.example.demo.entity.Comment;
@@ -44,7 +42,6 @@ public class CommentController {
 
 	@Operation(summary = "Comment to post")
 	@PostMapping
-	@Secured(Constants.ROLE_USER_NAME)
 	public ResponseEntity<?> insertComment(
 			@Valid @RequestBody(required = true) InsertCommentReqDto request) {
 
@@ -61,7 +58,6 @@ public class CommentController {
 
 	@Operation(summary = "Edit comment in post")
 	@PutMapping(value = "/{commentId}")
-	@Secured(Constants.ROLE_USER_NAME)
 	public ResponseEntity<?> updateComment(
 			@PathVariable(required = true) @Size(max = 36) String commentId,
 			@Valid @RequestBody(required = true) UpdateCommentReqDto request) {
@@ -81,7 +77,6 @@ public class CommentController {
 
 	@Operation(summary = "Delete comment in post")
 	@DeleteMapping(value = "/{commentId}")
-	@Secured(Constants.ROLE_USER_NAME)
 	public ResponseEntity<?> deleteComment(
 			@PathVariable(required = true) @Size(max = 36) String commentId) {
 

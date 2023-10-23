@@ -19,10 +19,10 @@ public interface UserInforRepository extends JpaRepository<UserInfor, String>{
 			+ "  ui.favorites AS favorites,"
 			+ "  ui.other_infor As otherInfor,"
 			+ "  ui.date_of_birth AS dateOfBirth"
-			+ "FROM"
+			+ " FROM"
 			+ "  users u INNER JOIN user_infor ui ON u.id = ui.id"
 			+ "  LEFT JOIN avatar_image ai ON u.id = ai.user_id"
-			+ "WHERE"
+			+ " WHERE"
 			+ "  u.id = ?2"
 			+ "  AND u.id in (SELECT user2 as userId"
 			+ "            FROM user_friend uf1"
@@ -34,6 +34,7 @@ public interface UserInforRepository extends JpaRepository<UserInfor, String>{
 	UserInforResDto getUserInfor(String userId, String userIdFriend);
 	
 	@Query(value = "SELECT"
+			+ "  u.id AS userId,"			
 			+ "  ui.full_name AS fullName,"
 			+ "  ai.image_url AS avatarUrl,"
 			+ "  ui.sex AS sex,"
@@ -42,10 +43,10 @@ public interface UserInforRepository extends JpaRepository<UserInfor, String>{
 			+ "  ui.favorites AS favorites,"
 			+ "  ui.other_infor As otherInfor,"
 			+ "  ui.date_of_birth AS dateOfBirth"
-			+ "FROM"
+			+ " FROM"
 			+ "  users u INNER JOIN user_infor ui ON u.id = ui.id"
 			+ "  LEFT JOIN avatar_image ai ON u.id = ai.user_id"
-			+ "WHERE"
+			+ " WHERE"
 			+ "  u.id = ?1", nativeQuery = true)
 	UserInforResDto getUserInforMe(String userId);
 }

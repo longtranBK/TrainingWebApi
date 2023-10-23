@@ -4,14 +4,12 @@ import javax.validation.constraints.Size;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.demo.constant.Constants;
 import com.example.demo.entity.Comment;
 import com.example.demo.entity.Post;
 import com.example.demo.service.CommentService;
@@ -42,7 +40,6 @@ public class ReactionController {
 	
 	@Operation(summary = "Reaction post")
 	@PutMapping(value = "/reaction-post/{postId}")
-	@Secured(Constants.ROLE_USER_NAME)
 	public ResponseEntity<?> reactionPost(
 			@PathVariable(value = "postId", required = true) @Size(max = 36) String postId) {
 		String userId = userService.getUserId();
@@ -56,7 +53,6 @@ public class ReactionController {
 
 	@Operation(summary = "Reaction post")
 	@PutMapping(value = "/reaction-comment/{commentId}")
-	@Secured(Constants.ROLE_USER_NAME)
 	public ResponseEntity<?> reactionComment(
 			@PathVariable(value = "commentId", required = true) @Size(max = 36) String commentId) {
 		String userId = userService.getUserId();

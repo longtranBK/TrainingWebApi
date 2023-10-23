@@ -1,6 +1,8 @@
 package com.example.demo.dto.response;
 
 public interface UserInforResDto {
+	
+	String getUserId();
 
 	String getFullname();
 
@@ -8,7 +10,7 @@ public interface UserInforResDto {
 
 	String getSex();
 	
-	String setSex(String sex);
+	void setSex(String sex);
 
 	String getStudyAt();
 

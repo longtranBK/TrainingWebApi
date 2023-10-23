@@ -7,7 +7,6 @@ import javax.validation.constraints.Size;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,11 +15,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.demo.constant.Constants;
-import com.example.demo.dto.request.ResetPasswordReqDto;
 import com.example.demo.dto.request.UpdatePasswordReqDto;
 import com.example.demo.dto.request.UpdateUserInforReqDto;
-import com.example.demo.dto.response.GetUserTimelineResDto;
 import com.example.demo.dto.response.UserInforResDto;
 import com.example.demo.entity.User;
 import com.example.demo.entity.UserInfor;
@@ -40,15 +36,20 @@ public class UsersController {
 
 	@Operation(summary = "Get user information of friend with userIdFriend")
 	@GetMapping(value = "/{userId}")
-	@Secured(Constants.ROLE_USER_NAME)
 	public ResponseEntity<?> getUserInfor(
 			@PathVariable(value = "userId", required = true) @Size(max = 36) String userId) {
 
+		String userIdCurrent = userService.getUserId();
 		User user = userService.getByUserId(userId);
 		if (user == null) {
 			return ResponseEntity.ok().body("User not found!");
 		}
-		UserInforResDto infor = userService.getUserInfor(user.getUserId(), userId);
+		
+		if (userId.equals(userIdCurrent)) {
+			return ResponseEntity.ok().body("UserId have to not current user!");
+		}
+		
+		UserInforResDto infor = userService.getUserInfor(userIdCurrent, userId);
 
 		if (infor == null) {
 			return ResponseEntity.ok().body("User is not friend!");
@@ -59,7 +60,6 @@ public class UsersController {
 	
 	@Operation(summary = "Get user information of me")
 	@GetMapping(value = "/me")
-	@Secured(Constants.ROLE_USER_NAME)
 	public ResponseEntity<?> getUserCurrentInfor() {
 		String userId = userService.getUserId();
 		UserInforResDto infor = userService.getUserInforMe(userId);		
@@ -68,7 +68,6 @@ public class UsersController {
 
 	@Operation(summary = "Update infor of me")
 	@PutMapping(value = { "/me" })
-	@Secured(Constants.ROLE_USER_NAME)
 	public ResponseEntity<?> updateUserCurrentInfor(
 			@Valid @RequestBody(required = true) UpdateUserInforReqDto request) throws ParseException {
 
@@ -82,7 +81,6 @@ public class UsersController {
 	
 	@Operation(summary = "Update password of me")
 	@PutMapping(value = { "/me/password" })
-	@Secured(Constants.ROLE_USER_NAME)
 	public ResponseEntity<?> updatePassword(
 			@Valid @RequestBody(required = true) UpdatePasswordReqDto request) throws ParseException {
 

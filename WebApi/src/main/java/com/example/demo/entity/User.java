@@ -1,6 +1,5 @@
 package com.example.demo.entity;
 
-import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.Set;
 
