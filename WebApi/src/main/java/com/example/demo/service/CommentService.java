@@ -1,6 +1,9 @@
 package com.example.demo.service;
 
+import java.util.List;
+
 import com.example.demo.dto.request.InsertCommentReqDto;
+import com.example.demo.dto.response.CommentCustomResDto;
 import com.example.demo.entity.Comment;
 
 public interface CommentService {
@@ -37,4 +40,13 @@ public interface CommentService {
 	 * @param commentId
 	 */
 	void deleteComment(String commentId);
+	
+	/**
+	 * 
+	 * @param postId
+	 * @param limit
+	 * @param offset
+	 * @return
+	 */
+	List<CommentCustomResDto> getCommentOfPost(String postId, int limit, int offset);
 }

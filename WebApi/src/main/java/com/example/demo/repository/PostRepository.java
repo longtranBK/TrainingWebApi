@@ -25,7 +25,7 @@ public interface PostRepository extends JpaRepository<Post, String>{
 			+ "			        WHERE uf2.user2 = ?1)"
 			+ "    AND create_ts >= ?2"
 			+ "    AND create_ts <= ?3"
-			+ "    AND delFlg = false"
+			+ "    AND del_flg = false"
 			+ "    ORDER BY create_ts DESC"
 			+ "    LIMIT ?5,?4", nativeQuery = true)
 	List<Post> getAllPosts(String userId, Date startDate, Date endDate, int limit, int offset);
@@ -44,7 +44,7 @@ public interface PostRepository extends JpaRepository<Post, String>{
 			+ "			       SELECT user1 as userId"
 			+ "			       FROM user_friend uf2"
 			+ "			        WHERE uf2.user2 = ?1)"
-			+ "    AND delFlg = false"
+			+ "    AND del_flg = false"
 			+ "    AND id = ?2", nativeQuery = true)
 	Post findByPostIdOfmeOrFriend(String userId, String postId);
 	
@@ -58,6 +58,6 @@ public interface PostRepository extends JpaRepository<Post, String>{
 			+ "    user_id = ?1"
 			+ "    AND create_ts >= ?2"
 			+ "    AND create_ts <= ?3"
-			+ "    AND delFlg = false", nativeQuery = true)
+			+ "    AND del_flg = false", nativeQuery = true)
 	int countPostWithTime(String userId, Date startDate, Date endDate);
 }

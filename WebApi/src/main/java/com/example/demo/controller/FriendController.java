@@ -48,9 +48,9 @@ public class FriendController {
 		}
 
 		if (userService.sentRequestFriend(userIdFriend, userIdCurrent) != null) {
-			return ResponseEntity.ok().body("Add friend successful!");
+			return ResponseEntity.ok().body("Sent request successful!");
 		} else {
-			return ResponseEntity.internalServerError().body("Add friend error!");
+			return ResponseEntity.internalServerError().body("Sent request error!");
 		}
 	}
 

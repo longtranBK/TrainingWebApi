@@ -47,12 +47,9 @@ public interface PostService {
 	 * @param endDate
 	 * @param limitPost
 	 * @param offsetPost
-	 * @param limitComment
-	 * @param offsetComment
 	 * @return GetPostResDto list
 	 */
-	List<GetPostResDto> getAllPost(Date startDate, Date endDate, int limitPost, int offsetPost, int limitComment,
-			int offsetComment);
+	List<GetPostResDto> getAllPost(Date startDate, Date endDate, int limitPost, int offsetPost);
 
 	/**
 	 * Update post
@@ -75,10 +72,8 @@ public interface PostService {
 	 * Get post of me or friend
 	 * 
 	 * @param postId
-	 * @param limitComment
-	 * @param offsetComment
 	 * @return GetPostResDto list
 	 */
-	GetPostResDto getPost(String postId, int limitComment, int offsetComment);
+	GetPostResDto getPost(String postId);
 
 }

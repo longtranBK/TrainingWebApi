@@ -1,11 +1,13 @@
 package com.example.demo.service.impl;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.dto.request.InsertCommentReqDto;
+import com.example.demo.dto.response.CommentCustomResDto;
 import com.example.demo.entity.Comment;
 import com.example.demo.repository.CommentRepository;
 import com.example.demo.service.CommentService;
@@ -46,6 +48,11 @@ public class CommentServiceImpl implements CommentService{
 	@Override
 	public void deleteComment(String commentId) {
 		commentRepository.updateDelFlg(commentId, false);
+	}
+
+	@Override
+	public List<CommentCustomResDto> getCommentOfPost(String postId, int limit, int offset) {
+		return commentRepository.findByPostIdCustom(postId, limit, offset);
 	}
 
 }

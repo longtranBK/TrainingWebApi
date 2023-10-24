@@ -51,7 +51,7 @@ public class ReactionController {
 		return ResponseEntity.ok().body(reactionService.reactionPost(postId));
 	}
 
-	@Operation(summary = "Reaction post")
+	@Operation(summary = "Reaction comment")
 	@PutMapping(value = "/reaction-comment/{commentId}")
 	public ResponseEntity<?> reactionComment(
 			@PathVariable(value = "commentId", required = true) @Size(max = 36) String commentId) {

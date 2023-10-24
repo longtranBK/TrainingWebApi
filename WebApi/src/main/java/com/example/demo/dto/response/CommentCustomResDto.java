@@ -6,9 +6,11 @@ public interface CommentCustomResDto {
 	
 	String getCommentId();
 	
-	String getUserId();
-
+	String getFullName();
+	
 	String getContent();
+	
+	int getCountLikes();
 
 	Timestamp getCreateTs();
 

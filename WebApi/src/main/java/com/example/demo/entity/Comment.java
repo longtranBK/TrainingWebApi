@@ -27,6 +27,6 @@ public class Comment {
 	@Column(name = "content", nullable = false)
 	private String content;
 
-	@Column(name = "delFlg")
+	@Column(name = "del_flg")
 	private boolean delFlg;
 }

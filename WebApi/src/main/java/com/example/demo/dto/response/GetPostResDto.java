@@ -21,6 +21,5 @@ public class GetPostResDto {
 	
 	private List<String> captureUrlList = new ArrayList<>();
 	
-	private List<CommentInfor> commentList = new ArrayList<>();
 }
 

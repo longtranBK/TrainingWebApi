@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -29,6 +30,8 @@ import com.example.demo.dto.request.UpdatePostReqDto;
 import com.example.demo.dto.response.GetPostResDto;
 import com.example.demo.dto.response.PostUpdateResDto;
 import com.example.demo.entity.Post;
+import com.example.demo.entity.PostImage;
+import com.example.demo.service.FileService;
 import com.example.demo.service.PostService;
 import com.example.demo.service.UserService;
 
@@ -38,7 +41,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "Post", description = "API thao tác với post")
 @Validated
 @RestController
-@RequestMapping("/v1/posts/")
+@RequestMapping("/v1/posts")
 public class PostController {
 
 	@Autowired
@@ -47,25 +50,34 @@ public class PostController {
 	@Autowired
 	private PostService postService;
 
+	@Autowired
+	private FileService fileService;
+
 	@Operation(summary = "Insert new post")
 	@PostMapping(consumes = "multipart/form-data")
 	public ResponseEntity<?> insertPost(
 			@Valid @RequestPart(value = "request", required = true) InsertPostReqDto request,
-			@RequestPart(value = "files", required = false)  MultipartFile[] avatarFiles) {
+			@RequestPart(value = "files", required = false) MultipartFile[] avatarFiles) {
+		if (avatarFiles != null) {
+			for (int i = 0; i < avatarFiles.length; i++) {
+				if (!fileService.checkJPEG(avatarFiles[i])) {
+					return ResponseEntity.badRequest().body("Please select file .jpg or .png!");
+				}
+			}
+		}
+
 		if (postService.insertPost(request, avatarFiles, userService.getUserId()) != null) {
 			return ResponseEntity.ok().body("Insert post successful!");
 		} else {
 			return ResponseEntity.internalServerError().body("Insert post error!");
 		}
 	}
-	
+
 	@Operation(summary = "Update post")
 	@PutMapping(value = "/{postId}", consumes = "multipart/form-data")
-	public ResponseEntity<?> updatePost(
-			@PathVariable(value = "postId", required = true) @Size(max = 36) String postId,
-			@Valid @RequestPart(value = "request", required = true) UpdatePostReqDto request, 
-			@RequestPart(value = "files", required = false) MultipartFile[] avatarFiles)
-			throws ParseException {
+	public ResponseEntity<?> updatePost(@PathVariable(value = "postId", required = true) @Size(max = 36) String postId,
+			@Valid @RequestPart(value = "request", required = true) UpdatePostReqDto request,
+			@RequestPart(value = "files", required = false) MultipartFile[] avatarFiles) throws ParseException {
 
 		Post post = postService.findByPostIdAndUserId(postId, userService.getUserId());
 		if (post == null) {
@@ -73,17 +85,17 @@ public class PostController {
 		}
 
 		PostUpdateResDto res = postService.updatePost(post, request, avatarFiles);
-		if(res != null) {
+		if (res != null) {
 			return ResponseEntity.ok().body(res);
 		} else {
 			return ResponseEntity.internalServerError().body("Update post error!");
 		}
 	}
-	
+
 	@Operation(summary = "Delete post")
 	@DeleteMapping(value = "/{postId}")
-	public ResponseEntity<?> deletePost(
-			@PathVariable(value = "postId", required = true) @Size(max = 36) String postId) throws IOException {
+	public ResponseEntity<?> deletePost(@PathVariable(value = "postId", required = true) @Size(max = 36) String postId)
+			throws IOException {
 
 		Post post = postService.findByPostIdAndUserId(postId, userService.getUserId());
 		if (post == null) {
@@ -96,24 +108,20 @@ public class PostController {
 
 	@Operation(summary = "Get all post of me and friend")
 	@GetMapping
-	public @ResponseBody ResponseEntity<List<GetPostResDto>> getAllPost( 
+	public @ResponseBody ResponseEntity<List<GetPostResDto>> getAllPost(
 			@RequestParam(value = "timeStart", required = true) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date timeStart,
 			@RequestParam(value = "timeEnd", required = true) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date timeEnd,
-			@RequestParam(value = "limit-post", required = true) int limitPost,
-			@RequestParam(value = "offset-post", required = true) int offsetPost,
-			@RequestParam(value = "limit-comment", required = true) int limitComment,
-			@RequestParam(value = "offset-comment", required = true) int offsetComment) {
-		List<GetPostResDto> response = postService.getAllPost(timeStart, timeEnd, limitPost, offsetPost, limitComment, offsetComment);
+			@RequestParam(value = "limit", required = true) int limit,
+			@RequestParam(value = "offset", required = true) int offset) {
+		List<GetPostResDto> response = postService.getAllPost(timeStart, timeEnd, limit, offset);
 		return ResponseEntity.ok().body(response);
 	}
-	
+
 	@Operation(summary = "Get post of me or friend")
 	@GetMapping(value = "/{postId}")
-	public @ResponseBody ResponseEntity<GetPostResDto> getPost( 
-			@PathVariable(value = "postId", required = true) @Size(max = 36) String postId,
-			@RequestParam(value = "limit-comment", required = true) int limitComment,
-			@RequestParam(value = "offset-comment", required = true) int offsetComment) {
-		GetPostResDto response = postService.getPost(postId, limitComment, offsetComment);
+	public @ResponseBody ResponseEntity<GetPostResDto> getPost(
+			@PathVariable(value = "postId", required = true) @Size(max = 36) String postId) {
+		GetPostResDto response = postService.getPost(postId);
 		return ResponseEntity.ok().body(response);
 	}
 

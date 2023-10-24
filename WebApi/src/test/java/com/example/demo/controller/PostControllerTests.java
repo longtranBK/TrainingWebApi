@@ -80,7 +80,6 @@ public class PostControllerTests {
 	void insertPost_insertOk() throws Exception {
 		InsertPostReqDto req = new InsertPostReqDto();
 		req.setContent("Test");
-		req.setStatus("1");
 		
 		MockMultipartFile captureFile = new MockMultipartFile("files", "", "image/png", "Capture of post".getBytes());
 		MockMultipartFile[] captureList = {captureFile};
@@ -104,7 +103,6 @@ public class PostControllerTests {
 	void insertPost_insertNg() throws Exception {
 		InsertPostReqDto req = new InsertPostReqDto();
 		req.setContent("Test");
-		req.setStatus("1");
 		
 		MockMultipartFile captureFile = new MockMultipartFile("files", "", "image/png", "Capture of post".getBytes());
 		MockMultipartFile[] captureList = {captureFile};
@@ -145,7 +143,6 @@ public class PostControllerTests {
 	void updatePost_postNotExists() throws Exception {
 		UpdatePostReqDto req = new UpdatePostReqDto();	
 		req.setContent("Test");
-		req.setStatus("1");
 
 		MockMultipartFile captureFile = new MockMultipartFile("files", "", "image/png", "Capture of post".getBytes());
 		MockMultipartFile request = new MockMultipartFile("request", "", "application/json",
@@ -167,7 +164,6 @@ public class PostControllerTests {
 	void updatePost_postExists_updateOk() throws Exception {
 		UpdatePostReqDto req = new UpdatePostReqDto();	
 		req.setContent("Test");
-		req.setStatus("1");
 
 		Post post = new Post();
 		MockMultipartFile captureFile = new MockMultipartFile("files", "", "image/png", "Capture of post".getBytes());
@@ -195,7 +191,6 @@ public class PostControllerTests {
 	void updatePost_postExists_updateNg() throws Exception {
 		UpdatePostReqDto req = new UpdatePostReqDto();	
 		req.setContent("Test");
-		req.setStatus("1");
 
 		Post post = new Post();
 		MockMultipartFile captureFile = new MockMultipartFile("files", "", "image/png", "Capture of post".getBytes());

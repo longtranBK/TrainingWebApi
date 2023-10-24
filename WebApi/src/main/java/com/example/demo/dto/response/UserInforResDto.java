@@ -10,8 +10,6 @@ public interface UserInforResDto {
 
 	String getSex();
 	
-	void setSex(String sex);
-
 	String getStudyAt();
 
 	String getWorkingAt();

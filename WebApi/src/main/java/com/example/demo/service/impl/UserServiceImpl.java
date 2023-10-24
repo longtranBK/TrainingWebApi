@@ -8,6 +8,10 @@ import java.util.UUID;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,10 +23,12 @@ import com.example.demo.constant.StatusFriendEnum;
 import com.example.demo.dto.request.SignupReqDto;
 import com.example.demo.dto.request.UpdateUserInforReqDto;
 import com.example.demo.dto.response.UserInforResDto;
+import com.example.demo.entity.AvatarImage;
 import com.example.demo.entity.Role;
 import com.example.demo.entity.User;
 import com.example.demo.entity.UserFriend;
 import com.example.demo.entity.UserInfor;
+import com.example.demo.repository.AvatarImageRepository;
 import com.example.demo.repository.RoleRepository;
 import com.example.demo.repository.UserFriendRepository;
 import com.example.demo.repository.UserInforRepository;
@@ -47,6 +53,12 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	private UserFriendRepository userFriendRepository;
 
+	@Autowired
+	private AuthenticationManager authenticationManager;
+	
+	@Autowired
+	private AvatarImageRepository avatarImageRepository;
+	
 	@Override
 	public User getByUserId(String userId) {
 		return userRepository.findByUserId(userId);
@@ -77,7 +89,7 @@ public class UserServiceImpl implements UserService {
 		userInfor.setUserId(uuid);
 		userInfor.setIsActive(Constants.ACTIVE_USER);
 
-		if (userSave != null && userInforRepository.save(userInfor)!= null) {
+		if (userSave != null && userInforRepository.save(userInfor) != null) {
 			return userSave;
 		}
 		return null;
@@ -97,9 +109,9 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public UserInfor updateUserInfor(UpdateUserInforReqDto request)
-			throws ParseException {
-		String userId = getUserId();		
+	@Transactional(rollbackOn = { Exception.class, Throwable.class })
+	public UserInfor updateUserInfor(UpdateUserInforReqDto request) throws ParseException {
+		String userId = getUserId();
 		UserInfor infor = userInforRepository.findByUserId(userId);
 		infor.setFullName(request.getFullName());
 		infor.setSex(request.getSex());
@@ -111,6 +123,12 @@ public class UserServiceImpl implements UserService {
 		Date parsed = format.parse(request.getDateOfBirth());
 		infor.setDateOfBirth(new java.sql.Date(parsed.getTime()));
 		infor.setAvatarUrl(request.getAvatarUrl());
+		
+		AvatarImage avatar = new AvatarImage();
+		avatar.setUserId(userId);
+		avatar.setImageUrl(request.getAvatarUrl());
+		avatarImageRepository.save(avatar);
+		infor.setAvatarUrl(avatar.getImageUrl());
 		
 		return userInforRepository.save(infor);
 	}
@@ -161,11 +179,16 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public User updatePassword(String currentPassword, String newPassword) {
-		String userId = getUserId();
-		User user = userRepository.findByUserIdAndPassword(userId, passwordEncoder.encode(currentPassword));
-		if (user == null) {
+		SecurityContext securityContext = SecurityContextHolder.getContext();
+		String username = securityContext.getAuthentication().getName();
+		try {
+			Authentication authentication = authenticationManager
+					.authenticate(new UsernamePasswordAuthenticationToken(username, currentPassword));
+		} catch (BadCredentialsException e) {
 			return null;
 		}
+		User user = userRepository.findByUsername(username);
+
 		user.setPassword(passwordEncoder.encode(newPassword));
 		userRepository.save(user);
 		return userRepository.save(user);

@@ -20,13 +20,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.example.demo.dto.request.InsertPostReqDto;
 import com.example.demo.dto.request.UpdatePostReqDto;
-import com.example.demo.dto.response.CommentCustomResDto;
-import com.example.demo.dto.response.CommentInfor;
 import com.example.demo.dto.response.GetPostResDto;
 import com.example.demo.dto.response.PostUpdateResDto;
 import com.example.demo.entity.Post;
 import com.example.demo.entity.PostImage;
-import com.example.demo.repository.CommentLikeRepository;
 import com.example.demo.repository.CommentRepository;
 import com.example.demo.repository.PostImageRepository;
 import com.example.demo.repository.PostLikeRepository;
@@ -58,10 +55,6 @@ public class PostServiceImpl implements PostService {
 
 	@Autowired
 	private PostLikeRepository postLikeRepository;
-	
-	@Autowired
-	private CommentLikeRepository commentLikeRepository;
-
 
 	@Autowired
 	private CommentRepository commentRepository;
@@ -157,7 +150,7 @@ public class PostServiceImpl implements PostService {
 
 	@Override
 	public List<GetPostResDto> getAllPost(Date startDate, Date endDate, int limitPost,
-			int offsetPost, int limitComment, int offsetComment) {
+			int offsetPost) {
 		List<GetPostResDto> response = new ArrayList<>();
 		String userId = userService.getUserId();
 		java.sql.Date start = new java.sql.Date(startDate.getTime());
@@ -171,32 +164,18 @@ public class PostServiceImpl implements PostService {
 			GetPostResDto postData = new GetPostResDto();
 			postData.setPostId(post.getPostId());
 			postData.setContent(post.getContent());
-
+			postData.setCreateTs(post.getCreateTs());
+			postData.setUpdateTs(post.getUpdateTs());
 			List<String> captureUrlList = postImageRepository.findByPostId(post.getPostId());
 			postData.setCaptureUrlList(captureUrlList);
-
 			postData.setCountLikes(postLikeRepository.countTotalLike(post.getPostId()));
-
-			List<CommentCustomResDto> commentListCus = commentRepository.findByPostIdCustom(post.getPostId(), limitComment, offsetComment);
-			
-			List<CommentInfor> listCommentView = new ArrayList<>();
-			commentListCus.forEach(comment -> {
-				CommentInfor cmt = new CommentInfor();
-				cmt.setCommentId(comment.getCommentId());
-				cmt.setContent(comment.getContent());
-				cmt.setCreateTs(comment.getCreateTs());
-				cmt.setUpdateTs(comment.getUpdateTs());
-				cmt.setCountLike(commentLikeRepository.countLike(comment.getCommentId()));
-				listCommentView.add(cmt);
-			});
-			postData.setCommentList(listCommentView);
 			response.add(postData);
 		});
 		return response;
 	}
 
 	@Override
-	public GetPostResDto getPost(String postId, int limitComment, int offsetComment) {
+	public GetPostResDto getPost(String postId) {
 		Post post = postRepository.findByPostIdOfmeOrFriend(userService.getUserId(), postId);
 		if (post == null) {
 			return null;
@@ -205,22 +184,11 @@ public class PostServiceImpl implements PostService {
 		
 		postData.setPostId(post.getPostId());
 		postData.setContent(post.getContent());
+		postData.setCreateTs(post.getCreateTs());
+		postData.setUpdateTs(post.getUpdateTs());
 		List<String> captureUrlList = postImageRepository.findByPostId(post.getPostId());
 		postData.setCaptureUrlList(captureUrlList);
 		postData.setCountLikes(postLikeRepository.countTotalLike(post.getPostId()));
-		List<CommentCustomResDto> commentListCus = commentRepository.findByPostIdCustom(post.getPostId(), limitComment, offsetComment);
-		
-		List<CommentInfor> listCommentView = new ArrayList<>();
-		commentListCus.forEach(comment -> {
-			CommentInfor cmt = new CommentInfor();
-			cmt.setCommentId(comment.getCommentId());
-			cmt.setContent(comment.getContent());
-			cmt.setCreateTs(comment.getCreateTs());
-			cmt.setUpdateTs(comment.getUpdateTs());
-			cmt.setCountLike(commentLikeRepository.countLike(comment.getCommentId()));
-			listCommentView.add(cmt);
-		});
-		postData.setCommentList(listCommentView);
 		
 		return postData;
 	}

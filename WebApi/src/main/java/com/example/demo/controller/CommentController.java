@@ -7,15 +7,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dto.request.InsertCommentReqDto;
 import com.example.demo.dto.request.UpdateCommentReqDto;
+import com.example.demo.dto.response.GetPostResDto;
 import com.example.demo.entity.Comment;
 import com.example.demo.entity.Post;
 import com.example.demo.service.CommentService;
@@ -86,5 +90,19 @@ public class CommentController {
 		}
 		commentService.deleteComment(commentId);
 		return ResponseEntity.ok().body("Delete comment successful!");
+	}
+	
+	@Operation(summary = "Get comment of post")
+	@GetMapping
+	public @ResponseBody ResponseEntity<?> getPost( 
+			@RequestParam(value = "postId", required = true) @Size(max = 36) String postId,
+			@RequestParam(value = "limit", required = true) int limit,
+			@RequestParam(value = "offset", required = true) int offset) {
+		Post post = postService.findByPostId(postId);
+		if (post == null) {
+			return ResponseEntity.ok().body("Post not found!");
+		}
+		
+		return ResponseEntity.ok().body(commentService.getCommentOfPost(postId, limit, offset));
 	}
 }

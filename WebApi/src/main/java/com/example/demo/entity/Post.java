@@ -1,5 +1,7 @@
 package com.example.demo.entity;
 
+import java.sql.Timestamp;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -24,7 +26,12 @@ public class Post {
 	@Column(name = "content")
 	private String content;
 	
-	@Column(name = "delFlg")
+	@Column(name = "del_flg")
 	private boolean delFlg;
+	
+	@Column(name = "create_ts")
+	private Timestamp createTs;
 
+	@Column(name = "update_ts")
+	private Timestamp updateTs;
 }

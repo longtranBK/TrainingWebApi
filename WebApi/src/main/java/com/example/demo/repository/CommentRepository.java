@@ -13,13 +13,17 @@ import com.example.demo.entity.Comment;
 public interface CommentRepository extends JpaRepository<Comment, String> {
 
 	@Query(value = "SELECT"
-			+ " comment_id AS commentId,"
-			+ " user_id AS userId,"
-			+ " content,"
-			+ " create_ts AS createTs,"
-			+ " update_ts AS updateTs"
-			+ " FROM comments WHERE post_id = ?1 AND delFlg = false ORDER BY createTs DESC"
-			+ " LIMIT ?4,?3", nativeQuery = true)
+			+ " c.id AS commentId,"
+			+ " ui.full_name AS fullName,"
+			+ " c.content,"
+			+ " (SELECT count(1) FROM comment_likes cl inner join comments cs on cs.id = cl.comment_id"
+			+ "	WHERE cs.id = c.id and cs.del_flg = false) as countLikes,"
+			+ " c.create_ts AS createTs,"
+			+ " c.update_ts AS updateTs"
+			+ " FROM comments c "
+			+ " INNER JOIN user_infor ui on c.user_id = ui.id"
+			+ " WHERE c.post_id = ?1 AND c.del_flg = false ORDER BY createTs DESC"
+			+ " LIMIT ?3,?2", nativeQuery = true)
 	List<CommentCustomResDto> findByPostIdCustom(String postId, int limit, int offset);
 	
 	@Modifying
@@ -27,11 +31,6 @@ public interface CommentRepository extends JpaRepository<Comment, String> {
 	void updateDelFlg(String postId, boolean delFlg);
 	
 	Comment findByCommentIdAndUserIdAndDelFlg(String commentId, String userId, boolean delFlg);
-	
-	@Query(value = "SELECT * FROM comment"
-			+ " WHERE user_id = ?1 AND delFlg = false AND create_ts >= ?2 AND create_ts <= ?3"
-			+ " ORDER BY create_ts DESC", nativeQuery = true)
-	List<Comment> getCommentList(String userId, Date startDate, Date endDate);
 	
 	@Query(value = "SELECT count(user_id) FROM comments"
 			+ " WHERE user_id = ?1 AND create_ts >= ?2 AND create_ts <= ?3", nativeQuery = true)

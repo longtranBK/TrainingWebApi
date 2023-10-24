@@ -3,6 +3,8 @@ package com.example.demo.repository;
 import java.sql.Date;
 import java.util.List;
 
+import javax.transaction.Transactional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -23,6 +25,7 @@ public interface UserFriendRepository  extends JpaRepository<UserFriend, String>
 	boolean isFriend(String userId1, String userId2);
 	
 	@Modifying
+	@Transactional
 	@Query(value = "DELETE"
 			+ " FROM user_friend"
 			+ " WHERE (user1 = ?1 AND user2 = ?2)"

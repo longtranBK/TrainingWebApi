@@ -50,7 +50,7 @@ public interface UserService {
 	 * Get user infor me
 	 * 
 	 * @param userId
-	 * @return UserInforResDto
+	 * @return GetUserInforResDto
 	 */
 	UserInforResDto getUserInforMe(String userId);
 	

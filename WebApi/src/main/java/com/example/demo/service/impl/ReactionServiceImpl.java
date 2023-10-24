@@ -1,5 +1,6 @@
 package com.example.demo.service.impl;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.entity.CommentLike;
@@ -12,10 +13,13 @@ import com.example.demo.service.UserService;
 @Service
 public class ReactionServiceImpl implements ReactionService {
 
+	@Autowired
 	private PostLikeRepository postLikeRepository;
 
+	@Autowired
 	private CommentLikeRepository commentLikeRepository;
 
+	@Autowired
 	private UserService userService;
 
 	@Override

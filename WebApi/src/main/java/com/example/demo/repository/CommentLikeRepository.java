@@ -10,7 +10,7 @@ import com.example.demo.entity.CommentLike;
 public interface CommentLikeRepository  extends JpaRepository<CommentLike, String> {
 	
 	@Query(value = "SELECT count(1) FROM comment_likes cl inner join comments c on c.id = cl.comment_id"
-			+ " WHERE c.id = ?1 and c.delFlg = false;", nativeQuery = true)
+			+ " WHERE c.id = ?1 and c.del_flg = false;", nativeQuery = true)
 	int countLike(String commentId);
 	
 	@Query(value = "SELECT"

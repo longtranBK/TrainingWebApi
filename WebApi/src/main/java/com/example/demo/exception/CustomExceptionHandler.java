@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 /**
  * Handle exception
@@ -57,6 +58,7 @@ public class CustomExceptionHandler {
 		responseBody.put("status", HttpStatus.BAD_REQUEST);
 
 	    List<String> errors = new ArrayList<>();
+	    
 	    for (FieldError error : ex.getBindingResult().getFieldErrors()) {
 	        errors.add(error.getField() + ": " + error.getDefaultMessage());
 	    }
@@ -71,7 +73,12 @@ public class CustomExceptionHandler {
     @ExceptionHandler ({ConstraintViolationException.class})
     protected ResponseEntity<Object> handleConstraintViolationException(
             ConstraintViolationException e) {
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(e.getMessage(), new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
-
+    
+    @ExceptionHandler ({MaxUploadSizeExceededException.class})
+    protected ResponseEntity<Object> handleMaxUploadSizeException(
+    		MaxUploadSizeExceededException e) {
+    	 return new ResponseEntity<>(e.getMessage(), new HttpHeaders(), HttpStatus.BAD_REQUEST);
+    }
 }
