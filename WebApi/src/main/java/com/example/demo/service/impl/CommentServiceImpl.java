@@ -47,7 +47,7 @@ public class CommentServiceImpl implements CommentService{
 
 	@Override
 	public void deleteComment(String commentId) {
-		commentRepository.updateDelFlg(commentId, false);
+		commentRepository.updateDelFlg(commentId, true);
 	}
 
 	@Override

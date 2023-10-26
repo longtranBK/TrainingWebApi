@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 import java.text.ParseException;
+import java.util.List;
 
 import com.example.demo.dto.request.SignupReqDto;
 import com.example.demo.dto.request.UpdateUserInforReqDto;
@@ -18,7 +19,7 @@ public interface UserService {
 	 * @return User
 	 */
 	User getByUserId(String userId);
-	
+
 	/**
 	 * Save user
 	 * 
@@ -27,7 +28,7 @@ public interface UserService {
 	 * @throws ParseException if parse date fail
 	 */
 	User saveUser(SignupReqDto req) throws ParseException;
-	
+
 	/**
 	 * Update new password user
 	 * 
@@ -36,7 +37,7 @@ public interface UserService {
 	 * @return User if update success
 	 */
 	User setNewPws(User user, String newPws);
-	
+
 	/**
 	 * Get user infor
 	 * 
@@ -45,7 +46,7 @@ public interface UserService {
 	 * @return UserInforResDto
 	 */
 	UserInforResDto getUserInfor(String userId, String userIdFriend);
-	
+
 	/**
 	 * Get user infor me
 	 * 
@@ -53,16 +54,16 @@ public interface UserService {
 	 * @return GetUserInforResDto
 	 */
 	UserInforResDto getUserInforMe(String userId);
-	
+
 	/**
 	 * Update user infor
 	 * 
 	 * @param request
 	 * @return User if update success
-	 * @throws ParseException  if parse date fail
+	 * @throws ParseException if parse date fail
 	 */
 	UserInfor updateUserInfor(UpdateUserInforReqDto request) throws ParseException;
-	
+
 	/**
 	 * Get user by username
 	 * 
@@ -70,7 +71,7 @@ public interface UserService {
 	 * @return User
 	 */
 	User findByUsername(String username);
-	
+
 	/**
 	 * Check friend of two user
 	 * 
@@ -79,7 +80,7 @@ public interface UserService {
 	 * @return true if had friend
 	 */
 	boolean isFriend(String userId1, String userId2);
-	
+
 	/**
 	 * Send request friend
 	 * 
@@ -88,7 +89,7 @@ public interface UserService {
 	 * @return UserFriend if add friend success
 	 */
 	UserFriend sentRequestFriend(String userId1, String userId2);
-	
+
 	/**
 	 * Unfriend
 	 * 
@@ -96,22 +97,22 @@ public interface UserService {
 	 * @param userId2
 	 */
 	void unFriend(String userId1, String userId2);
-	
+
 	/**
 	 * Get user id of login user
 	 * 
 	 * @return userId
 	 */
 	String getUserId();
-	
+
 	/**
 	 * Find user by username or email
 	 * 
 	 * @param username
 	 * @return User
 	 */
-	User findByUsernameOrEmail(String username, String email);
-	
+	List<User> findByUsernameOrEmail(String username, String email);
+
 	/**
 	 * Find user by username and token
 	 * 
@@ -120,7 +121,7 @@ public interface UserService {
 	 * @return User
 	 */
 	User findByUsernameAndToken(String username, String token);
-	
+
 	/**
 	 * Update password of me
 	 * 
@@ -129,15 +130,15 @@ public interface UserService {
 	 * @return User if update success
 	 */
 	User updatePassword(String currentPassword, String newPassword);
-	
+
 	/**
 	 * 
 	 * @param userCurrentId
 	 * @param userFriendId
 	 * @return
 	 */
-	boolean hasSendRequest(String userCurrentId, String userFriendId);
-	
+	boolean hasSendRequestToU1OrU2(String userCurrentId, String userFriendId);
+
 	/**
 	 * 
 	 * @param userCurrentId
@@ -145,7 +146,7 @@ public interface UserService {
 	 * @return
 	 */
 	int cancelSendRequest(String userCurrentId, String userFriendId);
-	
+
 	/**
 	 * 
 	 * @param userCurrentId
@@ -153,5 +154,21 @@ public interface UserService {
 	 * @return
 	 */
 	UserFriend acceptFriend(String userCurrentId, String userFriendId);
+
+	/**
+	 * 
+	 * @param token
+	 * @param user
+	 * @return
+	 */
+	User updateResetPasswordToken(String token, User user);
+
 	
+	/**
+	 * 
+	 * @param userCurrentId
+	 * @param userFriendId
+	 * @return
+	 */
+	boolean hasReceiveRequestToU2(String userCurrentId, String userFriendId);
 }

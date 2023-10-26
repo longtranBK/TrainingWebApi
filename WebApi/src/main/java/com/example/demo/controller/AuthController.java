@@ -106,7 +106,7 @@ public class AuthController {
 	public ResponseEntity<?> signup(
 			@Valid @RequestBody(required = true) SignupReqDto request) throws ParseException {
 		
-		if (userService.findByUsernameOrEmail(request.getUsername(), request.getEmail()) != null) {
+		if (userService.findByUsernameOrEmail(request.getUsername(), request.getEmail()).size() != 0) {
 			return ResponseEntity.ok().body("Username or email is already taken!");
 		}
 		
@@ -126,11 +126,17 @@ public class AuthController {
 		if (user == null) {
 			return ResponseEntity.ok().body("User not found!");
 		}
-		ForgotPasswordResDto response = new ForgotPasswordResDto();
-		response.setToken(RandomStringUtils.randomAlphabetic(30));
-		response.setMsg("Token forgot password had created!");
 
-		return ResponseEntity.ok().body(response);
+		ForgotPasswordResDto response = new ForgotPasswordResDto();
+		
+		String token = RandomStringUtils.randomAlphabetic(30);
+		if (userService.updateResetPasswordToken(token, user) != null) {
+			response.setToken(token);
+			response.setMsg("Token forgot password had created!");
+			return ResponseEntity.ok().body(response);
+		}
+		return ResponseEntity.internalServerError().body("Error!");
+		
 	}
 	
 	@Operation(summary = "Reset and set new password")

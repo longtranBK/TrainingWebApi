@@ -3,6 +3,8 @@ package com.example.demo.repository;
 import java.sql.Date;
 import java.util.List;
 
+import javax.transaction.Transactional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -27,8 +29,9 @@ public interface CommentRepository extends JpaRepository<Comment, String> {
 	List<CommentCustomResDto> findByPostIdCustom(String postId, int limit, int offset);
 	
 	@Modifying
-	@Query("update comments c set c.delFlg = ?2 where c.postId= ?1")
-	void updateDelFlg(String postId, boolean delFlg);
+	@Transactional
+	@Query("update comments c set c.delFlg = ?2 where c.id= ?1")
+	void updateDelFlg(String commentId, boolean delFlg);
 	
 	Comment findByCommentIdAndUserIdAndDelFlg(String commentId, String userId, boolean delFlg);
 	

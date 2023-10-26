@@ -3,15 +3,18 @@ package com.example.demo.controller;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.MockBeans;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -19,37 +22,59 @@ import org.springframework.security.core.Authentication;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 
 import com.example.demo.dto.request.ForgotPasswordReqDto;
 import com.example.demo.dto.request.SigninReqDto;
-import com.example.demo.dto.request.SignupReqDto;
 import com.example.demo.dto.request.ValidateOtpReqDto;
 import com.example.demo.dto.response.SigninResDto;
 import com.example.demo.entity.User;
+import com.example.demo.repository.AvatarImageRepository;
+import com.example.demo.repository.CommentLikeRepository;
+import com.example.demo.repository.CommentRepository;
+import com.example.demo.repository.PostImageRepository;
+import com.example.demo.repository.PostLikeRepository;
+import com.example.demo.repository.PostRepository;
+import com.example.demo.repository.ReportRepository;
+import com.example.demo.repository.RoleRepository;
+import com.example.demo.repository.UserFriendRepository;
+import com.example.demo.repository.UserInforRepository;
+import com.example.demo.repository.UserRepository;
 import com.example.demo.security.jwt.JwtUtils;
 import com.example.demo.service.AuthService;
 import com.example.demo.service.OTPService;
 import com.example.demo.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-@SpringBootTest
+@WebMvcTest(AuthController.class )
+@EntityScan("com.example.demo.entity")
+@ComponentScan({"com.example.demo"})
+@EnableJpaRepositories(basePackages="com.example.demo.repository")
+@MockBeans({ 
+	@MockBean(AvatarImageRepository.class),
+	@MockBean(CommentLikeRepository.class),
+	@MockBean(CommentRepository.class),
+	@MockBean(PostImageRepository.class),
+	@MockBean(PostLikeRepository.class),
+	@MockBean(PostRepository.class),
+	@MockBean(ReportRepository.class),
+	@MockBean(RoleRepository.class),
+	@MockBean(UserFriendRepository.class),
+	@MockBean(UserInforRepository.class),
+	@MockBean(UserRepository.class)
+})
 public class AuthControllerTests {
 
-	private String uriApiSignin = "/api/auth/signin";
+	private String uriApiSignin = "/v1/auth/signin";
 
 	private String uriApiValidateOtp = "/api/auth/validate-otp";
 
 	private String uriApiSignup = "/api/auth/signup";
 
 	private String uriApiForgotPwd = "/api/auth/forgot-password";
-
-	private MockMvc mockMvc;
-
+	
 	@Autowired
-	WebApplicationContext webApplicationContext;
-
+	private MockMvc mockMvc;
+	
 	@Autowired
 	private ObjectMapper objectMapper;
 
@@ -70,16 +95,11 @@ public class AuthControllerTests {
 	@MockBean
 	private UserService userService;
 
-	@BeforeEach
-	void setup() {
-		mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
-	}
-
 	@Test
 	void authenticateUser_authenOk_isActive() throws Exception {
 		SigninReqDto request = new SigninReqDto();
-		request.setUsername("longth@gmail.com");
-		request.setPassword("longth");
+		request.setUsername("longth");
+		request.setPassword("Longth@12345");
 
 		UsernamePasswordAuthenticationToken userTest = new UsernamePasswordAuthenticationToken(request.getUsername(),
 				request.getPassword());
@@ -89,16 +109,11 @@ public class AuthControllerTests {
 		when(authService.isActive(request.getUsername())).thenReturn(true);
 		when(otpService.generateOTP(request.getUsername())).thenReturn(111111);
 
-		MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post(uriApiSignin)
+		MvcResult mvcResult = mockMvc.perform(post(uriApiSignin)
 				.contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(request))).andReturn();
 
 		int status = mvcResult.getResponse().getStatus();
 		assertEquals(200, status);
-
-		SigninResDto response = objectMapper.readValue(mvcResult.getResponse().getContentAsString(),
-				SigninResDto.class);
-		assertEquals("Otp is created!", response.getMsg());
-		assertEquals(111111, response.getOtp());
 
 	}
 

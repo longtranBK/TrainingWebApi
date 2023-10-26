@@ -50,7 +50,7 @@ public interface UserFriendRepository  extends JpaRepository<UserFriend, String>
 			+ " WHERE ((user1 = ?1 AND user2 = ?2)"
 			+ " OR (user2 = ?1 AND user1 = ?2))"
 			+ " AND status = '0'", nativeQuery = true)
-	boolean hasSendRequestFriend(String userId1, String userId2);
+	boolean hasSendRequestFriendToU1OrU2(String userId1, String userId2);
 	
 	@Modifying
 	@Query(value = "DELETE"
@@ -62,4 +62,16 @@ public interface UserFriendRepository  extends JpaRepository<UserFriend, String>
 	@Query(value = "SELECT count(1) FROM user_friend"
 			+ " WHERE (user1 =?1 or user2 = ?1) AND status = '1' AND create_ts >= ?2 AND create_ts <= ?3", nativeQuery = true)
 	int countNewFriendWithTime(String userId, Date startDate, Date endDate);
+	
+	@Query(value = "SELECT"
+			+ " CASE"
+			+ "    WHEN count(1) = 1 THEN 'true'"
+			+ "    ELSE 'false'"
+			+ " END"
+			+ " FROM user_friend"
+			+ " WHERE user2 = ?1 AND user1 = ?2"
+			+ " AND status = '0'", nativeQuery = true)
+	boolean hasReceiveRequestFriendToU2(String userIdCurrent, String userIdFriend);
+	
+	UserFriend findByUser1AndUser2AndStatus(String user1, String user2, String status);
 }

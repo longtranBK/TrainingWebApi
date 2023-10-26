@@ -39,7 +39,7 @@ public class FriendController {
 			return ResponseEntity.ok().body("User not found!");
 		}
 
-		if (userService.hasSendRequest(userIdCurrent, userIdFriend)) {
+		if (userService.hasSendRequestToU1OrU2(userIdCurrent, userIdFriend)) {
 			return ResponseEntity.ok().body("Request had sent!");
 		}
 
@@ -47,7 +47,7 @@ public class FriendController {
 			return ResponseEntity.ok().body("User was friend!");
 		}
 
-		if (userService.sentRequestFriend(userIdFriend, userIdCurrent) != null) {
+		if (userService.sentRequestFriend(userIdCurrent, userIdFriend) != null) {
 			return ResponseEntity.ok().body("Sent request successful!");
 		} else {
 			return ResponseEntity.internalServerError().body("Sent request error!");
@@ -93,11 +93,11 @@ public class FriendController {
 			return ResponseEntity.ok().body("User was friend!");
 		}
 
-		if (!userService.hasSendRequest(userIdCurrent, userIdFriend)) {
+		if (!userService.hasReceiveRequestToU2(userIdCurrent, userIdFriend)) {
 			return ResponseEntity.ok().body("Request friend not found!");
 		}
 
-		if (userService.acceptFriend(userIdFriend, userIdCurrent) != null) {
+		if (userService.acceptFriend(userIdCurrent, userIdFriend) != null) {
 			return ResponseEntity.ok().body("Accept request success!");
 		} else {
 			return ResponseEntity.ok().body("Accept request error!");

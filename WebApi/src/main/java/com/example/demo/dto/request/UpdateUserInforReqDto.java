@@ -44,7 +44,7 @@ public class UpdateUserInforReqDto {
 	@Pattern(regexp = Constants.DATE_PATTERN, message = "The dateOfBirth is invalid.")
 	private String dateOfBirth;
 	
-	@Schema(type = "string", example = "D:\\uploads\\73b0ed55-5cde-45b8-bcb6-4258870387d2\\avatar.png")
+	@Schema(type = "string", example = "D:/uploads/73b0ed55-5cde-45b8-bcb6-4258870387d2/Untitled.png")
 	@Size(max = 256)
 	private String avatarUrl;
 	

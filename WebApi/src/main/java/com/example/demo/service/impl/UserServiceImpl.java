@@ -3,6 +3,7 @@ package com.example.demo.service.impl;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 import javax.transaction.Transactional;
@@ -163,7 +164,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public User findByUsernameOrEmail(String username, String email) {
+	public List<User> findByUsernameOrEmail(String username, String email) {
 		return userRepository.findByUsernameOrEmail(username, email);
 	}
 
@@ -195,8 +196,8 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public boolean hasSendRequest(String userCurrentId, String userFriendId) {
-		return userFriendRepository.hasSendRequestFriend(userCurrentId, userFriendId);
+	public boolean hasSendRequestToU1OrU2(String userCurrentId, String userFriendId) {
+		return userFriendRepository.hasSendRequestFriendToU1OrU2(userCurrentId, userFriendId);
 	}
 
 	@Override
@@ -206,11 +207,20 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public UserFriend acceptFriend(String userCurrentId, String userFriendId) {
-		UserFriend userFriend = new UserFriend();
-		userFriend.setUser1(userCurrentId);
-		userFriend.setUser2(userFriendId);
+		UserFriend userFriend = userFriendRepository.findByUser1AndUser2AndStatus(userFriendId, userCurrentId, StatusFriendEnum.REQUEST.getValue());
 		userFriend.setStatus(StatusFriendEnum.FRIEND.getValue());
 		return userFriendRepository.save(userFriend);
+	}
+
+	@Override
+	public User updateResetPasswordToken(String token, User user) {
+		user.setResetPasswordToken(token);
+		return userRepository.save(user);
+	}
+
+	@Override
+	public boolean hasReceiveRequestToU2(String userCurrentId, String userFriendId) {
+		return userFriendRepository.hasReceiveRequestFriendToU2(userCurrentId, userFriendId);
 	}
 
 }
